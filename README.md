@@ -1,4 +1,5 @@
 # red-tetris
+42 school [subject](https://cdn.intra.42.fr/pdf/pdf/72691/en.subject.pdf).
 
 In the front-end we must not use classes but we can use any framework. As in the given boilerplate we will use React for the frontend. It must be a single-page-application. We will also use Redux. The frontend must be bundled into an executable that the backend/server will send once to the client.
 
