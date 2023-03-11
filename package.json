@@ -13,6 +13,9 @@
     "coverage": "NODE_ENV=test nyc --include src --all -r text -r lcov -r text --require babel-core/register mocha "
   },
   "dependencies": {
+    "fs": "^0.0.1-security",
+    "n-readlines": "^1.0.1",
+    "pg": "^8.10.0",
     "react": "^15.0.2",
     "react-dom": "^15.0.2",
     "react-redux": "^4.4.5",
