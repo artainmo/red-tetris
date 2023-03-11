@@ -1,0 +1,24 @@
+---------- Database refresh ----------
+---------- Account creation ----------
+New account created named Alfred
+New account created named Conrad
+Logged into account named Alfred
+Player's username is too long
+Player's username contains special characters
+---------- Matchmaking ----------
+Alfred created a joinable game
+No one joined Alfred's game
+No one joined Alfred's game
+No one joined Alfred's game
+Conrad: Conrad joined Alfred's game
+Alfred: Conrad joined Alfred's game
+Conrad created a joinable game
+Alfred: Alfred joined Conrad's game
+No one joined Conrad's game
+Conrad: Alfred joined Conrad's game
+---------- Visualize scores ----------
+Conrad
+Alfred vs Conrad -> 10 - 32
+Conrad vs Alfred -> 44 - 12
+Alfred
+Alfred vs Conrad -> 10 - 32
