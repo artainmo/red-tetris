@@ -35,7 +35,7 @@ async function test() {
 	console.log("---------- Matchmaking ----------")
   let gamePlayer1 = await player.searchGame();
   gamePlayer1.waitForSomeoneToJoin();
-  sleep(6000);
+  sleep(4000);
   let gamePlayer2 = await player2.searchGame();
   sleep(4000);
   gamePlayer2.waitGameStart()
@@ -44,7 +44,7 @@ async function test() {
   console.log("")
 
 	let game2Player2 = await player2.searchGame();
-  await gamePlayer2.start_play();
+  await game2Player2.start_play();
   await game2Player2.finalScore(44);
   sleep(4000);
 	let game2Player1 = await player.searchGame();
@@ -53,10 +53,16 @@ async function test() {
   console.log("")
 
   let game3Player2 = await game2Player2.next_game();
+  game3Player2.waitForSomeoneToJoin();
+  sleep(4000);
   game2Player1 = await player.searchGame();
+  sleep(4000);
+  await game3Player2.start_play();
   game3Player2.waitForSomeoneToQuit();
-  sleep(6000);
-  await game2Player1.quit(player.name)
+  sleep(4000);
+  await game2Player1.quit(player.name);
+  await game3Player2.finalScore(36);
+  await game3Player2.quit(player2.name);
   sleep(4000);
 
 	console.log("---------- Visualize scores ----------")
@@ -87,12 +93,13 @@ async function compare_results() {
 	while ((solutionLine = solutionRL.next())) {
 		answerLine = answerRL.next();
 		if (solutionLine.toString('ascii') === answerLine.toString('ascii')) {
-			console.log('.');
+			process.stdout.write('\x1b[32m . \x1b[0m');
 		} else {
-			console.log('X');
+			process.stdout.write('\x1b[31m X \x1b[0m');
 			failed = true;
 		}
 	}
+	process.stdout.write("\n")
 	if (failed) {
 		console.log('database, player, game: FAILED')
 		process.exit(1);

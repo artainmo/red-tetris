@@ -40,7 +40,7 @@ class Game {
 			this._player2 = quittableGame.rows[0].player2_id;
 			this._player1 = quittableGame.rows[0].player1_id;
 		}
-		console.log(`${this._player1}: ${this._player2} quited ${this.player1}'s game`);
+		console.log(`${this._player1}: Someone quited ${this.player1}'s game`);
 		db.close_connection();
 		return true;
 	}
@@ -104,11 +104,16 @@ class Game {
 			var winner = this._player2;
 			var loser = this._player1;
 		}
-		await db.query("INSERT INTO game (player1_id, player2_id) VALUES ($1, $2)", [winner, loser])
-		const newGame = await db.query("SELECT * FROM game WHERE locked = false AND player1_id = $1 AND player2_id = $2;", [winner, loser])
+		if (loser === null) {
+			await db.query("INSERT INTO game (player1_id) VALUES ($1)", [winner])
+			var newGame = await db.query("SELECT * FROM game WHERE locked = false AND player1_id = $1 AND player2_id IS NULL;", [winner])
+		} else {
+			await db.query("INSERT INTO game (player1_id, player2_id) VALUES ($1, $2)", [winner, loser])
+			var newGame = await db.query("SELECT * FROM game WHERE locked = false AND player1_id = $1 AND player2_id = $2;", [winner, loser])
+		}
 		db.close_connection();
-		console.log(`Next game matchmaking with ${newGame.rows[0]._player1_id} and ${newGame.rows[0]._player2_id}`)
-		return Game(newGame.rows[0].id, newGame.rows[0]._player1_id, newGame.rows[0]._player2_id);
+		console.log(`Next game matchmaking with ${newGame.rows[0].player1_id} and ${newGame.rows[0].player2_id}`)
+		return new Game(newGame.rows[0].id, newGame.rows[0].player1_id, newGame.rows[0].player2_id);
 	}
 
 	async quit(username) {
@@ -132,7 +137,7 @@ class Game {
 			return false;
 		}
 		db.close_connection();
-		console.log(`Someone quited the game. ${this._player1} is left`)
+		console.log(`${username} quited the game. ${this._player1} is left`)
 		return true;
 	}
 

@@ -19,8 +19,28 @@ Alfred started the game
 Game of Alfred and Conrad scored 10 and 32
 
 Conrad created a joinable game
-Game started between Alfred and Conrad
+Game started between Conrad and null
 Game of Conrad and null scored 44 and null
-Alfred: Alfred joined Conrad's game
-Someone quited the game. Conrad is left
+Alfred created a joinable game
+Alfred quited the game. null is left
 
+Next game matchmaking with Conrad and null
+No one joined Conrad's game
+No one joined Conrad's game
+No one joined Conrad's game
+Alfred: Alfred joined Conrad's game
+Conrad: Alfred joined Conrad's game
+Game started between Conrad and Alfred
+No one quited Conrad's game
+No one quited Conrad's game
+Alfred quited the game. Conrad is left
+Conrad: Someone quited Conrad's game
+Game of Conrad and null scored 36 and null
+Conrad quited the game. null is left
+---------- Visualize scores ----------
+Conrad
+Alfred vs Conrad -> 10 - 32
+Conrad vs null -> 44 - null
+
+Alfred
+Alfred vs Conrad -> 10 - 32
