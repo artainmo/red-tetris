@@ -101,10 +101,10 @@ async function compare_results() {
 	}
 	process.stdout.write("\n")
 	if (failed) {
-		console.log('database, player, game: FAILED')
+		console.log('database, player, game: \x1b[31mFAILED\x1b[0m')
 		process.exit(1);
 	} else {
-		console.log('database, player, game: SUCCESS')
+		console.log('database, player, game: \x1b[32mSUCCESS\x1b[0m')
 		process.exit(0);
 	}
 }
