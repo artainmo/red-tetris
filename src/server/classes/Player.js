@@ -50,7 +50,7 @@ class Player {
 	async searchGame() {
 		const game = new Game;
 		const db = new database();
-		const openGames = await db.query("SELECT * FROM game WHERE player2_id IS NULL", []);
+		const openGames = await db.query("SELECT * FROM game WHERE locked = false AND player2_id IS NULL");
 		if (openGames.rows.length !== 0) { //Join existing game
 			await db.query("UPDATE game SET player2_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 			game.id = openGames.rows[0].id
@@ -59,8 +59,7 @@ class Player {
 			console.log(`${this._username}: ${this._username} joined ${game.player1}'s game`)
 		} else { //Create joinable game
 			await db.query("INSERT INTO game (player1_id) VALUES ($1);", [this._username]);
-			const newGame = await db.query("SELECT id FROM game WHERE player1_id = $1 AND player2_id IS NULL;", 
-											[this._username]);
+			const newGame = await db.query("SELECT id FROM game WHERE locked = false AND player1_id = $1 AND player2_id IS NULL;", [this._username]);
 			game.id = newGame.rows[0].id
 			game.player1 = this._username;
 			console.log(`${this._username} created a joinable game`)

@@ -9,5 +9,6 @@ CREATE TABLE game (
 	player1_id varchar(20) REFERENCES account(username) NOT NULL,
 	player2_id varchar(20) REFERENCES account(username) CHECK (player2_id != player1_id) DEFAULT NULL,
 	player1_score INT DEFAULT NULL,
-	player2_score INT DEFAULT NULL
+	player2_score INT DEFAULT NULL,
+	locked boolean DEFAULT false
 );

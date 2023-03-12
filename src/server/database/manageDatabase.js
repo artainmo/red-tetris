@@ -51,21 +51,21 @@ class database {
 		await client.end(); //close connection
 	}
 
-	async query(request, values) {
+	async query(request, values=[]) {
 		return await this._pool.query(request, values);
 	}
 }
 
 if (process.argv.length === 3 && process.argv[2] === "create") {
-	(async () => { 
+	(async () => {
 		db = new database(false);
-		try { await db.createDatabase(); console.log("Database created."); 
+		try { await db.createDatabase(); console.log("Database created.");
 		} catch { console.log("Database already exist."); process.exit(0); }
 	})();
 } else if (process.argv.length === 3 && process.argv[2] === "destroy") {
 	(async () => {
 		db = new database(false);
-		try { await db.destroy_database(); console.log("Database destroyed."); 
+		try { await db.destroy_database(); console.log("Database destroyed.");
 		} catch(e) { console.log("Database already non-existent."); process.exit(0); }
 	})();
 }
