@@ -38,7 +38,7 @@ class Player {
 	async getAllPastGames() {
 		let games = [];
 		const db = new database();
-		const sql_games = await db.query("SELECT * FROM game WHERE player1_id = $1 OR player2_id = $1", [this._username]);
+		const sql_games = await db.query("SELECT * FROM game WHERE locked = true AND player1_id = $1 OR player2_id = $1", [this._username]);
 		for (let i=0; i<sql_games.rows.length; i++) {
 			let game = sql_games.rows[i];
 			games.push(new Game(game.id, game.player1_id, game.player2_id, game.player1_score, game.player2_score));

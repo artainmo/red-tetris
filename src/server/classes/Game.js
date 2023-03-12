@@ -27,7 +27,25 @@ class Game {
 		return true;
 	}
 
-	async start() {
+	async waitForSomeoneToQuit() {
+		if (this._id === null || this._player1 === null || this._player2 === null) {
+			console.log("This game cannot be quited");
+			return false;
+		}
+		const db = new database();
+		while (this._player2 !== null) {
+			console.log(`No one quited ${this._player1}'s game`);
+			sleep(2000);
+			let quittableGame = await db.query("SELECT * FROM game WHERE id = $1", [this._id]);
+			this._player2 = quittableGame.rows[0].player2_id;
+			this._player1 = quittableGame.rows[0].player1_id;
+		}
+		console.log(`${this._player1}: ${this._player2} quited ${this.player1}'s game`);
+		db.close_connection();
+		return true;
+	}
+
+	async start_play() {
 		if (this._id === null || this._player1 === null) {
 			console.log("Unable to start this game")
 			return false;
@@ -35,7 +53,25 @@ class Game {
 		const db = new database();
 		await db.query("UPDATE game SET locked = true WHERE id = $1", [this._id])
 		db.close_connection();
+		console.log(`Game started between ${this._player1} and ${this._player2}`)
 		return true
+	}
+
+	async waitGameStart() {
+		if (this._id === null || this._player1 === null || this._player2 === null) {
+			console.log("This game cannot be started");
+			return false;
+		}
+		const db = new database();
+		while (1) {
+			console.log(`${this._player1}'s game not started yet`);
+			sleep(2000);
+			let game = await db.query("SELECT locked FROM game WHERE id = $1", [this._id]);
+			if (game.rows[0].locked === true) { break; }
+		}
+		console.log(`${this.player1} started the game`);
+		db.close_connection();
+		return true;
 	}
 
 	async finalScore(score1, score2=null) {
@@ -51,25 +87,27 @@ class Game {
 			await db.query("UPDATE game SET player2_score = $1 WHERE id = $2;", [this._player2_score, this._id]);
 		}
 		db.close_connection();
+		console.log(`Game of ${this._player1} and ${this._player2} scored ${this._player1_score} and ${this._player2_score}`);
 		return true;
 	}
 
-	async next() {
+	async next_game() {
 		if (this._id === null || this._player1 === null || this._player1_score === null) {
 			console.log("This game is not finished. Can't go to next game.")
 			return false;
 		}
 		const db = new database();
 		if (this._player2_score === null || this._player1_score > this._player2_score) {
-			const winner = this._player1;
-			const loser = this._player2;
+			var winner = this._player1;
+			var loser = this._player2;
 		} else {
-			const winner = this._player2;
-			const loser = this._player1;
+			var winner = this._player2;
+			var loser = this._player1;
 		}
 		await db.query("INSERT INTO game (player1_id, player2_id) VALUES ($1, $2)", [winner, loser])
 		const newGame = await db.query("SELECT * FROM game WHERE locked = false AND player1_id = $1 AND player2_id = $2;", [winner, loser])
 		db.close_connection();
+		console.log(`Next game matchmaking with ${newGame.rows[0]._player1_id} and ${newGame.rows[0]._player2_id}`)
 		return Game(newGame.rows[0].id, newGame.rows[0]._player1_id, newGame.rows[0]._player2_id);
 	}
 
@@ -89,11 +127,12 @@ class Game {
 			await db.query("UPDATE game SET player2_id = null WHERE id = $1", [this._id])
 			this._player2 = null;
 		} else {
-			console.log(`${username} is unable to quit ${this._player1} and ${this._player2}'s game'`)
+			console.log(`${username} is unable to quit ${this._player1} and ${this._player2}'s game`)
 			db.close_connection();
 			return false;
 		}
 		db.close_connection();
+		console.log(`Someone quited the game. ${this._player1} is left`)
 		return true;
 	}
 

@@ -14,7 +14,7 @@ console.log = function(d) {
   log_stdout.write(util.format(d) + '\n');
 };
 
-async function test() {	
+async function test() {
 	console.log("---------- Database refresh ----------")
 	execSync(`cd ${__dirname}/../.. && make refresh_database`, { encoding: 'utf-8' });
 
@@ -29,21 +29,35 @@ async function test() {
 		const _player = new Player()
 		await _player.connect("dwdwdwdwdwdewfregtgt4gfrwfefeefefewfewffw")
 	} catch(e) { console.log(e.message); }
-	try { const _player = new Player(); await _player.connect("dd dd"); } 
+	try { const _player = new Player(); await _player.connect("dd dd"); }
 	catch(e) { console.log(e.message); }
 
 	console.log("---------- Matchmaking ----------")
-    let gamePlayer1 = await player.searchGame();
-    gamePlayer1.waitForSomeoneToJoin();
-    sleep(6000);
-    let gamePlayer2 = await player2.searchGame();
-    sleep(4000);
-    await gamePlayer1.finalScore(10,32);
+  let gamePlayer1 = await player.searchGame();
+  gamePlayer1.waitForSomeoneToJoin();
+  sleep(6000);
+  let gamePlayer2 = await player2.searchGame();
+  sleep(4000);
+  gamePlayer2.waitGameStart()
+  await gamePlayer1.start_play();
+  await gamePlayer1.finalScore(10,32);
+  console.log("")
 
 	let game2Player2 = await player2.searchGame();
+  await gamePlayer2.start_play();
+  await game2Player2.finalScore(44);
+  sleep(4000);
 	let game2Player1 = await player.searchGame();
-	await game2Player2.waitForSomeoneToJoin();
-    await game2Player2.finalScore(44,12);
+  sleep(2000);
+  await game2Player1.quit(player.name)
+  console.log("")
+
+  let game3Player2 = await game2Player2.next_game();
+  game2Player1 = await player.searchGame();
+  game3Player2.waitForSomeoneToQuit();
+  sleep(6000);
+  await game2Player1.quit(player.name)
+  sleep(4000);
 
 	console.log("---------- Visualize scores ----------")
 	console.log(player2.name);
@@ -52,6 +66,8 @@ async function test() {
 		let game = gamesPlayer2[i];
 		console.log(`${game.player1} vs ${game.player2} -> ${game.player1_score} - ${game.player2_score}`);
 	}
+  console.log("")
+
 	console.log(player.name);
 	const gamesPlayer1 = await player.getAllPastGames();
 	for (let i = 0; i < gamesPlayer1.length; i++) {
@@ -78,7 +94,7 @@ async function compare_results() {
 		}
 	}
 	if (failed) {
-		console.log('database, player, game: FAILED')		
+		console.log('database, player, game: FAILED')
 		process.exit(1);
 	} else {
 		console.log('database, player, game: SUCCESS')
