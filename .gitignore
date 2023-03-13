@@ -1,5 +1,7 @@
 .idea/
 node_modules/
+dist/
 package-lock.json
 .env
-.swp
+**/.swp
+**/.DS_Store
