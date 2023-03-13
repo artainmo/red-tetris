@@ -1,3 +1,6 @@
+all:
+	npm install && npm run build && npm run start
+
 create_database:
 	node src/server/database/manageDatabase.js create
 
