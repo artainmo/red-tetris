@@ -11,7 +11,7 @@ In the **backend** we will use **classes** and write in **javascript** with **no
 
 Launch the whole app in one command:
 ```
-make //npm install && npm run build && npm run start
+make
 ```
 
 Refresh the database:
@@ -21,7 +21,7 @@ make refresh_database
 
 Run the frontend in dev-mode with hot reload:
 ```
-make dev_front //npm install && npm run dev
+make dev_front
 ```
 
 Run unit-tests:
