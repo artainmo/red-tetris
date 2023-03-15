@@ -1,0 +1,7 @@
+---------- Database refresh ----------
+---------- Account creation ----------
+200 : Connection success of Alfred
+200 : Connection success of Conrad
+200 : Connection success of Alfred
+400 : Player's username is too long
+400 : Player's username contains special characters
