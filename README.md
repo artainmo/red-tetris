@@ -24,6 +24,11 @@ Run the frontend in dev-mode with hot reload:
 make dev_front
 ```
 
+Run the backend in dev-mode with hot reload:
+```
+make dev_back
+```
+
 Run unit-tests:
 ```
 make unittest

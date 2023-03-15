@@ -10,7 +10,10 @@ destroy_database:
 refresh_database: destroy_database create_database
 
 dev_front:
-	npm install && npm run dev
+	npm install && npm run dev_front
+
+dev_back:
+	npm install && npm run dev_back
 
 unittest:
 	node test/db_player_game/test.js
