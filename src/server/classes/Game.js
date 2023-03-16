@@ -10,6 +10,13 @@ class Game {
 		this._player2_score = player2_score;
 	}
 
+	display() {
+		const text = `${this._player1} vs ${this._player2}` +
+					` - ${this._player1_score} : ${this._player2_score}`
+		console.log(text);
+		return text;
+	}
+
 	async waitForSomeoneToJoin() {
 		if (this._id === null || this._player1 === null || this._player2 !== null) {
 			console.log("This game cannot be joined");
@@ -24,7 +31,7 @@ class Game {
 		}
 		console.log(`${this._player1}: ${this._player2} joined ${this.player1}'s game`);
 		db.close_connection();
-		return true;
+		return this;
 	}
 
 	async waitForSomeoneToQuit() {
@@ -42,7 +49,7 @@ class Game {
 		}
 		console.log(`${this._player1}: Someone quited ${this.player1}'s game`);
 		db.close_connection();
-		return true;
+		return this;
 	}
 
 	async start_play() {
@@ -88,7 +95,7 @@ class Game {
 		}
 		db.close_connection();
 		console.log(`Game of ${this._player1} and ${this._player2} scored ${this._player1_score} and ${this._player2_score}`);
-		return true;
+		return this;
 	}
 
 	async next_game() {
@@ -138,7 +145,7 @@ class Game {
 		}
 		db.close_connection();
 		console.log(`${username} quited the game. ${this._player1} is left`)
-		return true;
+		return this;
 	}
 
 	set id(value) {

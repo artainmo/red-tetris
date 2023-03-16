@@ -1,7 +1,7 @@
 const { sleep } = require(__dirname + '/../../src/utils/utils.js');
 const { Player } = require(__dirname + '/../../src/server/classes/Player.js');
 const { Game } = require(__dirname + '/../../src/server/classes/Game.js');
-const { execSync } = require('child_process');
+const { execSync, fork } = require('child_process');
 const fs = require('fs');
 const util = require('util');
 const ReadLines = require('n-readlines');
@@ -21,72 +21,78 @@ async function test() {
 	execSync(`cd ${__dirname}/../.. && make refresh_database`, { encoding: 'utf-8' });
 
 	console.log("---------- Account creation ----------")
-  var response = await axios.post("/connect/Alfred");
+  var response = await axios.get("/connect/Alfred");
   console.log(response.status + " : " + response.data);
-  var response = await axios.post("/connect/Conrad");
+  var response = await axios.get("/connect/Conrad");
   console.log(response.status + " : " + response.data);
-  var response = await axios.post("/connect/Alfred");
+  var response = await axios.get("/connect/Alfred");
   console.log(response.status + " : " + response.data);
   try {
-    var response = await axios.post("/connect/dwdwdwdwdwdewfregtgt4gfrwfefeefefewfewffw");
+    var response = await axios.get("/connect/dwdwdwdwdwdewfregtgt4gfrwfefeefefewfewffw");
   } catch (e) {
     console.log(e.response.status + " : " + e.response.data);
   }
   try {
-    var response = await axios.post("/connect/dd%20dd");
+    var response = await axios.get("/connect/dd%20dd");
   } catch (e) {
     console.log(e.response.status + " : " + e.response.data);
   }
 
-	// console.log("---------- Matchmaking ----------")
-  // let gamePlayer1 = await player.searchGame();
-  // gamePlayer1.waitForSomeoneToJoin();
-  // sleep(4000);
-  // let gamePlayer2 = await player2.searchGame();
-  // sleep(4000);
-  // gamePlayer2.waitGameStart()
-  // await gamePlayer1.start_play();
-  // await gamePlayer1.finalScore(10,32);
-  // console.log("")
-  //
-	// let game2Player2 = await player2.searchGame();
-  // await game2Player2.start_play();
-  // await game2Player2.finalScore(44);
-  // sleep(4000);
-	// let game2Player1 = await player.searchGame();
-  // sleep(2000);
-  // await game2Player1.quit(player.name)
-  // console.log("")
-  //
-  // let game3Player2 = await game2Player2.next_game();
-  // game3Player2.waitForSomeoneToJoin();
-  // sleep(4000);
-  // game2Player1 = await player.searchGame();
-  // sleep(4000);
-  // await game3Player2.start_play();
-  // game3Player2.waitForSomeoneToQuit();
-  // sleep(4000);
-  // await game2Player1.quit(player.name);
-  // await game3Player2.finalScore(36);
-  // await game3Player2.quit(player2.name);
-  // sleep(4000);
-  //
-	// console.log("---------- Visualize scores ----------")
-	// console.log(player2.name);
-	// const gamesPlayer2 = await player2.getAllPastGames();
-	// for (let i = 0; i < gamesPlayer2.length; i++) {
-	// 	let game = gamesPlayer2[i];
-	// 	console.log(`${game.player1} vs ${game.player2} -> ${game.player1_score} - ${game.player2_score}`);
-	// }
-  // console.log("")
-  //
-	// console.log(player.name);
-	// const gamesPlayer1 = await player.getAllPastGames();
-	// for (let i = 0; i < gamesPlayer1.length; i++) {
-	// 	let game = gamesPlayer1[i];
-	// 	console.log(`${game.player1} vs ${game.player2} -> ${game.player1_score} - ${game.player2_score}`);
-	// }
-	// console.log("---------- END ----------")
+	console.log("---------- Matchmaking ----------")
+  var gamePlayer1 = (await axios.get("/game/search/Alfred")).data;
+  console.log(gamePlayer1);
+  const child = fork("test_child.js");
+  var gamePlayer1 = (await axios.post("/game/wait/join", gamePlayer1)).data;
+  console.log(gamePlayer1);
+  sleep(5000);
+  var response = (await axios.patch("/game/start", gamePlayer1)).data;
+  console.log(response);
+  sleep(8000);
+  var gamePlayer1 = (await axios.post("/game/score/10/32", gamePlayer1)).data;
+  console.log(gamePlayer1);
+  console.log("")
+
+	var game2Player1 = (await axios.get("/game/search/Alfred")).data;
+  console.log(game2Player1);
+  var response = (await axios.patch("/game/start", game2Player1)).data;
+  console.log(response);
+  var game2Player1 = (await axios.post("/game/score/44", game2Player1)).data;
+  console.log(game2Player1);
+	var game2Player2 = (await axios.get("/game/search/Conrad")).data;
+  console.log(game2Player2);
+  sleep(2000);
+  var game2Player2 = (await axios.post("/game/quit/Conrad", game2Player2)).data;
+  console.log(game2Player2);
+  console.log("")
+
+  console.log(game2Player1);
+  var game3Player1 = (await axios.post('/game/next', game2Player1)).data;
+  console.log(game3Player1);
+  const child2 = fork("test_child2.js");
+  var game3Player1 = (await axios.post("/game/wait/join", game3Player1)).data;
+  var response = (await axios.patch("/game/start", game3Player1)).data;
+  console.log(response);
+  var game3Player1 = (await axios.post("/game/wait/quit", game3Player1)).data;
+  console.log(game3Player1);
+  var game3Player1 = (await axios.post("/game/quit/Alfred", game3Player1)).data;
+  console.log(game3Player1);
+
+	console.log("---------- Visualize scores ----------")
+	console.log("Conrad");
+	const gamesPlayer2 = (await axios.get("/games/Conrad")).data;
+	for (let i = 0; i < gamesPlayer2.length; i++) {
+		let game = gamesPlayer2[i];
+		console.log(`${game._player1} vs ${game._player2} -> ${game._player1_score} - ${game._player2_score}`);
+	}
+  console.log("")
+
+	console.log("Alfred");
+  const gamesPlayer1 = (await axios.get("/games/Alfred")).data;
+	for (let i = 0; i < gamesPlayer1.length; i++) {
+	   let game = gamesPlayer1[i];
+	   console.log(`${game._player1} vs ${game._player2} -> ${game._player1_score} - ${game._player2_score}`);
+	}
+	console.log("---------- END ----------")
 }
 
 async function compare_results() {
