@@ -4,16 +4,21 @@ import { gameFinalScore, gameNext } from "../api/routes.api"
 
 const Game = ({user, game, setGame, setPage}) => {
   const endGame = async () => {
-    if (game._player2 === null) {
-      await gameFinalScore(game, 25);
-      game._player1_score = 25;
+    if (game._player1 === user) {
+      if (game._player2 === null) {
+        await gameFinalScore(game, 25);
+        game._player1_score = 25;
+      } else {
+        await gameFinalScore(game, 33, 44);
+        game._player1_score = 33;
+        game._player2_score = 44;
+      }
+      const response = await gameNext(game);
+      setGame(response.data);
     } else {
-      await gameFinalScore(game, 33, 44);
-      game._player1_score = 33;
-      game._player2_score = 44;
+      //get game created by player1 via sockets
+      //setGame()
     }
-    const response = await gameNext(game);
-    setGame(response.data);
     setPage("SearchGame");
   }
 

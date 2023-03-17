@@ -17,6 +17,7 @@ console.log = function(d) {
 };
 
 async function test() {
+  var response = {status: 400, data: "failed"};
 	console.log("---------- Database refresh ----------")
 	execSync(`cd ${__dirname}/../.. && make refresh_database`, { encoding: 'utf-8' });
 
@@ -42,7 +43,13 @@ async function test() {
   var gamePlayer1 = (await axios.get("/game/search/Alfred")).data;
   console.log(gamePlayer1);
   const child = fork("test_child.js");
-  var gamePlayer1 = (await axios.post("/game/wait/join", gamePlayer1)).data;
+  do {
+    sleep(2000);
+    try {
+      var response = await axios.post("/game/wait/join", gamePlayer1);
+    } catch(e) { response.status = e.response.status; response.data = e.response.data; }
+  } while (response.status !== 200)
+  gamePlayer1 = response.data
   console.log(gamePlayer1);
   sleep(5000);
   var response = (await axios.patch("/game/start", gamePlayer1)).data;
@@ -61,7 +68,7 @@ async function test() {
 	var game2Player2 = (await axios.get("/game/search/Conrad")).data;
   console.log(game2Player2);
   sleep(2000);
-  var game2Player2 = (await axios.post("/game/quit/Conrad", game2Player2)).data;
+  var game2Player2 = (await axios.patch("/game/quit/Conrad", game2Player2)).data;
   console.log(game2Player2);
   console.log("")
 
@@ -69,10 +76,22 @@ async function test() {
   var game3Player1 = (await axios.post('/game/next', game2Player1)).data;
   console.log(game3Player1);
   const child2 = fork("test_child2.js");
-  var game3Player1 = (await axios.post("/game/wait/join", game3Player1)).data;
+  do {
+    sleep(2000);
+    try {
+      var response = await axios.post("/game/wait/join", game3Player1);
+    } catch(e) { response.status = e.response.status; response.data = e.response.data; }
+  } while (response.status !== 200)
+  game3Player1 = response.data
   var response = (await axios.patch("/game/start", game3Player1)).data;
   console.log(response);
-  var game3Player1 = (await axios.patch("/game/wait/quit", game3Player1)).data;
+  do {
+    sleep(2000);
+    try {
+      var response = await axios.patch("/game/wait/quit", game3Player1);
+    } catch(e) { response.status = e.response.status; response.data = e.response.data; }
+  } while (response.status !== 200)
+  game3Player1 = response.data
   console.log(game3Player1);
   var game3Player1 = (await axios.patch("/game/quit/Alfred", game3Player1)).data;
   console.log(game3Player1);

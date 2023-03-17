@@ -15,9 +15,15 @@ console.log = function(d) {
 };
 
 async function test() {
+  var response = {status: 400, data: "failed"};
   var gamePlayer2 = (await axios.get("/game/search/Conrad")).data;
   console.log(gamePlayer2);
-  var response = await axios.post("/game/wait/start", gamePlayer2);
+  do {
+    sleep(2000);
+    try {
+      var response = await axios.post("/game/wait/start", gamePlayer2);
+    } catch (e) { response.status = e.response.status; response.data = e.response.data; }
+  } while (response.status !== 200)
   console.log(response.data);
 }
 
