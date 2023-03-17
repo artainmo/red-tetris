@@ -20,7 +20,7 @@ async function test() {
   var response = await axios.post("/game/wait/start", gamePlayer2);
   console.log(response.data);
   sleep(5000);
-  var gamePlayer2 = (await axios.post("/game/quit/Conrad", gamePlayer2)).data;
+  var gamePlayer2 = (await axios.patch("/game/quit/Conrad", gamePlayer2)).data;
   console.log(gamePlayer2);
 }
 

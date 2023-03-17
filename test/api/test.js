@@ -72,9 +72,9 @@ async function test() {
   var game3Player1 = (await axios.post("/game/wait/join", game3Player1)).data;
   var response = (await axios.patch("/game/start", game3Player1)).data;
   console.log(response);
-  var game3Player1 = (await axios.post("/game/wait/quit", game3Player1)).data;
+  var game3Player1 = (await axios.patch("/game/wait/quit", game3Player1)).data;
   console.log(game3Player1);
-  var game3Player1 = (await axios.post("/game/quit/Alfred", game3Player1)).data;
+  var game3Player1 = (await axios.patch("/game/quit/Alfred", game3Player1)).data;
   console.log(game3Player1);
 
 	console.log("---------- Visualize scores ----------")

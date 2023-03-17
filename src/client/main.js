@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Auth from './pages/Auth'
 
-ReactDOM.render(
-    <h1>Hello World</h1>,
-  document.getElementById('root')
-);
+ReactDOM.render(<React.StrictMode><Auth/></React.StrictMode>,
+      document.getElementById('root'));

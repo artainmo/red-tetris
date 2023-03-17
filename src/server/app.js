@@ -112,7 +112,7 @@ router.post('/game/score/:score1/:score2?', async (req,res,next) => {
   }
 });
 
-router.post('/game/quit/:name', async (req,res,next) => {
+router.patch('/game/quit/:name', async (req,res,next) => {
   const name = req.params.name;
   const body = req.body;
   const game = new Game(body._id, body._player1, body._player2, body._player1_score,
@@ -140,7 +140,7 @@ router.post('/game/next', async (req,res,next) => {
   }
 });
 
-router.post('/game/wait/quit', async (req,res,next) => {
+router.patch('/game/wait/quit', async (req,res,next) => {
   const body = req.body;
   const game = new Game(body._id, body._player1, body._player2, body._player1_score,
     body._player2_score);
