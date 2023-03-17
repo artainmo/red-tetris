@@ -1,11 +1,12 @@
 const express = require('express');
+const socketio = require('socket.io');
 const { Player } = require(__dirname + '/classes/Player.js');
 const { Game } = require(__dirname + '/classes/Game.js');
 
 
 const app = express();
-app.listen(3000, () => {
-  console.log(`App listening at http://localhost:3000`)
+const server = app.listen(3000, () => {
+  console.log(`App listening at http://localhost:3000`);
 });
 
 /*
@@ -151,4 +152,20 @@ router.patch('/game/wait/quit', async (req,res,next) => {
   } else {
     res.status(200).json(newGame);
   }
+});
+
+
+//Setting up the websockets with socket.io
+const io = socketio(server);
+
+io.on('connection', async (socket) => {
+  console.log('A user connected to websocket');
+  socket.on('disconnect', () => {
+    console.log('A user disconnected from websocket and thus left its room');
+  });
+
+  socket.on('joinRoom', (roomId) => {
+    console.log('A user joined the room named ' + roomId);
+    socket.join(roomId);
+  });
 });

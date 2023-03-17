@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Button from "@mui/material/Button";
-import { gameFinalScore, gameNext } from "../api/routes.api"
+import { gameFinalScore, gameNext } from "../api/http.api"
+import { connect, disconnect, joinRoom } from "../api/socket.api"
 
 const Game = ({user, game, setGame, setPage}) => {
+
+  useEffect(() => {
+    const socket = connect();
+    joinRoom(socket, game._player1 + "_" + game._player2);
+    return () => disconnect(socket);
+  }, []);
+
   const endGame = async () => {
     if (game._player1 === user) {
       if (game._player2 === null) {

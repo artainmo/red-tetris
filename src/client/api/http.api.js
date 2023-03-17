@@ -1,6 +1,6 @@
 import { API_ENDPOINT } from "./api_endpoint"
 const axios = require('axios');
-axios.defaults.baseURL = API_ENDPOINT;
+axios.defaults.baseURL = API_ENDPOINT + "/rest";
 
 export const connect = async (name) => {
  	try {

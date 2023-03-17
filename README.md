@@ -5,7 +5,7 @@ The **front-end** must be a **single-page-application** and we must use **functi
 We will use the framework **React** with library Redux.<br>
 The frontend javascript will be **bundled** into an executable with **webpack** [[1](https://medium.com/age-of-awareness/setup-react-with-webpack-and-babel-5114a14a47e9),[2](https://www.educative.io/answers/how-to-create-a-react-application-with-webpack)] that the backend/server will send once to the client together with an index.html. This limits the number of HTTP requests, increasing website speed. 
 
-In the **backend** we will use **classes** and write in **javascript** with **nodejs** and **express**. We will use **PostgreSQL** as database.
+In the **backend** we will use **classes** and write in **javascript** with **nodejs**, **express** for http server and **socket.io** for socket implementation during the game. We will use **PostgreSQL** as database.
 
 ## Use
 

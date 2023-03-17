@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import { getGames } from "../api/routes.api";
+import { getGames } from "../api/http.api";
 import SearchGame from "./SearchGame";
 
 const Home = ({user, setUser}) => {

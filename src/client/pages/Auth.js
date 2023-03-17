@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from '@mui/material/Typography';
-import { connect } from "../api/routes.api"
+import { connect } from "../api/http.api"
 import Home from './Home'
 
 const Auth = () => {
