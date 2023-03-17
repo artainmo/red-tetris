@@ -4,7 +4,8 @@ import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import { searchGame, gameWaitForSomeoneToJoin, gameWaitQuit, gameWaitStart, gameStart, gameQuit } from "../api/http.api";
+import { searchGame, gameWaitForSomeoneToJoin, gameWaitQuit, gameWaitStart,
+      gameStart, gameQuit } from "../api/http.api";
 import Game from "../game/Game.tmp"
 
 const SearchGame = ({user, page, setPage}) => {

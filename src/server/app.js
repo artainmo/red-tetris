@@ -2,6 +2,7 @@ const express = require('express');
 const socketio = require('socket.io');
 const { Player } = require(__dirname + '/classes/Player.js');
 const { Game } = require(__dirname + '/classes/Game.js');
+const { Piece } = require(__dirname + '/classes/Piece.js');
 
 
 const app = express();
@@ -167,5 +168,21 @@ io.on('connection', async (socket) => {
   socket.on('joinRoom', (roomId) => {
     console.log('A user joined the room named ' + roomId);
     socket.join(roomId);
+  });
+
+  socket.on('askNewPiece', (roomId) => {
+    console.log("Sending new piece to " + roomId);
+    const piece = (new Piece()).generate_random_piece()
+    io.to(roomId).emit('newPiece', piece);
+  });
+
+  socket.on('sendPersonalGameStructure', (data) => {
+    socket.broadcast.to(data.roomId).emit('otherPlayerGameStructure',
+                                            data.gameStructure);
+  });
+
+  socket.on('sendNextGame', (data) => {
+    console.log("Sending next game");
+    socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame);
   });
 });
