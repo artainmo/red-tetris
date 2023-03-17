@@ -1,5 +1,4 @@
 const { database } = require(__dirname + '/../database/manageDatabase.js');
-const { sleep } = require(__dirname + '/../../utils/utils.js');
 
 class Game {
 	constructor(id=null, player1=null, player2=null, player1_score=null, player2_score=null) { //optional parameters...
@@ -23,15 +22,17 @@ class Game {
 			return false;
 		}
 		const db = new database();
-		while (this._player2 === null) {
+		let joinableGame = await db.query("SELECT player2_id FROM game WHERE id = $1", [this._id]);
+		this._player2 = joinableGame.rows[0].player2_id;
+		if (this._player2 === null) {
 			console.log(`No one joined ${this._player1}'s game`);
-			sleep(2000);
-			let joinableGame = await db.query("SELECT player2_id FROM game WHERE id = $1", [this._id]);
-			this._player2 = joinableGame.rows[0].player2_id;
+			db.close_connection();
+			return false;
+		} else {
+			console.log(`${this._player1}: ${this._player2} joined ${this._player1}'s game`);
+			db.close_connection();
+			return this;
 		}
-		console.log(`${this._player1}: ${this._player2} joined ${this.player1}'s game`);
-		db.close_connection();
-		return this;
 	}
 
 	async waitForSomeoneToQuit() {
@@ -40,16 +41,36 @@ class Game {
 			return false;
 		}
 		const db = new database();
-		while (this._player2 !== null) {
+		let quittableGame = await db.query("SELECT * FROM game WHERE id = $1", [this._id]);
+		this._player2 = quittableGame.rows[0].player2_id;
+		this._player1 = quittableGame.rows[0].player1_id;
+		if (this._player2 !== null) {
 			console.log(`No one quited ${this._player1}'s game`);
-			sleep(2000);
-			let quittableGame = await db.query("SELECT * FROM game WHERE id = $1", [this._id]);
-			this._player2 = quittableGame.rows[0].player2_id;
-			this._player1 = quittableGame.rows[0].player1_id;
+			db.close_connection();
+			return false;
+		} else {
+			console.log(`${this._player1}: Someone quited ${this.player1}'s game`);
+			db.close_connection();
+			return this;
 		}
-		console.log(`${this._player1}: Someone quited ${this.player1}'s game`);
-		db.close_connection();
-		return this;
+	}
+
+	async waitGameStart() {
+		if (this._id === null || this._player1 === null || this._player2 === null) {
+			console.log("This game cannot be started");
+			return false;
+		}
+		const db = new database();
+		let game = await db.query("SELECT locked FROM game WHERE id = $1", [this._id]);
+		if (game.rows[0].locked !== true) {
+			console.log(`${this._player1}'s game not started yet`);
+			db.close_connection();
+			return false;
+		} else {
+			console.log(`${this.player1} started the game`);
+			db.close_connection();
+			return true;
+		}
 	}
 
 	async start_play() {
@@ -62,23 +83,6 @@ class Game {
 		db.close_connection();
 		console.log(`Game started between ${this._player1} and ${this._player2}`)
 		return true
-	}
-
-	async waitGameStart() {
-		if (this._id === null || this._player1 === null || this._player2 === null) {
-			console.log("This game cannot be started");
-			return false;
-		}
-		const db = new database();
-		while (1) {
-			console.log(`${this._player1}'s game not started yet`);
-			sleep(2000);
-			let game = await db.query("SELECT locked FROM game WHERE id = $1", [this._id]);
-			if (game.rows[0].locked === true) { break; }
-		}
-		console.log(`${this.player1} started the game`);
-		db.close_connection();
-		return true;
 	}
 
 	async finalScore(score1, score2=null) {
@@ -127,9 +131,9 @@ class Game {
 		const db = new database();
 		if (username === this._player1) {
 			if (this._player2 !== null) {
-				await db.query("UPDATE game SET player1_id = $1 WHERE id = $1", [this._player2, this._id])
-				this._player1 = this._player2;
 				await db.query("UPDATE game SET player2_id = null WHERE id = $1", [this._id])
+				await db.query("UPDATE game SET player1_id = $1 WHERE id = $2", [this._player2, this._id])
+				this._player1 = this._player2;
 				this._player2 = null;
 			} else {
 				await db.query("DELETE FROM game WHERE id = $1", [this._id]);

@@ -16,8 +16,10 @@ const Home = ({user, setUser}) => {
       const response = await getGames(user);
       setGames(response.data);
     }
-    getMyGames();
-  }, []);
+    if (page === "Home") {
+      getMyGames();
+    }
+  }, [page]);
 
   const displayGame = (player1, player2, score1, score2) => {
     if (player2 === null) {

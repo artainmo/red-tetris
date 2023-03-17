@@ -6,8 +6,11 @@ const Game = ({user, game, setGame, setPage}) => {
   const endGame = async () => {
     if (game._player2 === null) {
       await gameFinalScore(game, 25);
+      game._player1_score = 25;
     } else {
-      await gameFinalScore(game, 44, 33);
+      await gameFinalScore(game, 33, 44);
+      game._player1_score = 33;
+      game._player2_score = 44;
     }
     const response = await gameNext(game);
     setGame(response.data);

@@ -65,7 +65,7 @@ router.post('/game/wait/join', async (req,res,next) => {
 
   const newGame = await game.waitForSomeoneToJoin();
   if (newGame === false) {
-    res.status(400).send("This game cannot be joined");
+    res.status(400).send("This game hasn't been joined");
   } else {
     res.status(200).json(newGame);
   }
@@ -91,7 +91,7 @@ router.post('/game/wait/start', async (req,res,next) => {
 
   const ret = await game.waitGameStart();
   if (ret === false) {
-    res.status(400).send("This game cannot be started");
+    res.status(400).send("This game has not been started");
   } else {
     res.status(200).send(`${body._player1} started the game`);
   }
@@ -106,7 +106,7 @@ router.post('/game/score/:score1/:score2?', async (req,res,next) => {
 
   const newGame = await game.finalScore(score1, score2);
   if (newGame === false) {
-    res.status(400).send("Final game score cannot be added")
+    res.status(400).send("Final game score cannot be added");
   } else {
     res.status(200).json(newGame);
   }
@@ -120,9 +120,9 @@ router.patch('/game/quit/:name', async (req,res,next) => {
 
   const newGame = await game.quit(name);
   if (newGame === false) {
-    res.status(400).send(`${name} is not able to quit ${body._player1} and ${body._player2}'s game`)
+    res.status(400).send(`Nobody quit`);
   } else {
-    res.status(200).json(newGame)
+    res.status(200).json(newGame);
   }
 });
 

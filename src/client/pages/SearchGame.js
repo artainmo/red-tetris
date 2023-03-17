@@ -20,27 +20,39 @@ const SearchGame = ({user, page, setPage}) => {
 
   useEffect(() => {
     const waitForSomeoneToJoin = async () => {
-      if (game !== null && game._player2 === null) {
         const response = await gameWaitForSomeoneToJoin(game);
-        setGame(response.data);
-      }
+        if (response.status === 200) {
+          setGame(response.data);
+        }
     }
     const waitForSomeoneToQuit = async () => {
-      if (game !== null && game._player2 !== null) {
         const response = await gameWaitQuit(game);
-        setGame(response.data);
-      }
+        if (response.status === 200) {
+          setGame(response.data);
+        }
     }
     const waitStart = async () => {
-      if (game !== null && game._player2 === user) {
-        await gameWaitStart(game);
-        setPage("Game");
-      }
+        const response = await gameWaitStart(game);
+        if (response.status === 200) {
+          setPage("Game");
+        }
     }
-    waitForSomeoneToJoin();
-    waitForSomeoneToQuit();
-    waitStart();
-  }, [game]);
+    if (page !== "SearchGame") return ;
+    if (game !== null && game._player2 === null) {
+      var interval1 = setInterval(waitForSomeoneToJoin, 2000);
+    }
+    if (game !== null && game._player2 !== null) {
+      var interval2 = setInterval(waitForSomeoneToQuit, 2000);
+    }
+    if (game !== null && game._player2 === user) {
+      var interval3 = setInterval(waitStart, 2000);
+    }
+    return () => {
+      if (typeof interval1 !== undefined) clearInterval(interval1);
+      if (typeof interval2 !== undefined) clearInterval(interval2);
+      if (typeof interval3 !== undefined) clearInterval(interval3);
+    }
+  }, [game, page]);
 
   if (page === "SearchGame") {
     return (<div>
@@ -56,10 +68,10 @@ const SearchGame = ({user, page, setPage}) => {
                   {game && game._player2 && <ListItem><ListItemText primary={game._player2}/></ListItem>}
                 </List>
               </div>
-              <Button variant="outlined" onClick={()=>{
-                    gameStart(game); setPage("Game");}}>
+              {game && game._player1 === user && <Button variant="outlined"
+                    onClick={()=>{gameStart(game); setPage("Game");}}>
                 Play
-              </Button>
+              </Button>}
             </div>)
   } else if (page === "Game") {
     return <div><Game user={user} game={game} setGame={setGame} setPage={setPage}/></div>

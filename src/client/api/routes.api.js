@@ -30,9 +30,9 @@ export const gameWaitForSomeoneToJoin = async (game) => {
 	}
 }
 
-export const gameStart = async (game) => {
+export const gameWaitQuit = async (game) => {
 	try {
-		var response = await axios.patch("/game/start", game);
+		var response = await axios.patch("/game/wait/quit", game);
 		return {status: response.status, data: response.data};
 	} catch (e) {
 		return {status: e.response.status, data: e.response.data};
@@ -42,6 +42,15 @@ export const gameStart = async (game) => {
 export const gameWaitStart = async (game) => {
 	try {
 		var response = await axios.post("/game/wait/start", game);
+		return {status: response.status, data: response.data};
+	} catch (e) {
+		return {status: e.response.status, data: e.response.data};
+	}
+}
+
+export const gameStart = async (game) => {
+	try {
+		var response = await axios.patch("/game/start", game);
 		return {status: response.status, data: response.data};
 	} catch (e) {
 		return {status: e.response.status, data: e.response.data};
@@ -74,15 +83,6 @@ export const gameQuit = async (game, name) => {
 export const gameNext = async (game) => {
 	try {
 		var response = await axios.post("/game/next", game);
-		return {status: response.status, data: response.data};
-	} catch (e) {
-		return {status: e.response.status, data: e.response.data};
-	}
-}
-
-export const gameWaitQuit = async (game) => {
-	try {
-		var response = await axios.patch("/game/wait/quit", game);
 		return {status: response.status, data: response.data};
 	} catch (e) {
 		return {status: e.response.status, data: e.response.data};

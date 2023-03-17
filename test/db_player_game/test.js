@@ -1,4 +1,4 @@
-const { sleep } = require(__dirname + '/../../src/utils/utils.js');
+const { sleep } = require(__dirname + '/../utils/utils.js');
 const { Player } = require(__dirname + '/../../src/server/classes/Player.js');
 const { Game } = require(__dirname + '/../../src/server/classes/Game.js');
 const { execSync } = require('child_process');
