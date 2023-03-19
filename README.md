@@ -9,6 +9,8 @@ In the **backend** we will use **classes** and write in **javascript** with **no
 
 ## Use
 
+Before launching this app make sure a PostgreSQL database named `red_tetris` runs.
+
 Launch the whole app in one command:
 ```
 make

@@ -15,7 +15,8 @@ class Player {
 	}
 
 	async tryAccountCreation(username) {
-		const db = await new database();
+		const db = new database(false);
+		await db.connectToDatabase();
 		try {
 			await db.query("INSERT INTO account (username) VALUES ($1);", [username]);
 			console.log(`New account created named ${username}`);
