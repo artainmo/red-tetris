@@ -19,9 +19,11 @@ class database {
 		try {
 			this._pool = new Pool(this._credentials); //A connection pool enables handling multiple requests at once
 			await this._pool.connect();
-			await this._pool.query("SELECT * FROM account;"); //Verify if tables exist
+			await this._pool.query("SELECT * FROM account;") //Verify if tables exist
 		} catch(e) {
-			if (e.message.substr(0,33) === 'relation "account" does not exist') {
+			if (e.code === "42P01") {
+				console.log(e.code)
+				console.log("Create the database...")
 				await this.createDatabase();
 				this.connectToDatabase();
 			} else {

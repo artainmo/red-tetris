@@ -21,7 +21,7 @@ class Player {
 			await db.query("INSERT INTO account (username) VALUES ($1);", [username]);
 			console.log(`New account created named ${username}`);
 		} catch(e) {
-			if (e.message.substr(0,61) === 'duplicate key value violates unique constraint "account_pkey"') {
+			if (e.code === "23505") {
 				console.log(`Logged into account named ${username}`);
 			} else {
 				console.log(e.message.substr(0,61));
