@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from '@mui/material/Typography';
 import { connect } from "../api/http.api"
 import Home from './Home'
+import Tetris from './Tetris'
 
 const Auth = () => {
   const [user, setUser] = useState(null);
@@ -28,6 +29,7 @@ const Auth = () => {
   }
 
   if (user === null) {
+    return (<Tetris />);
     return (<div>
               <TextField variant="outlined" placeholder="name" value={name}
                     onChange={(e)=>{setName(event.target.value);}} />

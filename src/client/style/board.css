@@ -1,0 +1,24 @@
+.board-wrapper {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    height: 75vh;
+}
+
+.board {
+    border: 2px solid black;
+    width: 400px;
+    height: 800px;
+}
+
+.row {
+    display: flex;
+}
+
+.cell {
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+    background-color: #3565d0;
+}
