@@ -7,16 +7,12 @@ const colorO = '#f6c709';
 const colorS = '#5717e0';
 const colorT = '#e74208';
 const colorZ = '#a808e7';
-const black = '#000000';
 
 const getPieceShape = (shape) => {
 	switch (shape) {
 		case 'I':
 			return [
-				[colorI, colorI, colorI, colorI],
-				[0, 0, 0, 0],
-				[0, 0, 0, 0],
-				[0, 0, 0, 0],
+				[colorI, colorI, colorI, colorI]
 			];
 		case 'J':
 			return [
