@@ -4,6 +4,7 @@ import { gameFinalScore, gameNext } from "../api/http.api"
 import { connect, disconnect, joinRoom, listenOtherPlayerGameStructure,
       listenNewPiece, sendNextGame, listenNextGame, askNewPiece,
       sendPersonalGameStructure } from "../api/socket.api"
+import Board from '../components/Board'
 
 const Game = ({user, game, setGame, setPage}) => {
   const socket = connect();
@@ -56,6 +57,9 @@ const Game = ({user, game, setGame, setPage}) => {
             <Button variant="outlined" onClick={()=>{endGame()}}>
               Simulate End Game
             </Button>
+
+            <Board />
+
             <p>(host should simulate end first and only afterwards players can leave)</p>
             <p>SIMULATE PIECE DISTRIBUTION</p>
             {newPiece && <p>{newPiece.type + " " + newPiece.direction + " " + newPiece.position}</p>}

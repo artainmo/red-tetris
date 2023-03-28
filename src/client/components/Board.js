@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {getPieceColor, getPieceShape} from './Piece';
 import '../style/board.css';
+import {askNewPiece} from '../api/socket.api'
 
 const directions = ['up', 'right', 'down', 'left'];
 const colorBg = '#3565d0';
@@ -12,7 +13,8 @@ const Board = ({pieceLetter}) => {
             const cells = [];
             for (let col = 0; col < 10; col++) {
                 cells.push({
-                    color: colorBg
+                    color: colorBg,
+                    fixed: false,
                 });
             }
             rows.push(cells);
@@ -24,7 +26,7 @@ const Board = ({pieceLetter}) => {
     const [piecePosition, setPiecePosition] = useState([]);
     const [pieceDirection, setPieceDirection] = useState('up');
     const [indexDirection, setIndexDirection] = useState(1);
-    const [pieceShape, setPieceShape] = useState(getPieceShape(pieceLetter, pieceDirection));
+    const [pieceShape, setPieceShape] = useState(getPieceShape('', pieceDirection));
 
     const insertColor = (newGrid, row, col) => {
         let gridRow;
@@ -35,6 +37,8 @@ const Board = ({pieceLetter}) => {
                     gridRow = row + i;
                     gridCol = col + j;
                     // handle overflow when turning stuck on borders left/right
+                    // !! prendre en compte le gap entre la bordure et le nb de cellules de la piece
+                    //  qui feraient un overflow (pas tjs 4...)
                     if (gridRow >= 20) {
                         gridRow -= 4;
                         setPiecePosition([gridRow, gridCol]);
@@ -43,13 +47,14 @@ const Board = ({pieceLetter}) => {
                         gridCol -= 4;
                         setPiecePosition([gridRow, gridCol]);
                     } else if (gridCol < 0) {
-                        setPiecePosition([gridRow, gridCol]);
                         gridCol += 4;
+                        setPiecePosition([gridRow, gridCol]);
                     }
                     newGrid[gridRow][gridCol] = { color: pieceShape[i][j] };
                 }
             }
         }
+        setPiecePosition([row, col]);
     };
 
     const insertNewPiece = (pieceLetter, direction, row, col) => {
@@ -63,12 +68,12 @@ const Board = ({pieceLetter}) => {
     const insertPiece = (pieceShape, direction, row, col) => {
         const newGrid = [...grid];
         insertColor(newGrid, row, col);
-        setPiecePosition([row, col]);
+        //setPiecePosition([row, col]);
         setGrid(newGrid);
     };
 
     const cleanGrid = (grid, row, col) => {
-        console.log(row, col)
+        //console.log(piecePosition)
         // clean la zone de la piece sur la grid,
         // !! bien check par la suite les couleurs car on peut avoir d'autres pieces sur le spectre
         // et aussi check les overflows
@@ -85,8 +90,8 @@ const Board = ({pieceLetter}) => {
     *  if it's left or right, a number representing a column will be returned
     *  if it's down, it'll be a row */
     const getBoundaryCellFromDirection = (pieceDirection, pieceShape, row, col) => {
-        let boundary = -1;
-            console.log(pieceShape);
+        let boundary;
+            //console.log(pieceShape);
         switch (pieceDirection) {
             case 'down':
                 for (let rowPiece = 0; rowPiece < 4; rowPiece++) {
@@ -120,7 +125,7 @@ const Board = ({pieceLetter}) => {
 
     const canMove = (pos, pieceShape, row, col) => {
         const boundary = getBoundaryCellFromDirection(pos, pieceShape, row, col);
-        console.log("Boundary = " + boundary)
+        // console.log("Boundary = " + boundary)
         // next step : add collisions between pieces
         if (pos === 'down' && boundary < 20) {
             return true;
@@ -136,6 +141,7 @@ const Board = ({pieceLetter}) => {
     /* inserting a new Piece */
     useEffect(() => {
         console.log("inserting a new Piece " + pieceLetter);
+        //console.log(pieceShape)
         insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
     }, [pieceLetter]);
 
@@ -155,9 +161,24 @@ const Board = ({pieceLetter}) => {
         }
     }, [pieceShape]);
 
-    /* changing position of Piece (when stuck to the border and changing the direction) */
+    /* piece gravity that takes effect every second */
     useEffect(() => {
-    }, [piecePosition]);
+        console.log("useEffect running");
+        if (JSON.stringify(pieceShape) !== JSON.stringify(getPieceShape(pieceLetter, pieceDirection))) {
+            console.log("returning")
+            return ;
+        }
+        const newGrid = [...grid];
+        const [row, col] = piecePosition;
+        const interval = setInterval(() => {
+            if (canMove('down', pieceShape,row + 1, col)) {
+                cleanGrid(newGrid, row, col);
+                insertPiece(pieceShape, pieceDirection, row + 1, col);
+            }
+            setGrid(newGrid);
+        }, 200);
+        return () => clearInterval(interval);
+    });
 
     /* handle KeyEvents => movePiece */
     useEffect(() => {

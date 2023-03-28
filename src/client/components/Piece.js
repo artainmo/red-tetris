@@ -255,6 +255,13 @@ const getPieceShape = (shape, direction) => {
 					];
 			}
 			break ;
+		default:
+			return [
+				[colorBg, colorBg, colorBg, colorBg],
+				[colorBg, colorBg, colorBg, colorBg],
+				[colorBg, colorBg, colorBg, colorBg],
+				[colorBg, colorBg, colorBg, colorBg]
+			];
 	}
 };
 

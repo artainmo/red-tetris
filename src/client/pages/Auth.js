@@ -29,7 +29,6 @@ const Auth = () => {
   }
 
   if (user === null) {
-    return (<Tetris />);
     return (<div>
               <TextField variant="outlined" placeholder="name" value={name}
                     onChange={(e)=>{setName(event.target.value);}} />
