@@ -1,5 +1,3 @@
-import React from 'react';
-
 const colorI = '#cc0f0f';
 const colorJ = '#1cd211';
 const colorL = '#95e011';
@@ -7,6 +5,28 @@ const colorO = '#f6c709';
 const colorS = '#5717e0';
 const colorT = '#e74208';
 const colorZ = '#a808e7';
+const colorBg = '#3565d0';
+
+const getPieceColor = (shape) => {
+	switch (shape) {
+		case 'I':
+			return colorI;
+		case 'J':
+			return colorJ;
+		case 'L':
+			return colorL;
+		case 'O':
+			return colorO;
+		case 'S':
+			return colorS;
+		case 'T':
+			return colorT;
+		case 'Z':
+			return colorZ;
+		default:
+			return colorBg;
+	}
+};
 
 const getPieceShape = (shape, direction) => {
 	switch (shape) {
@@ -15,30 +35,30 @@ const getPieceShape = (shape, direction) => {
 				case 'up':
 					return [
 						[colorI, colorI, colorI, colorI],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'down':
 					return [
-						[0, 0, 0, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
 						[colorI, colorI, colorI, colorI]
 					];
 				case 'left':
 					return [
-						[colorI, 0, 0, 0],
-						[colorI, 0, 0, 0],
-						[colorI, 0, 0, 0],
-						[colorI, 0, 0, 0]
+						[colorI, colorBg, colorBg, colorBg],
+						[colorI, colorBg, colorBg, colorBg],
+						[colorI, colorBg, colorBg, colorBg],
+						[colorI, colorBg, colorBg, colorBg]
 					];
 				case 'right':
 					return [
-						[0, 0, 0, colorI],
-						[0, 0, 0, colorI],
-						[0, 0, 0, colorI],
-						[0, 0, 0, colorI]
+						[colorBg, colorBg, colorBg, colorI],
+						[colorBg, colorBg, colorBg, colorI],
+						[colorBg, colorBg, colorBg, colorI],
+						[colorBg, colorBg, colorBg, colorI]
 					];
 			}
 			break ;
@@ -46,31 +66,31 @@ const getPieceShape = (shape, direction) => {
 			switch (direction) {
 				case 'up':
 					return [
-						[colorJ, 0, 0, 0],
-						[colorJ, colorJ, colorJ, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0],
+						[colorJ, colorBg, colorBg, colorBg],
+						[colorJ, colorJ, colorJ, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
 					];
 				case 'down':
 					return [
-							[0, colorJ, colorJ, colorJ],
-							[0, 0, 0, colorJ],
-							[0, 0, 0, 0],
-							[0, 0, 0, 0],
+							[colorBg, colorJ, colorJ, colorJ],
+							[colorBg, colorBg, colorBg, colorJ],
+							[colorBg, colorBg, colorBg, colorBg],
+							[colorBg, colorBg, colorBg, colorBg],
 					];
 				case 'left':
 					return [
-						[0, 0, 0, colorJ],
-						[0, 0, 0, colorJ],
-						[0, 0, colorJ, colorJ],
-						[0, 0, 0, 0],
+						[colorBg, colorBg, colorBg, colorJ],
+						[colorBg, colorBg, colorBg, colorJ],
+						[colorBg, colorBg, colorJ, colorJ],
+						[colorBg, colorBg, colorBg, colorBg],
 					];
 				case 'right':
 					return [
-						[colorJ, colorJ, 0, 0],
-						[colorJ, 0, 0, 0],
-						[colorJ, 0, 0, 0],
-						[0, 0, 0, 0],
+						[colorJ, colorJ, colorBg, colorBg],
+						[colorJ, colorBg, colorBg, colorBg],
+						[colorJ, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
 					];
 			}
 			break ;
@@ -78,31 +98,31 @@ const getPieceShape = (shape, direction) => {
 			switch (direction) {
 				case 'up':
 					return [
-						[0, 0, 0, colorL],
-						[0, colorL, colorL, colorL],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0],
+						[colorBg, colorBg, colorBg, colorL],
+						[colorBg, colorL, colorL, colorL],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
 					];
 				case 'down':
 					return [
-						[colorL, colorL, colorL, 0],
-						[colorL, 0, 0, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0],
+						[colorL, colorL, colorL, colorBg],
+						[colorL, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
 					];
 				case 'left':
 					return [
-						[0, 0, colorL, colorL],
-						[0, 0, 0, colorL],
-						[0, 0, 0, colorL],
-						[0, 0, 0, 0],
+						[colorBg, colorBg, colorL, colorL],
+						[colorBg, colorBg, colorBg, colorL],
+						[colorBg, colorBg, colorBg, colorL],
+						[colorBg, colorBg, colorBg, colorBg],
 					];
 				case 'right':
 					return [
-						[colorL, 0, 0, 0],
-						[colorL, 0, 0, 0],
-						[colorL, colorL, 0, 0],
-						[0, 0, 0, 0],
+						[colorL, colorBg, colorBg, colorBg],
+						[colorL, colorBg, colorBg, colorBg],
+						[colorL, colorL, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
 					];
 			}
 			break ;
@@ -110,31 +130,31 @@ const getPieceShape = (shape, direction) => {
 			switch (direction) {
 				case 'up':
 					return [
-						[0, colorO, colorO, 0],
-						[0, colorO, colorO, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorO, colorO, colorBg],
+						[colorBg, colorO, colorO, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'down':
 					return [
-						[0, colorO, colorO, 0],
-						[0, colorO, colorO, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorO, colorO, colorBg],
+						[colorBg, colorO, colorO, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'left':
 					return [
-						[0, colorO, colorO, 0],
-						[0, colorO, colorO, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorO, colorO, colorBg],
+						[colorBg, colorO, colorO, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'right':
 					return [
-						[0, colorO, colorO, 0],
-						[0, colorO, colorO, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorO, colorO, colorBg],
+						[colorBg, colorO, colorO, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 			}
 			break ;
@@ -142,31 +162,31 @@ const getPieceShape = (shape, direction) => {
 			switch (direction) {
 				case 'up':
 					return [
-						[0, colorS, colorS, 0],
-						[colorS, colorS, 0, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorS, colorS, colorBg],
+						[colorS, colorS, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'down':
 					return [
-						[0, 0, 0, 0],
-						[0, colorS, colorS, 0],
-						[colorS, colorS, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorS, colorS, colorBg],
+						[colorS, colorS, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'left':
 					return [
-						[colorS, 0, 0, 0],
-						[colorS, colorS, 0, 0],
-						[0, colorS, 0, 0],
-						[0, 0, 0, 0]
+						[colorS, colorBg, colorBg, colorBg],
+						[colorS, colorS, colorBg, colorBg],
+						[colorBg, colorS, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'right':
 					return [
-						[0, colorS, 0, 0],
-						[0, colorS, colorS, 0],
-						[0, 0, colorS, 0],
-						[0, 0, 0, 0],
+						[colorBg, colorS, colorBg, colorBg],
+						[colorBg, colorS, colorS, colorBg],
+						[colorBg, colorBg, colorS, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
 					];
 			}
 			break ;
@@ -174,31 +194,31 @@ const getPieceShape = (shape, direction) => {
 			switch (direction) {
 				case 'up':
 					return [
-						[0, colorT, 0, 0],
-						[colorT, colorT, colorT, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorT, colorBg, colorBg],
+						[colorT, colorT, colorT, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'down':
 					return [
-						[0, 0, 0, 0],
-						[colorT, colorT, colorT, 0],
-						[0, colorT, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorT, colorT, colorT, colorBg],
+						[colorBg, colorT, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'left':
 					return [
-						[0, colorT, 0, 0],
-						[colorT, colorT, 0, 0],
-						[0, colorT, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorT, colorBg, colorBg],
+						[colorT, colorT, colorBg, colorBg],
+						[colorBg, colorT, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'right':
 					return [
-						[0, colorT, 0, 0],
-						[0, colorT, colorT, 0],
-						[0, colorT, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorT, colorBg, colorBg],
+						[colorBg, colorT, colorT, colorBg],
+						[colorBg, colorT, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 			}
 			break ;
@@ -206,35 +226,35 @@ const getPieceShape = (shape, direction) => {
 			switch (direction) {
 				case 'up':
 					return [
-						[colorZ, colorZ, 0, 0],
-						[0, colorZ, colorZ, 0],
-						[0, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorZ, colorZ, colorBg, colorBg],
+						[colorBg, colorZ, colorZ, colorBg],
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'down':
 					return [
-						[0, 0, 0, 0],
-						[colorZ, colorZ, 0, 0],
-						[0, colorZ, colorZ, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorBg, colorBg, colorBg],
+						[colorZ, colorZ, colorBg, colorBg],
+						[colorBg, colorZ, colorZ, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'left':
 					return [
-						[0, colorZ, 0, 0],
-						[colorZ, colorZ, 0, 0],
-						[colorZ, 0, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorZ, colorBg, colorBg],
+						[colorZ, colorZ, colorBg, colorBg],
+						[colorZ, colorBg, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 				case 'right':
 					return [
-						[0, 0, colorZ, 0],
-						[0, colorZ, colorZ, 0],
-						[0, colorZ, 0, 0],
-						[0, 0, 0, 0]
+						[colorBg, colorBg, colorZ, colorBg],
+						[colorBg, colorZ, colorZ, colorBg],
+						[colorBg, colorZ, colorBg, colorBg],
+						[colorBg, colorBg, colorBg, colorBg]
 					];
 			}
 			break ;
 	}
 };
 
-export default getPieceShape;
+export {getPieceColor, getPieceShape};
