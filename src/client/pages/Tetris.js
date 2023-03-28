@@ -3,7 +3,7 @@ import Board from '../components/Board';
 import Button from '@mui/material/Button'
 
 const Tetris = () => {
-  const [pieceShape, setPieceShape] = useState('I');
+  const [pieceLetter, setPieceLetter] = useState('I');
 
   return (
       <div className="tetris">
@@ -14,7 +14,7 @@ const Tetris = () => {
           Simulate End Game
         </Button>
 
-        <Board pieceShape={pieceShape} />
+        <Board pieceLetter={pieceLetter} />
 
       </div>
   );

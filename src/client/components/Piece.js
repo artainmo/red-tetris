@@ -7,6 +7,7 @@ const colorT = '#e74208';
 const colorZ = '#a808e7';
 const colorBg = '#3565d0';
 
+// useless now but can be useful in the future
 const getPieceColor = (shape) => {
 	switch (shape) {
 		case 'I':
