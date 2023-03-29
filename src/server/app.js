@@ -4,8 +4,23 @@ const { Player } = require(__dirname + '/classes/Player.js');
 const { Game } = require(__dirname + '/classes/Game.js');
 const { Piece } = require(__dirname + '/classes/Piece.js');
 
-
 const app = express();
+
+/* only for dev purpose (remove after !) */
+const cors = require('cors');
+app.use(cors());
+
+const corsOptions = {
+  origin: true,
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204,
+  allowedHeaders: ['Access-Control-Allow-Origin'],
+}
+
+app.get('/', cors(corsOptions), function (req, res, next) {
+  res.json({msg: 'This is CORS-enabled for only example.com.'})
+})
+/* */
+
 const server = app.listen(3000, () => {
   console.log(`App listening at http://localhost:3000`);
 });

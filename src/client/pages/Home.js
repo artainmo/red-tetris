@@ -38,8 +38,8 @@ const Home = ({user, setUser}) => {
               <div>
                 <Typography variant="h4">Games</Typography>
                 <List>
-                  {games.map((game)=> (
-                    <ListItem>
+                  {games.map((game, key)=> (
+                    <ListItem key={key} >
                       <ListItemText primary={displayGame(game._player1,
                         game._player2, game._player1_score, game._player2_score)}/>
                     </ListItem>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {getPieceColor, getPieceShape} from './Piece';
 import '../style/board.css';
-import {askNewPiece} from '../api/socket.api'
 
 const directions = ['up', 'right', 'down', 'left'];
 const colorBg = '#3565d0';
@@ -28,6 +27,23 @@ const Board = ({pieceLetter}) => {
     const [indexDirection, setIndexDirection] = useState(1);
     const [pieceShape, setPieceShape] = useState(getPieceShape('', pieceDirection));
 
+    const handleOverflow = (gridRow, gridCol) => {
+        // handle overflow when turning stuck on borders left/right
+        // !! prendre en compte le gap entre la bordure et le nb de cellules de la piece
+        //  qui feraient un overflow (pas tjs 4...)
+        if (gridRow >= 20) {
+            gridRow -= 4;
+            setPiecePosition([gridRow, gridCol]);
+        }
+        if (gridCol >= 10) {
+            gridCol -= 4;
+            setPiecePosition([gridRow, gridCol]);
+        } else if (gridCol < 0) {
+            gridCol += 4;
+            setPiecePosition([gridRow, gridCol]);
+        }
+    };
+
     const insertColor = (newGrid, row, col) => {
         let gridRow;
         let gridCol;
@@ -36,20 +52,7 @@ const Board = ({pieceLetter}) => {
                 if (pieceShape[i][j] !== colorBg) {
                     gridRow = row + i;
                     gridCol = col + j;
-                    // handle overflow when turning stuck on borders left/right
-                    // !! prendre en compte le gap entre la bordure et le nb de cellules de la piece
-                    //  qui feraient un overflow (pas tjs 4...)
-                    if (gridRow >= 20) {
-                        gridRow -= 4;
-                        setPiecePosition([gridRow, gridCol]);
-                    }
-                    if (gridCol >= 10) {
-                        gridCol -= 4;
-                        setPiecePosition([gridRow, gridCol]);
-                    } else if (gridCol < 0) {
-                        gridCol += 4;
-                        setPiecePosition([gridRow, gridCol]);
-                    }
+                    handleOverflow(gridRow, gridCol);
                     newGrid[gridRow][gridCol] = { color: pieceShape[i][j] };
                 }
             }
@@ -142,6 +145,7 @@ const Board = ({pieceLetter}) => {
     useEffect(() => {
         console.log("inserting a new Piece " + pieceLetter);
         //console.log(pieceShape)
+       // setPieceShape(getPieceShape(pieceLetter, pieceDirection));
         insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
     }, [pieceLetter]);
 
@@ -164,10 +168,6 @@ const Board = ({pieceLetter}) => {
     /* piece gravity that takes effect every second */
     useEffect(() => {
         console.log("useEffect running");
-        if (JSON.stringify(pieceShape) !== JSON.stringify(getPieceShape(pieceLetter, pieceDirection))) {
-            console.log("returning")
-            return ;
-        }
         const newGrid = [...grid];
         const [row, col] = piecePosition;
         const interval = setInterval(() => {

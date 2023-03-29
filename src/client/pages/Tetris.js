@@ -4,7 +4,9 @@ import Button from '@mui/material/Button'
 
 const Tetris = () => {
   const [pieceLetter, setPieceLetter] = useState('');
+  const [pieceShape, setPieceShape] = useState([]);
   const [isActive, setIsActive] = useState(false);
+
 
   // gameloop
   useEffect(() => {
@@ -33,7 +35,7 @@ const Tetris = () => {
             <Button variant="outlined" onClick={()=>{setIsActive(true)}}>Start</Button>
         }
 
-        <Board pieceLetter={pieceLetter} />
+        <Board pieceShape={pieceShape} />
 
       </div>
   );

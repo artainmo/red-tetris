@@ -4,7 +4,6 @@ import Button from "@mui/material/Button";
 import Typography from '@mui/material/Typography';
 import { connect } from "../api/http.api"
 import Home from './Home'
-import Tetris from './Tetris'
 
 const Auth = () => {
   const [user, setUser] = useState(null);
