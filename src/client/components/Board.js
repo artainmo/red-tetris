@@ -24,6 +24,7 @@ const Board = ({isActive, setIsActive}) => {
 
     const [grid, setGrid] = useState(initGrid());
     const [pieceLetter, setPieceLetter] = useState('');
+    const [pieceType, setPieceType] = useState('');
     const [piecePosition, setPiecePosition] = useState([]);
     const [pieceDirection, setPieceDirection] = useState('up');
     const [indexDirection, setIndexDirection] = useState(1);
@@ -59,7 +60,7 @@ const Board = ({isActive, setIsActive}) => {
                     } else if (gridCol < 0) {
                         colOverflow = Math.min(colOverflow, gridCol);
                     }
-                    console.log("heeeeeeeere " + gridCol+ ' '+ colOverflow)
+                    //console.log("heeeeeeeere " + gridCol+ ' '+ colOverflow)
                     newGrid[gridRow - rowOverflow][gridCol - colOverflow] = { color: pieceShape[i][j], fixed: false };
                 }
             }
@@ -250,24 +251,25 @@ const Board = ({isActive, setIsActive}) => {
 
     /* inserting a new Piece */
     useEffect(() => {
-        console.log("inserting a new Piece " + pieceLetter);
         if (pieceLetter !== '') {
+            console.log("inserting a new Piece " + pieceLetter);
             insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
+            setPieceLetter('');
         }
     }, [pieceLetter]);
 
     /* changing direction of Piece */
     useEffect(() => {
-        console.log("changing direction to " + pieceDirection);
         if (piecePosition[0] !== undefined && piecePosition[1] !== undefined) {
-            setPieceShape(getPieceShape(pieceLetter, pieceDirection));
+            console.log("changing direction to " + pieceDirection);
+            setPieceShape(getPieceShape(pieceType, pieceDirection));
         }
     }, [pieceDirection]);
 
     /* changing shape of Piece (after changing the direction) */
     useEffect(() => {
-        console.log("updating shape...");
         if (piecePosition[0] !== undefined && piecePosition[1] !== undefined) {
+            console.log("updating shape...");
             insertPiece(pieceShape, pieceDirection, piecePosition[0], piecePosition[1]);
         }
     }, [pieceShape]);
@@ -293,9 +295,10 @@ const Board = ({isActive, setIsActive}) => {
     // gameloop
     useEffect(() => {
         if (isActive && getNewPiece) {
-            const pieces = ['I', 'J', 'L', 'S', 'Z', 'T', 'O'];
-            const randomIndex = Math.floor(Math.random() * pieces.length);
-            setPieceLetter(pieces[randomIndex]);
+            // const pieces = ['I', 'J', 'L', 'S', 'Z', 'T', 'O'];
+            // const randomIndex = Math.floor(Math.random() * pieces.length);
+            setPieceLetter('I');
+            setPieceType('I');
             setGetNewPiece(false);
         }
     }, [isActive, getNewPiece]);
