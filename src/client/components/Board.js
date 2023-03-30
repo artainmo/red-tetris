@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {getPieceColor, getPieceShape} from './Piece';
 import '../style/board.css';
+import {askNewPiece} from '../api/socket.api'
 
 const directions = ['up', 'right', 'down', 'left'];
 const colorBg = '#3565d0';
 
-const Board = ({pieceLetter}) => {
+const Board = ({isActive}) => {
     const initGrid = () => {
         const rows = [];
         for (let row = 0; row < 20; row++) {
@@ -22,27 +23,12 @@ const Board = ({pieceLetter}) => {
     };
 
     const [grid, setGrid] = useState(initGrid());
+    const [pieceLetter, setPieceLetter] = useState('');
     const [piecePosition, setPiecePosition] = useState([]);
     const [pieceDirection, setPieceDirection] = useState('up');
     const [indexDirection, setIndexDirection] = useState(1);
     const [pieceShape, setPieceShape] = useState(getPieceShape('', pieceDirection));
-
-    const handleOverflow = (gridRow, gridCol) => {
-        // handle overflow when turning stuck on borders left/right
-        // !! prendre en compte le gap entre la bordure et le nb de cellules de la piece
-        //  qui feraient un overflow (pas tjs 4...)
-        if (gridRow >= 20) {
-            gridRow -= 4;
-            setPiecePosition([gridRow, gridCol]);
-        }
-        if (gridCol >= 10) {
-            gridCol -= 4;
-            setPiecePosition([gridRow, gridCol]);
-        } else if (gridCol < 0) {
-            gridCol += 4;
-            setPiecePosition([gridRow, gridCol]);
-        }
-    };
+    const [getNewPiece, setGetNewPiece] = useState(true);
 
     const insertColor = (newGrid, row, col) => {
         let gridRow;
@@ -52,7 +38,20 @@ const Board = ({pieceLetter}) => {
                 if (pieceShape[i][j] !== colorBg) {
                     gridRow = row + i;
                     gridCol = col + j;
-                    handleOverflow(gridRow, gridCol);
+                    // handle overflow when turning stuck on borders left/right
+                    // !! prendre en compte le gap entre la bordure et le nb de cellules de la piece
+                    //  qui feraient un overflow (pas tjs 4...)
+                    if (gridRow >= 20) {
+                        gridRow -= 4;
+                        setPiecePosition([gridRow, gridCol]);
+                    }
+                    if (gridCol >= 10) {
+                        gridCol -= 4;
+                        setPiecePosition([gridRow, gridCol]);
+                    } else if (gridCol < 0) {
+                        gridCol += 4;
+                        setPiecePosition([gridRow, gridCol]);
+                    }
                     newGrid[gridRow][gridCol] = { color: pieceShape[i][j] };
                 }
             }
@@ -83,7 +82,9 @@ const Board = ({pieceLetter}) => {
         for (let rowGrid = row; rowGrid < row + 4; rowGrid++) {
             for (let colGrid = col; colGrid < col + 4; colGrid++) {
                 if (rowGrid >= 0 && colGrid >= 0 && rowGrid <= 19 && colGrid <= 9) {
-                    grid[rowGrid][colGrid].color = colorBg;
+                    if (grid[rowGrid][colGrid].fixed !== true) {
+                        grid[rowGrid][colGrid].color = colorBg;
+                    }
                 }
             }
         }
@@ -94,7 +95,7 @@ const Board = ({pieceLetter}) => {
     *  if it's down, it'll be a row */
     const getBoundaryCellFromDirection = (pieceDirection, pieceShape, row, col) => {
         let boundary;
-            //console.log(pieceShape);
+        //console.log(pieceShape);
         switch (pieceDirection) {
             case 'down':
                 for (let rowPiece = 0; rowPiece < 4; rowPiece++) {
@@ -126,15 +127,41 @@ const Board = ({pieceLetter}) => {
         }
     };
 
+    const setFixed = (pieceShape, row, col) => {
+        for (let rowPiece = 0; rowPiece < 4; rowPiece++) {
+            for (let colPiece = 0; colPiece < 4; colPiece++) {
+                if (pieceShape[rowPiece][colPiece] !== colorBg) {
+                    grid[row + rowPiece][col + colPiece] = { color : pieceShape[rowPiece][colPiece], fixed: true };
+                }
+            }
+        }
+        setGetNewPiece(true);
+    };
+
+    const checkFixed = (newPosition, pieceShape) => {
+        for (let rowPiece = 0; rowPiece < 4; rowPiece++) {
+            for (let colPiece = 0; colPiece < 4; colPiece++) {
+                if (pieceShape[rowPiece][colPiece] !== colorBg) {
+                    const row = rowPiece + newPosition[0];
+                    const col = colPiece + newPosition[1];
+                    if (grid[row][col].fixed) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    };
+
     const canMove = (pos, pieceShape, row, col) => {
         const boundary = getBoundaryCellFromDirection(pos, pieceShape, row, col);
         // console.log("Boundary = " + boundary)
         // next step : add collisions between pieces
-        if (pos === 'down' && boundary < 20) {
+        if (pos === 'down' && boundary < 20 && checkFixed([row, col], pieceShape)) {
             return true;
-        } else if (pos === 'left' && boundary >= 0) {
+        } else if (pos === 'left' && boundary >= 0 && checkFixed([row, col], pieceShape)) {
             return true;
-        } else if (pos === 'right' && boundary < 10) {
+        } else if (pos === 'right' && boundary < 10 && checkFixed([row, col], pieceShape)) {
             return true;
         } else {
             return false;
@@ -145,7 +172,6 @@ const Board = ({pieceLetter}) => {
     useEffect(() => {
         console.log("inserting a new Piece " + pieceLetter);
         //console.log(pieceShape)
-       // setPieceShape(getPieceShape(pieceLetter, pieceDirection));
         insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
     }, [pieceLetter]);
 
@@ -167,18 +193,32 @@ const Board = ({pieceLetter}) => {
 
     /* piece gravity that takes effect every second */
     useEffect(() => {
-        console.log("useEffect running");
-        const newGrid = [...grid];
-        const [row, col] = piecePosition;
-        const interval = setInterval(() => {
-            if (canMove('down', pieceShape,row + 1, col)) {
-                cleanGrid(newGrid, row, col);
-                insertPiece(pieceShape, pieceDirection, row + 1, col);
-            }
-            setGrid(newGrid);
-        }, 200);
-        return () => clearInterval(interval);
+        if (isActive && !getNewPiece) {
+            console.log("useEffect running");
+            const newGrid = [...grid];
+            const [row, col] = piecePosition;
+            const interval = setInterval(() => {
+                if (canMove('down', pieceShape,row + 1, col)) {
+                    cleanGrid(newGrid, row, col);
+                    insertPiece(pieceShape, pieceDirection, row + 1, col);
+                } else {
+                    setFixed(pieceShape, row, col);
+                }
+                setGrid(newGrid);
+            }, 200);
+            return () => clearInterval(interval);
+        }
     });
+
+    // gameloop
+    useEffect(() => {
+        if (isActive && getNewPiece) {
+            const pieces = ['I', 'J', 'L', 'S', 'Z', 'T', 'O'];
+            const randomIndex = Math.floor(Math.random() * pieces.length);
+            setPieceLetter(pieces[randomIndex]);
+            setGetNewPiece(false);
+        }
+    }, [isActive, getNewPiece]);
 
     /* handle KeyEvents => movePiece */
     useEffect(() => {

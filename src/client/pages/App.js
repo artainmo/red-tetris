@@ -5,7 +5,7 @@ import Auth from './Auth'
 const App = () => {
     return (
         <div>
-            <Auth />
+            <Tetris />
         </div>
     );
 };
