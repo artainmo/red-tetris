@@ -83,7 +83,7 @@ const Board = ({isActive}) => {
             for (let colGrid = col; colGrid < col + 4; colGrid++) {
                 if (rowGrid >= 0 && colGrid >= 0 && rowGrid <= 19 && colGrid <= 9) {
                     if (grid[rowGrid][colGrid].fixed !== true) {
-                        grid[rowGrid][colGrid].color = colorBg;
+                        grid[rowGrid][colGrid] = {color: colorBg, fixed: false};
                     }
                 }
             }
@@ -135,6 +135,7 @@ const Board = ({isActive}) => {
                 }
             }
         }
+        removeFullLines();
         setGetNewPiece(true);
     };
 
@@ -166,6 +167,17 @@ const Board = ({isActive}) => {
         } else {
             return false;
         }
+    };
+
+    const removeFullLines = () => {
+        let newGrid = [...grid];
+        for (let row = 0; row < 20; row++) {
+            if (!newGrid[row].some(cell => cell.color === colorBg && cell.fixed === false)) {
+                newGrid.splice(row, 1);
+                newGrid.unshift(Array(10).fill({color: colorBg, fixed: false}));
+            }
+        }
+        setGrid(newGrid);
     };
 
     /* inserting a new Piece */
@@ -204,8 +216,7 @@ const Board = ({isActive}) => {
                 } else {
                     setFixed(pieceShape, row, col);
                 }
-                setGrid(newGrid);
-            }, 200);
+            }, 500);
             return () => clearInterval(interval);
         }
     });
