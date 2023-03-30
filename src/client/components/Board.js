@@ -6,7 +6,7 @@ import {askNewPiece} from '../api/socket.api'
 const directions = ['up', 'right', 'down', 'left'];
 const colorBg = '#3565d0';
 
-const Board = ({isActive}) => {
+const Board = ({isActive, setIsActive}) => {
     const initGrid = () => {
         const rows = [];
         for (let row = 0; row < 20; row++) {
@@ -62,6 +62,7 @@ const Board = ({isActive}) => {
     const insertNewPiece = (pieceLetter, direction, row, col) => {
         const newGrid = [...grid];
         setPieceShape(getPieceShape(pieceLetter, direction));
+        checkGameOver();
         insertColor(newGrid, row, col);
         setPiecePosition([row, col]);
         setGrid(newGrid);
@@ -180,10 +181,22 @@ const Board = ({isActive}) => {
         setGrid(newGrid);
     };
 
+    const checkGameOver = () => {
+        if (pieceShape !== undefined) {
+            for (let row = 0; row < 4; row++) {
+                for (let col = 0; col < 4; col++) {
+                    if (pieceShape[row][col] !== colorBg && grid[row][col + 3].fixed) {
+                        console.log("game over !")
+                        setIsActive(false);
+                    }
+                }
+            }
+        }
+    };
+
     /* inserting a new Piece */
     useEffect(() => {
         console.log("inserting a new Piece " + pieceLetter);
-        //console.log(pieceShape)
         insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
     }, [pieceLetter]);
 
@@ -253,12 +266,13 @@ const Board = ({isActive}) => {
             }
             setGrid(newGrid);
         };
+        if (isActive) {
+            window.addEventListener('keydown', handleKeyDown);
 
-        window.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
+            return () => {
+                window.removeEventListener('keydown', handleKeyDown);
+            };
+        }
     });
 
     return (

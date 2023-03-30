@@ -20,7 +20,7 @@ const Tetris = () => {
             <Button variant="outlined" onClick={()=>{setIsActive(true)}}>Start</Button>
         }
 
-        <Board isActive={isActive} />
+        <Board isActive={isActive} setIsActive={setIsActive} />
 
       </div>
   );
