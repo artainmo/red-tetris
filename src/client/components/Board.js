@@ -30,41 +30,95 @@ const Board = ({isActive, setIsActive}) => {
     const [pieceShape, setPieceShape] = useState(getPieceShape('', pieceDirection));
     const [getNewPiece, setGetNewPiece] = useState(true);
 
+    const handleRotation = (gap, gridRow, gridCol) => {
+        if (gridRow >= 20) {
+            gap[0]--;
+        }
+        if (gridCol >= 10) {
+            gridCol -= 4;
+        } else if (gridCol < 0) {
+            gridCol += 4;
+        }
+    };
+
     const insertColor = (newGrid, row, col) => {
-        let gridRow;
-        let gridCol;
+        let gridRow, gridCol;
+        let rowOverflow = 0, colOverflow = 0;
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 4; j++) {
                 if (pieceShape[i][j] !== colorBg) {
                     gridRow = row + i;
                     gridCol = col + j;
-                    // handle overflow when turning stuck on borders left/right
-                    // !! prendre en compte le gap entre la bordure et le nb de cellules de la piece
-                    //  qui feraient un overflow (pas tjs 4...)
                     if (gridRow >= 20) {
-                        gridRow -= 4;
-                        setPiecePosition([gridRow, gridCol]);
+                        rowOverflow = Math.max(rowOverflow, gridRow - 19);
+                        gridRow -= Math.min(rowOverflow, gridRow - 19);
                     }
                     if (gridCol >= 10) {
-                        gridCol -= 4;
-                        setPiecePosition([gridRow, gridCol]);
+                        colOverflow = Math.max(colOverflow, gridCol - 9);
+                        gridCol -= Math.min(colOverflow, gridCol - 9);
                     } else if (gridCol < 0) {
-                        gridCol += 4;
-                        setPiecePosition([gridRow, gridCol]);
+                        colOverflow = Math.min(colOverflow, gridCol);
                     }
-                    newGrid[gridRow][gridCol] = { color: pieceShape[i][j] };
+                    console.log("heeeeeeeere " + gridCol+ ' '+ colOverflow)
+                    newGrid[gridRow - rowOverflow][gridCol - colOverflow] = { color: pieceShape[i][j], fixed: false };
                 }
             }
         }
-        setPiecePosition([row, col]);
+        setPiecePosition([row - rowOverflow, col - colOverflow]);
     };
+
+    // const insertColor = (newGrid, row, col) => {
+    //     let gridRow;
+    //     let gridCol;
+    //     let gap = [0, 0]; // gap of [row, col] the Piece overflows when rotating and have to be shifted of
+    //     for (let i = 0; i < 4; i++) {
+    //         for (let j = 0; j < 4; j++) {
+    //             if (pieceShape[i][j] !== colorBg) {
+    //                 gridRow = row + i;
+    //                 gridCol = col + j;
+    //                 //handleRotation(gap, gridRow, gridCol);
+    //                 if (gridRow >= 20) {
+    //                     gridRow -= 4;
+    //                     setPiecePosition([gridRow, gridCol]);
+    //                 }
+    //                 if (gridCol >= 10) {
+    //                     gridCol -= (10 - );
+    //                     setPiecePosition([gridRow, gridCol]);
+    //                 } else if (gridCol < 0) {
+    //                     gridCol += 4;
+    //                     setPiecePosition([gridRow, gridCol]);
+    //                 }
+    //                 newGrid[gridRow][gridCol] = { color: pieceShape[i][j], fixed: false };
+    //
+    //                 {
+    //
+    //                 // handle overflow when turning stuck on borders left/right
+    //                 // !! prendre en compte le gap entre la bordure et le nb de cellules de la piece
+    //                 //  qui feraient un overflow (pas tjs 4...)
+    //                 // if (gridRow >= 20) {
+    //                 //     gridRow -= 4;
+    //                 //     setPiecePosition([gridRow, gridCol]);
+    //                 // }
+    //                 // if (gridCol >= 10) {
+    //                 //     gridCol -= 4;
+    //                 //     setPiecePosition([gridRow, gridCol]);
+    //                 // } else if (gridCol < 0) {
+    //                 //     gridCol += 4;
+    //                 //     setPiecePosition([gridRow, gridCol]);
+    //                 // }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     setPiecePosition([row + gap[0], col + gap[1]]);
+    // };
 
     const insertNewPiece = (pieceLetter, direction, row, col) => {
         const newGrid = [...grid];
         setPieceShape(getPieceShape(pieceLetter, direction));
         checkGameOver();
         insertColor(newGrid, row, col);
-        setPiecePosition([row, col]);
+        //setPiecePosition([row, col]);
         setGrid(newGrid);
     };
 
@@ -146,7 +200,7 @@ const Board = ({isActive, setIsActive}) => {
                 if (pieceShape[rowPiece][colPiece] !== colorBg) {
                     const row = rowPiece + newPosition[0];
                     const col = colPiece + newPosition[1];
-                    if (grid[row][col].fixed) {
+                    if (row < 20 && col < 10 && grid[row][col].fixed) {
                         return false;
                     }
                 }
@@ -197,7 +251,9 @@ const Board = ({isActive, setIsActive}) => {
     /* inserting a new Piece */
     useEffect(() => {
         console.log("inserting a new Piece " + pieceLetter);
-        insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
+        if (pieceLetter !== '') {
+            insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
+        }
     }, [pieceLetter]);
 
     /* changing direction of Piece */
