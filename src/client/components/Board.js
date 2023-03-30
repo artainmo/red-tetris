@@ -26,7 +26,7 @@ const Board = ({isActive, setIsActive}) => {
     const [pieceLetter, setPieceLetter] = useState('');
     const [pieceType, setPieceType] = useState('');
     const [piecePosition, setPiecePosition] = useState([]);
-    const [pieceDirection, setPieceDirection] = useState('up');
+    const [pieceDirection, setPieceDirection] = useState('');
     const [indexDirection, setIndexDirection] = useState(1);
     const [pieceShape, setPieceShape] = useState(getPieceShape('', pieceDirection));
     const [getNewPiece, setGetNewPiece] = useState(true);
@@ -114,13 +114,15 @@ const Board = ({isActive, setIsActive}) => {
     //     setPiecePosition([row + gap[0], col + gap[1]]);
     // };
 
-    const insertNewPiece = (pieceLetter, direction, row, col) => {
+    const insertNewPiece = (pieceL, direction, row, col) => {
         const newGrid = [...grid];
-        setPieceShape(getPieceShape(pieceLetter, direction));
+        console.log("1 " + pieceL + " + " + pieceShape);
+        setPieceShape(getPieceShape(pieceL, direction));
         checkGameOver();
-        insertColor(newGrid, row, col);
+        console.log("2 " + pieceL + " + " + pieceShape);
+        //insertColor(newGrid, row, col);
         //setPiecePosition([row, col]);
-        setGrid(newGrid);
+        //setGrid(newGrid);
     };
 
     const insertPiece = (pieceShape, direction, row, col) => {
@@ -251,9 +253,12 @@ const Board = ({isActive, setIsActive}) => {
 
     /* inserting a new Piece */
     useEffect(() => {
+        console.log("hey " + pieceLetter)
         if (pieceLetter !== '') {
             console.log("inserting a new Piece " + pieceLetter);
-            insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
+            setPieceShape(getPieceShape(pieceLetter, pieceDirection));
+            checkGameOver();
+            //insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
             setPieceLetter('');
         }
     }, [pieceLetter]);
@@ -299,6 +304,9 @@ const Board = ({isActive, setIsActive}) => {
             // const randomIndex = Math.floor(Math.random() * pieces.length);
             setPieceLetter('I');
             setPieceType('I');
+            setPieceDirection('up');
+            setIndexDirection(1);
+            setPiecePosition([0, 3]);
             setGetNewPiece(false);
         }
     }, [isActive, getNewPiece]);
