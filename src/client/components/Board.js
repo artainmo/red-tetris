@@ -37,6 +37,28 @@ const Board = ({isActive, setIsActive}) =>
     const [pieceShape, setPieceShape] = useState(getPieceShape('', pieceDirection));
     const [getNewPiece, setGetNewPiece] = useState(true);
 
+    const canRotate = (pieceShape, direction, row, col) => {
+        /* simulate the shape after rotating */
+        //console.log(row, col)
+        const piece_tmp = getPieceShape(pieceType, DIRECTIONS[(indexDirection + 1) % 4]);
+        for (let i = 0; i < PIECE_LENGTH; i++) {
+            for (let j = 0; j < PIECE_WIDTH; j++) {
+                const gridRow = row + i;
+                const gridCol = col + j;
+                //console.log(piece_tmp[i][j], grid[gridRow][gridCol].fixed, gridRow, gridCol)
+                if (piece_tmp[i][j] !== COLOR_BG
+                    && gridRow >= 0 && gridCol >= 0
+                    && gridRow <= GRID_LENGTH
+                    && gridCol <= GRID_WIDTH
+                    && grid[gridRow][gridCol].fixed) {
+                    console.log('---------cannot rotate---------')
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
     const insertPiece = (pieceShape, direction, row, col) => {
         const newGrid = [...grid];
         let gridRow, gridCol;
@@ -124,6 +146,7 @@ const Board = ({isActive, setIsActive}) =>
         const newGrid = [...grid];
         const [row, col] = piecePosition;
 
+        event.preventDefault();
         if (event.key === 'ArrowDown' && canMove('down', pieceShape,row + 1, col)) {
             cleanGrid(newGrid, row, col);
             insertPiece(pieceShape, pieceDirection, row + 1, col);
@@ -135,7 +158,7 @@ const Board = ({isActive, setIsActive}) =>
         } else if (event.key === 'ArrowRight' && canMove('right', pieceShape, row, col + 1)) {
             cleanGrid(newGrid, row, col);
             insertPiece(pieceShape, pieceDirection, row, col + 1);
-        } else if (event.key === 'ArrowUp') {
+        } else if (event.key === 'ArrowUp' && canRotate(pieceShape, pieceDirection, row, col)) {
             cleanGrid(newGrid, row, col);
             setIndexDirection(indexDirection + 1);
             setPieceDirection(DIRECTIONS[indexDirection % 4]);
