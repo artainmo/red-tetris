@@ -248,10 +248,10 @@ const Board = ({isActive, setIsActive}) =>
     /* askNewPiece */
     useEffect(() => {
         if (isActive && getNewPiece) {
-            // const pieces = ['I', 'J', 'L', 'S', 'Z', 'T', 'O'];
-            // const randomIndex = Math.floor(Math.random() * pieces.length);
-            setPieceLetter('I');
-            setPieceType('I');
+            const pieces = ['I', 'J', 'L', 'S', 'Z', 'T', 'O'];
+            const randomIndex = Math.floor(Math.random() * pieces.length);
+            setPieceLetter(pieces[randomIndex]);
+            setPieceType(pieces[randomIndex]);
             setPieceDirection('up');
             setIndexDirection(1);
             setPiecePosition([0, 3]);

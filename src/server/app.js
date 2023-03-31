@@ -6,7 +6,8 @@ const { Piece } = require(__dirname + '/classes/Piece.js');
 
 const app = express();
 
-/* only for dev purpose (remove after !) */
+/* only for dev purpose (remove after !)
+* */
 const cors = require('cors');
 app.use(cors());
 
@@ -16,10 +17,9 @@ const corsOptions = {
   allowedHeaders: ['Access-Control-Allow-Origin'],
 }
 
-app.get('/', cors(corsOptions), function (req, res, next) {
-  res.json({msg: 'This is CORS-enabled for only example.com.'})
-})
-/* */
+// app.get('/', cors(corsOptions), function (req, res, next) {
+//   //res.json({msg: 'This is CORS-enabled for only example.com.'})
+// })
 
 const server = app.listen(3000, () => {
   console.log(`App listening at http://localhost:3000`);
@@ -34,7 +34,7 @@ const path_to_bundled_files = __dirname + "/../../dist/";
 app.use(express.static(path_to_bundled_files));
 
 //Send our bundled single-page-application frontend in one HTTP request when on homepage
-app.get('/', (req, res) => {
+app.get('/', cors(corsOptions), (req, res) => {
   res.sendFile('index.html', { root: path_to_bundled_files});
 });
 
@@ -172,7 +172,12 @@ router.patch('/game/wait/quit', async (req,res,next) => {
 
 
 //Setting up the websockets with socket.io
-const io = socketio(server);
+const io = socketio(server, {
+  cors: {
+    origin: true,
+    methods: "*",
+  }
+});
 
 io.on('connection', async (socket) => {
   console.log('A user connected to websocket');
