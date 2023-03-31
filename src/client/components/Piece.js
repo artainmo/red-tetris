@@ -29,6 +29,42 @@ const getPieceColor = (shape) => {
 	}
 };
 
+/* get the most left, right or bottom cell of a Piece
+    *  if it's left or right, a number representing a column will be returned
+    *  if it's down, it'll be a row */
+const getBoundaryCellFromDirection = (pieceDirection, pieceShape, row, col) => {
+	let boundary;
+	switch (pieceDirection) {
+		case 'down':
+			for (let rowPiece = 0; rowPiece < pieceShape.length; rowPiece++) {
+				for (let colPiece = 0; colPiece < pieceShape[rowPiece].length; colPiece++) {
+					if (pieceShape[rowPiece][colPiece] !== colorBg) {
+						boundary = rowPiece + row;
+					}
+				}
+			}
+			return boundary;
+		case 'left':
+			for (let rowPiece = pieceShape.length - 1; rowPiece >= 0; rowPiece--) {
+				for (let colPiece = pieceShape[rowPiece].length - 1; colPiece >= 0; colPiece--) {
+					if (pieceShape[rowPiece][colPiece] !== colorBg) {
+						boundary = colPiece + col;
+					}
+				}
+			}
+			return boundary;
+		case 'right':
+			for (let rowPiece = 0; rowPiece < pieceShape.length; rowPiece++) {
+				for (let colPiece = 0; colPiece < pieceShape[rowPiece].length; colPiece++) {
+					if (pieceShape[rowPiece][colPiece] !== colorBg) {
+						boundary = colPiece + col;
+					}
+				}
+			}
+			return boundary;
+	}
+};
+
 const getPieceShape = (shape, direction) => {
 	switch (shape) {
 		case 'I':
@@ -265,4 +301,4 @@ const getPieceShape = (shape, direction) => {
 	}
 };
 
-export {getPieceColor, getPieceShape};
+export {getPieceColor, getPieceShape, getBoundaryCellFromDirection};

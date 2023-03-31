@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import {getPieceColor, getPieceShape} from './Piece';
+import { getPieceShape, getBoundaryCellFromDirection } from './Piece';
 import '../style/board.css';
-import {askNewPiece} from '../api/socket.api'
 
-const directions = ['up', 'right', 'down', 'left'];
-const colorBg = '#3565d0';
+const DIRECTIONS = ['up', 'right', 'down', 'left'];
+const GRID_LENGTH = 20;
+const GRID_WIDTH = 10;
+const PIECE_LENGTH = 4;
+const PIECE_WIDTH = 4;
+const COLOR_BG = '#3565d0';
+const GRAVITY_MS = 500; /* interval to make the tetromino falling down, in milliseconds */
 
-const Board = ({isActive, setIsActive}) => {
+const Board = ({isActive, setIsActive}) =>
+{
     const initGrid = () => {
         const rows = [];
-        for (let row = 0; row < 20; row++) {
+
+        for (let row = 0; row < GRID_LENGTH; row++) {
             const cells = [];
-            for (let col = 0; col < 10; col++) {
+            for (let col = 0; col < GRID_WIDTH; col++) {
                 cells.push({
-                    color: colorBg,
+                    color: COLOR_BG,
                     fixed: false,
                 });
             }
@@ -31,164 +37,52 @@ const Board = ({isActive, setIsActive}) => {
     const [pieceShape, setPieceShape] = useState(getPieceShape('', pieceDirection));
     const [getNewPiece, setGetNewPiece] = useState(true);
 
-    const handleRotation = (gap, gridRow, gridCol) => {
-        if (gridRow >= 20) {
-            gap[0]--;
-        }
-        if (gridCol >= 10) {
-            gridCol -= 4;
-        } else if (gridCol < 0) {
-            gridCol += 4;
-        }
-    };
-
-    const insertColor = (newGrid, row, col) => {
+    const insertPiece = (pieceShape, direction, row, col) => {
+        const newGrid = [...grid];
         let gridRow, gridCol;
         let rowOverflow = 0, colOverflow = 0;
-        for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 4; j++) {
-                if (pieceShape[i][j] !== colorBg) {
+
+        for (let i = 0; i < PIECE_LENGTH; i++) {
+            for (let j = 0; j < PIECE_WIDTH; j++) {
+                if (pieceShape[i][j] !== COLOR_BG) {
                     gridRow = row + i;
                     gridCol = col + j;
-                    if (gridRow >= 20) {
-                        rowOverflow = Math.max(rowOverflow, gridRow - 19);
-                        gridRow -= Math.min(rowOverflow, gridRow - 19);
+                    /* handleOverflow when rotating, we need to get the gap between the border
+                    * of the grid and the cells that are overflowing to then shift the Piece */
+                    if (gridRow >= GRID_LENGTH) {
+                        rowOverflow = Math.max(rowOverflow, gridRow - (GRID_LENGTH - 1));
+                        gridRow -= Math.min(rowOverflow, gridRow - (GRID_LENGTH - 1));
                     }
-                    if (gridCol >= 10) {
-                        colOverflow = Math.max(colOverflow, gridCol - 9);
-                        gridCol -= Math.min(colOverflow, gridCol - 9);
+                    if (gridCol >= GRID_WIDTH) {
+                        colOverflow = Math.max(colOverflow, gridCol - (GRID_WIDTH - 1));
+                        gridCol -= Math.min(colOverflow, gridCol - (GRID_WIDTH - 1));
                     } else if (gridCol < 0) {
                         colOverflow = Math.min(colOverflow, gridCol);
                     }
-                    //console.log("heeeeeeeere " + gridCol+ ' '+ colOverflow)
                     newGrid[gridRow - rowOverflow][gridCol - colOverflow] = { color: pieceShape[i][j], fixed: false };
                 }
             }
         }
         setPiecePosition([row - rowOverflow, col - colOverflow]);
-    };
-
-    // const insertColor = (newGrid, row, col) => {
-    //     let gridRow;
-    //     let gridCol;
-    //     let gap = [0, 0]; // gap of [row, col] the Piece overflows when rotating and have to be shifted of
-    //     for (let i = 0; i < 4; i++) {
-    //         for (let j = 0; j < 4; j++) {
-    //             if (pieceShape[i][j] !== colorBg) {
-    //                 gridRow = row + i;
-    //                 gridCol = col + j;
-    //                 //handleRotation(gap, gridRow, gridCol);
-    //                 if (gridRow >= 20) {
-    //                     gridRow -= 4;
-    //                     setPiecePosition([gridRow, gridCol]);
-    //                 }
-    //                 if (gridCol >= 10) {
-    //                     gridCol -= (10 - );
-    //                     setPiecePosition([gridRow, gridCol]);
-    //                 } else if (gridCol < 0) {
-    //                     gridCol += 4;
-    //                     setPiecePosition([gridRow, gridCol]);
-    //                 }
-    //                 newGrid[gridRow][gridCol] = { color: pieceShape[i][j], fixed: false };
-    //
-    //                 {
-    //
-    //                 // handle overflow when turning stuck on borders left/right
-    //                 // !! prendre en compte le gap entre la bordure et le nb de cellules de la piece
-    //                 //  qui feraient un overflow (pas tjs 4...)
-    //                 // if (gridRow >= 20) {
-    //                 //     gridRow -= 4;
-    //                 //     setPiecePosition([gridRow, gridCol]);
-    //                 // }
-    //                 // if (gridCol >= 10) {
-    //                 //     gridCol -= 4;
-    //                 //     setPiecePosition([gridRow, gridCol]);
-    //                 // } else if (gridCol < 0) {
-    //                 //     gridCol += 4;
-    //                 //     setPiecePosition([gridRow, gridCol]);
-    //                 // }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     setPiecePosition([row + gap[0], col + gap[1]]);
-    // };
-
-    const insertNewPiece = (pieceL, direction, row, col) => {
-        const newGrid = [...grid];
-        console.log("1 " + pieceL + " + " + pieceShape);
-        setPieceShape(getPieceShape(pieceL, direction));
-        checkGameOver();
-        console.log("2 " + pieceL + " + " + pieceShape);
-        //insertColor(newGrid, row, col);
-        //setPiecePosition([row, col]);
-        //setGrid(newGrid);
-    };
-
-    const insertPiece = (pieceShape, direction, row, col) => {
-        const newGrid = [...grid];
-        insertColor(newGrid, row, col);
-        //setPiecePosition([row, col]);
         setGrid(newGrid);
     };
 
     const cleanGrid = (grid, row, col) => {
-        //console.log(piecePosition)
-        // clean la zone de la piece sur la grid,
-        // !! bien check par la suite les couleurs car on peut avoir d'autres pieces sur le spectre
-        // et aussi check les overflows
-        for (let rowGrid = row; rowGrid < row + 4; rowGrid++) {
-            for (let colGrid = col; colGrid < col + 4; colGrid++) {
-                if (rowGrid >= 0 && colGrid >= 0 && rowGrid <= 19 && colGrid <= 9) {
+        for (let rowGrid = row; rowGrid < row + PIECE_LENGTH; rowGrid++) {
+            for (let colGrid = col; colGrid < col + PIECE_WIDTH; colGrid++) {
+                if (rowGrid >= 0 && colGrid >= 0 && rowGrid <= GRID_LENGTH - 1 && colGrid <= GRID_WIDTH - 1) {
                     if (grid[rowGrid][colGrid].fixed !== true) {
-                        grid[rowGrid][colGrid] = {color: colorBg, fixed: false};
+                        grid[rowGrid][colGrid] = {color: COLOR_BG, fixed: false};
                     }
                 }
             }
         }
     };
 
-    /* get the most left, right or bottom cell of a Piece
-    *  if it's left or right, a number representing a column will be returned
-    *  if it's down, it'll be a row */
-    const getBoundaryCellFromDirection = (pieceDirection, pieceShape, row, col) => {
-        let boundary;
-        //console.log(pieceShape);
-        switch (pieceDirection) {
-            case 'down':
-                for (let rowPiece = 0; rowPiece < 4; rowPiece++) {
-                    for (let colPiece = 0; colPiece < 4; colPiece++) {
-                        if (pieceShape[rowPiece][colPiece] !== colorBg) {
-                            boundary = rowPiece + row;
-                        }
-                    }
-                }
-                return boundary;
-            case 'left':
-                for (let rowPiece = 3; rowPiece >= 0; rowPiece--) {
-                    for (let colPiece = 3; colPiece >= 0; colPiece--) {
-                        if (pieceShape[rowPiece][colPiece] !== colorBg) {
-                            boundary = colPiece + col;
-                        }
-                    }
-                }
-                return boundary;
-            case 'right':
-                for (let rowPiece = 0; rowPiece < 4; rowPiece++) {
-                    for (let colPiece = 0; colPiece < 4; colPiece++) {
-                        if (pieceShape[rowPiece][colPiece] !== colorBg) {
-                            boundary = colPiece + col;
-                        }
-                    }
-                }
-                return boundary;
-        }
-    };
-
     const setFixed = (pieceShape, row, col) => {
-        for (let rowPiece = 0; rowPiece < 4; rowPiece++) {
-            for (let colPiece = 0; colPiece < 4; colPiece++) {
-                if (pieceShape[rowPiece][colPiece] !== colorBg) {
+        for (let rowPiece = 0; rowPiece < PIECE_LENGTH; rowPiece++) {
+            for (let colPiece = 0; colPiece < PIECE_WIDTH; colPiece++) {
+                if (pieceShape[rowPiece][colPiece] !== COLOR_BG) {
                     grid[row + rowPiece][col + colPiece] = { color : pieceShape[rowPiece][colPiece], fixed: true };
                 }
             }
@@ -198,12 +92,12 @@ const Board = ({isActive, setIsActive}) => {
     };
 
     const checkFixed = (newPosition, pieceShape) => {
-        for (let rowPiece = 0; rowPiece < 4; rowPiece++) {
-            for (let colPiece = 0; colPiece < 4; colPiece++) {
-                if (pieceShape[rowPiece][colPiece] !== colorBg) {
+        for (let rowPiece = 0; rowPiece < PIECE_LENGTH; rowPiece++) {
+            for (let colPiece = 0; colPiece < PIECE_WIDTH; colPiece++) {
+                if (pieceShape[rowPiece][colPiece] !== COLOR_BG) {
                     const row = rowPiece + newPosition[0];
                     const col = colPiece + newPosition[1];
-                    if (row < 20 && col < 10 && grid[row][col].fixed) {
+                    if (row < GRID_LENGTH && col < GRID_WIDTH && grid[row][col].fixed) {
                         return false;
                     }
                 }
@@ -214,25 +108,48 @@ const Board = ({isActive, setIsActive}) => {
 
     const canMove = (pos, pieceShape, row, col) => {
         const boundary = getBoundaryCellFromDirection(pos, pieceShape, row, col);
-        // console.log("Boundary = " + boundary)
-        // next step : add collisions between pieces
-        if (pos === 'down' && boundary < 20 && checkFixed([row, col], pieceShape)) {
+
+        if (pos === 'down' && boundary < GRID_LENGTH && checkFixed([row, col], pieceShape)) {
             return true;
         } else if (pos === 'left' && boundary >= 0 && checkFixed([row, col], pieceShape)) {
             return true;
-        } else if (pos === 'right' && boundary < 10 && checkFixed([row, col], pieceShape)) {
+        } else if (pos === 'right' && boundary < GRID_WIDTH && checkFixed([row, col], pieceShape)) {
             return true;
         } else {
             return false;
         }
     };
 
+    const handleKeyDown = (event) => {
+        const newGrid = [...grid];
+        const [row, col] = piecePosition;
+
+        if (event.key === 'ArrowDown' && canMove('down', pieceShape,row + 1, col)) {
+            cleanGrid(newGrid, row, col);
+            insertPiece(pieceShape, pieceDirection, row + 1, col);
+        } else if (event.key === 'ArrowDown') {
+            setFixed(pieceShape, row, col);
+        } else if (event.key === 'ArrowLeft' && canMove('left', pieceShape, row, col - 1)) {
+            cleanGrid(newGrid, row, col);
+            insertPiece(pieceShape, pieceDirection, row, col - 1);
+        } else if (event.key === 'ArrowRight' && canMove('right', pieceShape, row, col + 1)) {
+            cleanGrid(newGrid, row, col);
+            insertPiece(pieceShape, pieceDirection, row, col + 1);
+        } else if (event.key === 'ArrowUp') {
+            cleanGrid(newGrid, row, col);
+            setIndexDirection(indexDirection + 1);
+            setPieceDirection(DIRECTIONS[indexDirection % 4]);
+        }
+        setGrid(newGrid);
+    };
+
     const removeFullLines = () => {
         let newGrid = [...grid];
-        for (let row = 0; row < 20; row++) {
-            if (!newGrid[row].some(cell => cell.color === colorBg && cell.fixed === false)) {
+
+        for (let row = 0; row < GRID_LENGTH; row++) {
+            if (!newGrid[row].some(cell => cell.color === COLOR_BG && cell.fixed === false)) {
                 newGrid.splice(row, 1);
-                newGrid.unshift(Array(10).fill({color: colorBg, fixed: false}));
+                newGrid.unshift(Array(GRID_WIDTH).fill({color: COLOR_BG, fixed: false}));
             }
         }
         setGrid(newGrid);
@@ -240,9 +157,9 @@ const Board = ({isActive, setIsActive}) => {
 
     const checkGameOver = () => {
         if (pieceShape !== undefined) {
-            for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 4; col++) {
-                    if (pieceShape[row][col] !== colorBg && grid[row][col + 3].fixed) {
+            for (let row = 0; row < PIECE_LENGTH; row++) {
+                for (let col = 0; col < PIECE_WIDTH; col++) {
+                    if (pieceShape[row][col] !== COLOR_BG && grid[row][col + 3].fixed) {
                         console.log("game over !")
                         setIsActive(false);
                     }
@@ -253,12 +170,10 @@ const Board = ({isActive, setIsActive}) => {
 
     /* inserting a new Piece */
     useEffect(() => {
-        console.log("hey " + pieceLetter)
         if (pieceLetter !== '') {
             console.log("inserting a new Piece " + pieceLetter);
             setPieceShape(getPieceShape(pieceLetter, pieceDirection));
             checkGameOver();
-            //insertNewPiece(pieceLetter, pieceDirection, 0, 3); // penser a modifier pieceDirection en prod ?
             setPieceLetter('');
         }
     }, [pieceLetter]);
@@ -292,12 +207,22 @@ const Board = ({isActive, setIsActive}) => {
                 } else {
                     setFixed(pieceShape, row, col);
                 }
-            }, 500);
+            }, GRAVITY_MS);
             return () => clearInterval(interval);
         }
     });
 
-    // gameloop
+    /* handle KeyEvents => movePiece */
+    useEffect(() => {
+        if (isActive) {
+            window.addEventListener('keydown', handleKeyDown);
+            return () => {
+                window.removeEventListener('keydown', handleKeyDown);
+            };
+        }
+    });
+
+    /* askNewPiece */
     useEffect(() => {
         if (isActive && getNewPiece) {
             // const pieces = ['I', 'J', 'L', 'S', 'Z', 'T', 'O'];
@@ -310,37 +235,6 @@ const Board = ({isActive, setIsActive}) => {
             setGetNewPiece(false);
         }
     }, [isActive, getNewPiece]);
-
-    /* handle KeyEvents => movePiece */
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            const newGrid = [...grid];
-            const [row, col] = piecePosition;
-
-            if (event.key === 'ArrowDown' && canMove('down', pieceShape,row + 1, col)) {
-                cleanGrid(newGrid, row, col);
-                insertPiece(pieceShape, pieceDirection, row + 1, col);
-            } else if (event.key === 'ArrowLeft' && canMove('left', pieceShape, row, col - 1)) {
-                cleanGrid(newGrid, row, col);
-                insertPiece(pieceShape, pieceDirection, row, col - 1);
-            } else if (event.key === 'ArrowRight' && canMove('right', pieceShape, row, col + 1)) {
-                cleanGrid(newGrid, row, col);
-                insertPiece(pieceShape, pieceDirection, row, col + 1);
-            } else if (event.key === 'ArrowUp') {
-                cleanGrid(newGrid, row, col);
-                setIndexDirection(indexDirection + 1);
-                setPieceDirection(directions[indexDirection % 4]);
-            }
-            setGrid(newGrid);
-        };
-        if (isActive) {
-            window.addEventListener('keydown', handleKeyDown);
-
-            return () => {
-                window.removeEventListener('keydown', handleKeyDown);
-            };
-        }
-    });
 
     return (
       <div className="board-wrapper">
