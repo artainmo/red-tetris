@@ -112,6 +112,7 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
             }
         }
         removeFullLines();
+        sendPersonalGameStructure(socket, roomId, grid);
         setGetNewPiece(true);
     };
 
@@ -248,6 +249,7 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
 
     /* askNewPiece */
     useEffect(() => {
+        console.log("here............................" , socket)
         if (isActive && socket !== null) {
             if (getNewPiece) {
                 console.log("asking for a new Piece " + roomId)

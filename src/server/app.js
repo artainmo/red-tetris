@@ -197,12 +197,17 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('sendPersonalGameStructure', (data) => {
-    socket.broadcast.to(data.roomId).emit('otherPlayerGameStructure',
+    socket.to(data.roomId).emit('otherPlayerGameStructure',
                                             data.gameStructure);
   });
 
   socket.on('sendNextGame', (data) => {
     console.log("Sending next game");
     socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame);
+  });
+
+  socket.on('sendGameState', (data) => {
+    console.log("Setting game state...");
+    socket.to(data.roomId).emit('gameState', data.isActive);
   });
 });

@@ -1,0 +1,13 @@
+.spectra {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+}
+
+.rowSpectra {
+    display: flex;
+}
+
+.cellSpectra {
+    box-sizing: border-box;
+}

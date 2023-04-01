@@ -1,0 +1,26 @@
+.tetris {
+    display: flex;
+    flex-direction: row;
+}
+
+.info-menu-section {
+    flex: 1;
+    height: 90vh;
+    background-color: #eee;
+}
+
+.board-section {
+    flex: 1;
+    height: 90vh;
+    background-color: #fff;
+}
+
+.spectras-section {
+    flex: 1;
+    height: 90vh;
+    background-color: #ddd;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+}
+

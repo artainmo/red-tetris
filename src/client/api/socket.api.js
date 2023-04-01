@@ -13,7 +13,6 @@ export const joinRoom = (socket, roomId) => {
   socket.emit("joinRoom", roomId);
 }
 
-
 export const askNewPiece = (socket, roomId) => {
   socket.emit('askNewPiece', roomId);
 }
@@ -42,7 +41,6 @@ export const listenOtherPlayerGameStructure = (socket, setOtherPlayerGameStructu
   });
 }
 
-
 export const sendNextGame = (socket, roomId, nextGame) => {
   socket.emit('sendNextGame', {roomId: roomId, nextGame: nextGame});
 }
@@ -52,5 +50,16 @@ export const listenNextGame = (socket, setGame) => {
   socket.on('nextGame', (nextGame) => {
     console.log("Next incoming game");
     setGame(nextGame);
+  });
+}
+
+export const sendGameState = (socket, roomId, isActive) => {
+  socket.emit('sendGameState', {roomId: roomId, isActive: isActive});
+}
+
+export const listenGameState = (socket, setIsActive) => {
+  socket.on('gameState', (isActive) => {
+    console.log('setting game to active !!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    setIsActive(isActive);
   });
 }
