@@ -237,7 +237,6 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
         }
     });
 
-    /* handle KeyEvents => movePiece */
     useEffect(() => {
         if (isActive) {
             window.addEventListener('keydown', handleKeyDown);
@@ -247,21 +246,31 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
         }
     });
 
-    /* askNewPiece + listenNewPiece */
+    /* askNewPiece */
     useEffect(() => {
         if (isActive && socket !== null) {
-            listenNewPiece(socket, setNewPiece);
-            if (user === game._player1 && getNewPiece) {
-                askNewPiece(socket, roomId); // a modifier apres : on veut que le que la piece soit ajoutee a une liste cote server
-                setPieceLetter(newPiece.type);
-                setPieceType(newPiece.type);
-                setPieceDirection('up');
-                setIndexDirection(1);
-                setPiecePosition([0, 3]);
-                setGetNewPiece(false);
+            if (getNewPiece) {
+                console.log("asking for a new Piece " + roomId)
+                askNewPiece(socket, roomId); // a modifier apres : on veut que la piece soit ajoutee a une liste cote server
             }
         }
     }, [isActive, getNewPiece]);
+
+    useEffect(() => {
+        listenNewPiece(socket, setNewPiece);
+    }, []);
+
+    useEffect(() => {
+        if (newPiece) {
+            console.log("-------- new piece --------")
+            setPieceLetter(newPiece.type);
+            setPieceType(newPiece.type);
+            setPieceDirection('up');
+            setIndexDirection(1);
+            setPiecePosition([0, 3]);
+            setGetNewPiece(false);
+        }
+    }, [newPiece]);
 
     return (
       <div className="board-wrapper">

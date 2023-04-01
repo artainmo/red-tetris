@@ -15,7 +15,7 @@ const Tetris = ({user, game, setGame, setPage}) => {
     joinRoom(socket, roomId);
     listenOtherPlayerGameStructure(socket, setOtherPlayerGameStructure);
     if (user === game._player2) listenNextGame(socket, setGame);
-    return () => disconnect(socket);
+    //return () => disconnect(socket);
   }, []);
 
   const endGame = async () => {
