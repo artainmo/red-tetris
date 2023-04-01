@@ -15,5 +15,11 @@ dev_front:
 dev_back:
 	npm install && npm run dev_back
 
+dev_back_front:
+	cd test; python3 front_hot-reload.py
+
+refresh_front:
+	npm run build
+
 unittest:
 	node test/db_player_game/test.js
