@@ -7,7 +7,6 @@ const { Piece } = require(__dirname + '/classes/Piece.js');
 const app = express();
 
 /* only for dev purpose (remove after !)
-* */
 const cors = require('cors');
 app.use(cors());
 
@@ -20,6 +19,7 @@ const corsOptions = {
 // app.get('/', cors(corsOptions), function (req, res, next) {
 //   //res.json({msg: 'This is CORS-enabled for only example.com.'})
 // })
+* */
 
 const server = app.listen(3000, () => {
   console.log(`App listening at http://localhost:3000`);
@@ -34,7 +34,7 @@ const path_to_bundled_files = __dirname + "/../../dist/";
 app.use(express.static(path_to_bundled_files));
 
 //Send our bundled single-page-application frontend in one HTTP request when on homepage
-app.get('/', cors(corsOptions), (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile('index.html', { root: path_to_bundled_files});
 });
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getPieceShape, getBoundaryCellFromDirection } from './Piece';
+import { askNewPiece, listenNewPiece, sendPersonalGameStructure } from "../api/socket.api";
 import '../style/board.css';
 
 const DIRECTIONS = ['up', 'right', 'down', 'left'];
@@ -10,7 +11,7 @@ const PIECE_WIDTH = 4;
 const COLOR_BG = '#3565d0';
 const GRAVITY_MS = 500; /* interval to make the tetromino falling down, in milliseconds */
 
-const Board = ({isActive, setIsActive}) =>
+const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
 {
     const initGrid = () => {
         const rows = [];
@@ -36,6 +37,7 @@ const Board = ({isActive, setIsActive}) =>
     const [indexDirection, setIndexDirection] = useState(1);
     const [pieceShape, setPieceShape] = useState(getPieceShape('', pieceDirection));
     const [getNewPiece, setGetNewPiece] = useState(true);
+    const [newPiece, setNewPiece] = useState(null);
 
     const canRotate = (pieceShape, direction, row, col) => {
         /* simulate the shape after rotating */
@@ -245,17 +247,19 @@ const Board = ({isActive, setIsActive}) =>
         }
     });
 
-    /* askNewPiece */
+    /* askNewPiece + listenNewPiece */
     useEffect(() => {
-        if (isActive && getNewPiece) {
-            const pieces = ['I', 'J', 'L', 'S', 'Z', 'T', 'O'];
-            const randomIndex = Math.floor(Math.random() * pieces.length);
-            setPieceLetter(pieces[randomIndex]);
-            setPieceType(pieces[randomIndex]);
-            setPieceDirection('up');
-            setIndexDirection(1);
-            setPiecePosition([0, 3]);
-            setGetNewPiece(false);
+        if (isActive && socket !== null) {
+            listenNewPiece(socket, setNewPiece);
+            if (user === game._player1 && getNewPiece) {
+                askNewPiece(socket, roomId); // a modifier apres : on veut que le que la piece soit ajoutee a une liste cote server
+                setPieceLetter(newPiece.type);
+                setPieceType(newPiece.type);
+                setPieceDirection('up');
+                setIndexDirection(1);
+                setPiecePosition([0, 3]);
+                setGetNewPiece(false);
+            }
         }
     }, [isActive, getNewPiece]);
 

@@ -6,7 +6,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { searchGame, gameWaitForSomeoneToJoin, gameWaitQuit, gameWaitStart,
       gameStart, gameQuit } from "../api/http.api";
-import Game from "../game/Game.tmp"
 import Tetris from './Tetris'
 
 const SearchGame = ({user, page, setPage}) => {
@@ -76,8 +75,7 @@ const SearchGame = ({user, page, setPage}) => {
               </Button>}
             </div>)
   } else if (page === "Game") {
-    // return  <Tetris />
-    return <div><Game user={user} game={game} setGame={setGame} setPage={setPage}/></div>
+    return  <Tetris user={user} game={game} setGame={setGame} setPage={setPage} />
   }
 }
 
