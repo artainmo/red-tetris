@@ -1,13 +1,14 @@
 .board-wrapper {
-    display: grid;
+    display: flex;
     align-items: center;
     justify-content: center;
+    max-height: 90vh;
 }
 
 .board {
-    border: 2px solid black;
+    border: 1px solid black;
     width: 400px;
-    height: 800px;
+    max-height: 800px;
 }
 
 .row {
@@ -20,3 +21,4 @@
     height: 40px;
     border: 1px solid black;
 }
+

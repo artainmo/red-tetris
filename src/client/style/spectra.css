@@ -1,6 +1,11 @@
+.spectra-wrapper {
+    margin-right: 1vw;
+    margin-bottom: 21vh;
+}
+
 .spectra {
-    position: relative;
-    width: 100%;
+    width: 10vw;
+    max-height: 10vh;
     padding-bottom: 56.25%; /* 16:9 aspect ratio */
 }
 
@@ -9,5 +14,6 @@
 }
 
 .cellSpectra {
-    box-sizing: border-box;
+    width: calc(10vw / 10);
+    height: calc(10vw / 10);
 }

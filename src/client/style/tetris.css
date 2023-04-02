@@ -6,20 +6,20 @@
 .info-menu-section {
     flex: 1;
     height: 90vh;
-    background-color: #eee;
 }
 
 .board-section {
     flex: 1;
     height: 90vh;
-    background-color: #fff;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .spectras-section {
-    flex: 1;
-    height: 90vh;
-    background-color: #ddd;
     display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    height: 90vh;
     flex-direction: column;
     overflow-y: scroll;
 }

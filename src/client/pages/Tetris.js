@@ -10,10 +10,11 @@ import Spectra from '../components/Spectra';
 
 const Tetris = ({user, game, setGame, setPage}) => {
   const [isActive, setIsActive] = useState(false);
-  const socket = connect();
-  const roomId = game._player1 + "_" + game._player2;
+  const socket = null;
+  //const roomId = game._player1 + "_" + game._player2;
   const [otherPlayerGameStructure, setOtherPlayerGameStructure] = useState(null);
 
+  /*
   useEffect(() => {
     console.log("-------- joining room --------------")
     joinRoom(socket, roomId);
@@ -45,7 +46,6 @@ const Tetris = ({user, game, setGame, setPage}) => {
       setGame(response.data);
     }
   }
-
   return (
       <div className="tetris">
         <div className="info-menu-section">
@@ -82,6 +82,38 @@ const Tetris = ({user, game, setGame, setPage}) => {
         </div>
 
       </div>
+  );
+*/
+  return (
+    <div className="tetris">
+      <div className="info-menu-section">
+        <Button variant="outlined" onClick={()=>{setPage("SearchGame");}}>
+          Back
+        </Button>
+
+        {
+          isActive ?
+            <Button variant="outlined" onClick={() => {setIsActive(false)}}>Stop</Button>
+            :
+            null
+        }
+        {
+          !isActive ?
+            <Button variant="outlined" onClick={()=>{setIsActive(true)}}>Start</Button>
+            :
+            null
+        }
+      </div>
+      <div className="board-section">
+        <Board isActive={isActive} setIsActive={setIsActive} socket={socket} user={user} game={game} roomId={null} />
+      </div>
+      <div className="spectras-section">
+        <Spectra ></Spectra>
+        <Spectra ></Spectra>
+        <Spectra ></Spectra>
+      </div>
+
+    </div>
   );
 };
 

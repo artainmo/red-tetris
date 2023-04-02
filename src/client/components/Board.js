@@ -112,7 +112,7 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
             }
         }
         removeFullLines();
-        sendPersonalGameStructure(socket, roomId, grid);
+        //sendPersonalGameStructure(socket, roomId, grid);
         setGetNewPiece(true);
     };
 
@@ -253,20 +253,22 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
         if (isActive && socket !== null) {
             if (getNewPiece) {
                 console.log("asking for a new Piece " + roomId)
-                askNewPiece(socket, roomId); // a modifier apres : on veut que la piece soit ajoutee a une liste cote server
+                //askNewPiece(socket, roomId); // a modifier apres : on veut que la piece soit ajoutee a une liste cote server
             }
         }
     }, [isActive, getNewPiece]);
 
     useEffect(() => {
-        listenNewPiece(socket, setNewPiece);
+        //listenNewPiece(socket, setNewPiece);
     }, []);
 
     useEffect(() => {
         if (newPiece) {
             console.log("-------- new piece --------")
-            setPieceLetter(newPiece.type);
-            setPieceType(newPiece.type);
+            //setPieceLetter(newPiece.type);
+            setPieceLetter('I');
+            //setPieceType(newPiece.type);
+            setPieceType('I');
             setPieceDirection('up');
             setIndexDirection(1);
             setPiecePosition([0, 3]);

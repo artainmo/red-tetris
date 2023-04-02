@@ -1,10 +1,11 @@
 import React from 'react';
 import Auth from './Auth'
+import Tetris from './Tetris'
 
 const App = () => {
     return (
         <div>
-            <Auth />
+            <Tetris user={'bob'} game={null} setGame={null} setPage={null} />
         </div>
     );
 };
