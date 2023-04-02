@@ -1,10 +1,15 @@
 .tetris {
     display: flex;
     flex-direction: row;
+    margin-top: 8vh;
 }
 
 .info-menu-section {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     height: 90vh;
 }
 
@@ -24,3 +29,6 @@
     overflow-y: scroll;
 }
 
+.buttons {
+    margin-top: 20px;
+}

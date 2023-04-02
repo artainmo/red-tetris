@@ -87,22 +87,28 @@ const Tetris = ({user, game, setGame, setPage}) => {
   return (
     <div className="tetris">
       <div className="info-menu-section">
-        <Button variant="outlined" onClick={()=>{setPage("SearchGame");}}>
-          Back
-        </Button>
+        <div className="score-timer">
+          <div className="score">Score: 0</div>
+          <div className="timer">Time: 00:00</div>
+        </div>
+        <div className="buttons">
+          <Button variant="outlined" onClick={()=>{setPage("SearchGame");}}>
+            Back
+          </Button>
 
-        {
-          isActive ?
-            <Button variant="outlined" onClick={() => {setIsActive(false)}}>Stop</Button>
+          {
+            isActive ?
+              <Button variant="outlined" onClick={() => {setIsActive(false)}}>Stop</Button>
             :
-            null
-        }
-        {
-          !isActive ?
-            <Button variant="outlined" onClick={()=>{setIsActive(true)}}>Start</Button>
+              null
+          }
+          {
+            !isActive ?
+              <Button variant="outlined" onClick={()=>{setIsActive(true)}}>Start</Button>
             :
-            null
-        }
+              null
+          }
+        </div>
       </div>
       <div className="board-section">
         <Board isActive={isActive} setIsActive={setIsActive} socket={socket} user={user} game={game} roomId={null} />

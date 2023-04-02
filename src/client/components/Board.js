@@ -145,6 +145,14 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
         }
     };
 
+    const landPiece = (newGrid, row, col) => {
+        while (canMove('down', pieceShape, row + 1, col)) {
+            cleanGrid(newGrid, row, col);
+            row++;
+        }
+        insertPiece(pieceShape, pieceDirection, row, col);
+    };
+
     const handleKeyDown = (event) => {
         const newGrid = [...grid];
         const [row, col] = piecePosition;
@@ -165,6 +173,8 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
             cleanGrid(newGrid, row, col);
             setIndexDirection(indexDirection + 1);
             setPieceDirection(DIRECTIONS[indexDirection % 4]);
+        } else if (event.key === ' ') {
+            landPiece(newGrid, row, col);
         }
         setGrid(newGrid);
     };
@@ -250,10 +260,17 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
     /* askNewPiece */
     useEffect(() => {
         console.log("here............................" , socket)
-        if (isActive && socket !== null) {
+//        if (isActive && socket !== null) {
+        if (isActive) {
             if (getNewPiece) {
                 console.log("asking for a new Piece " + roomId)
                 //askNewPiece(socket, roomId); // a modifier apres : on veut que la piece soit ajoutee a une liste cote server
+                setPieceLetter('I');
+                setPieceType('I');
+                setPieceDirection('up');
+                setIndexDirection(1);
+                setPiecePosition([0, 3]);
+                setGetNewPiece(false);
             }
         }
     }, [isActive, getNewPiece]);
@@ -266,8 +283,8 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
         if (newPiece) {
             console.log("-------- new piece --------")
             //setPieceLetter(newPiece.type);
-            setPieceLetter('I');
             //setPieceType(newPiece.type);
+            setPieceLetter('I');
             setPieceType('I');
             setPieceDirection('up');
             setIndexDirection(1);
