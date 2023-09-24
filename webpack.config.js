@@ -42,6 +42,7 @@ module.exports = {
 	plugins: [
     	new HtmlWebpackPlugin({
       		template: path.join(__dirname, "src", "client", "public", "index.html"),
+            favicon: path.join(__dirname, "src", "client", "public", "tetrimino.ico")
     	}),
 	]
 };
