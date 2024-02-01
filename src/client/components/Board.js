@@ -58,6 +58,7 @@ const Board = ({ isActive, setIsActive, socket, user, game, roomId }) =>
                 }
             }
         }
+        console.log('---------can rotate---------');
         return true;
     };
 

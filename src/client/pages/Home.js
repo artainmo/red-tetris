@@ -13,11 +13,11 @@ const Home = ({user, setUser}) => {
 
   useEffect(() => {
     const getMyGames = async () => {
-      const response = await getGames(user);
-      setGames(response.data);
+    const response = await getGames(user);
+    setGames(response.data);
     }
     if (page === "Home") {
-      getMyGames();
+        getMyGames();
     }
   }, [page]);
 

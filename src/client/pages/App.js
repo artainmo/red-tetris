@@ -1,12 +1,15 @@
 import React from 'react';
-import Auth from './Auth'
 import Tetris from './Tetris'
+import Home from './Home'
+import LandingPage from './LandingPage';
+import { Routes, Route } from 'react-router-dom';
 
 const App = () => {
     return (
-        <div>
-            <Tetris user={'bob'} game={null} setGame={null} setPage={null} />
-        </div>
+        <Routes>
+            <Route path="/" element={<LandingPage/>}/>
+            <Route path="/tetris" element={<Tetris/>}/>
+        </Routes>
     );
 };
 

@@ -9,51 +9,51 @@ import { searchGame, gameWaitForSomeoneToJoin, gameWaitQuit, gameWaitStart,
 import Tetris from './Tetris'
 
 const SearchGame = ({user, page, setPage}) => {
-  const [game, setGame] = useState(null);
+  	const [game, setGame] = useState(null);
 
-  useEffect(() => {
-    const findGame = async () => {
-      const response = await searchGame(user);
-      setGame(response.data);
-    }
-    findGame();
-  }, []);
+  	useEffect(() => {
+    	const findGame = async () => {
+      		const response = await searchGame(user);
+      		setGame(response.data);
+    	}
+    	findGame();
+  	}, []);
 
-  useEffect(() => {
-    const waitForSomeoneToJoin = async () => {
-        const response = await gameWaitForSomeoneToJoin(game);
-        if (response.status === 200) {
-          setGame(response.data);
-        }
-    }
-    const waitForSomeoneToQuit = async () => {
-        const response = await gameWaitQuit(game);
-        if (response.status === 200) {
-          setGame(response.data);
-        }
-    }
-    const waitStart = async () => {
-        const response = await gameWaitStart(game);
-        if (response.status === 200) {
-          setPage("Game");
-        }
-    }
-    if (page !== "SearchGame") return ;
-    if (game !== null && game._player2 === null) {
-      var interval1 = setInterval(waitForSomeoneToJoin, 2000);
-    }
-    if (game !== null && game._player2 !== null) {
-      var interval2 = setInterval(waitForSomeoneToQuit, 2000);
-    }
-    if (game !== null && game._player2 === user) {
-      var interval3 = setInterval(waitStart, 2000);
-    }
-    return () => {
-      if (typeof interval1 !== undefined) clearInterval(interval1);
-      if (typeof interval2 !== undefined) clearInterval(interval2);
-      if (typeof interval3 !== undefined) clearInterval(interval3);
-    }
-  }, [game, page]);
+  	useEffect(() => {
+		const waitForSomeoneToJoin = async () => {
+			const response = await gameWaitForSomeoneToJoin(game);
+			if (response.status === 200) {
+				setGame(response.data);
+			}
+		}
+		const waitForSomeoneToQuit = async () => {
+			const response = await gameWaitQuit(game);
+			if (response.status === 200) {
+			setGame(response.data);
+			}
+		}
+		const waitStart = async () => {
+			const response = await gameWaitStart(game);
+			if (response.status === 200) {
+			setPage("Game");
+			}
+		}
+		if (page !== "SearchGame") return ;
+		if (game !== null && game._player2 === null) {
+		var interval1 = setInterval(waitForSomeoneToJoin, 2000);
+		}
+		if (game !== null && game._player2 !== null) {
+		var interval2 = setInterval(waitForSomeoneToQuit, 2000);
+		}
+		if (game !== null && game._player2 === user) {
+		var interval3 = setInterval(waitStart, 2000);
+		}
+		return () => {
+		if (typeof interval1 !== undefined) clearInterval(interval1);
+		if (typeof interval2 !== undefined) clearInterval(interval2);
+		if (typeof interval3 !== undefined) clearInterval(interval3);
+		}
+  	}, [game, page]);
 
   if (page === "SearchGame") {
     return (<div>
