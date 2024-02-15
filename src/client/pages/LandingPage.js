@@ -1,12 +1,14 @@
 import React from "react";
 import Header from '../components/Header';
 import backgroundImage from '../assets/USSR_Flag.jpeg';
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
 
+	const navigate = useNavigate();
+	
 	const handleClick = () => {
-		console.log('clicked !!!');
-		// add later the link
+		navigate('/auth');
 	}
 
 	const landingPageContainerStyle = {

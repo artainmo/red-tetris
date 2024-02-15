@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Typography from '@mui/material/Typography';
 import { connect } from "../api/http.api"
 import Home from './Home'
 
 const Auth = () => {
+	// change to redux
 	const [user, setUser] = useState(null);
   	const [name, setName] = useState("");
   	const [nameTooLong, setNameTooLong] = useState(false);
@@ -27,24 +25,35 @@ const Auth = () => {
       		setNameTooLong(false);
       		setUser(name);
     	}
-  }
+  	}
 
-  if (user === null) {
-    return (
-	<div>
-        <TextField variant="outlined" placeholder="name" value={name} onChange={(e)=>{setName(event.target.value);}} />
-        <br/>
-        {nameTooLong && <div><br/><Typography>Name is too long.</Typography></div>}
-        {nameInvalidChars && <div><br/><Typography>Name cannot contain special characters.</Typography></div>}
-        <br/>
-        <Button variant="outlined" onClick={()=>{userConnect()}}>
-            Connect
-        </Button>
-    </div>
-	);
-  } else {
-    	return <div><Home user={user} setUser={setUser}/></div>
-  }
+	const buttonStyle = {
+
+	}
+
+	const textFieldStyle = {
+
+	}
+
+	const typoStyle = {
+
+	}
+
+  	if (user === null) {
+    	return (
+			<div>
+				<TextField variant="outlined" placeholder="name" value={name} onChange={(e)=>{setName(event.target.value);}} />
+				<br/>
+				{nameTooLong && <div><br/><Typography>Name is too long.</Typography></div>}
+				{nameInvalidChars && <div><br/><Typography>Name cannot contain special characters.</Typography></div>}
+				<br/>
+				
+				<button onClick={()=>{userConnect()}}>Go !</button>
+			</div>
+		);
+  	} else {
+    	return <div><Home user={user} setUser={setUser}/></div>;
+  	}
 }
 
 export default Auth;
