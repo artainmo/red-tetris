@@ -1,59 +1,58 @@
-import React, { useState } from 'react';
-import { connect } from "../api/http.api"
-import Home from './Home'
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setName, userConnect } from '../redux/slices/authSlice';
+import { useNavigate } from 'react-router-dom';
+import { mainContainerStyle, landingPageStyle, blockStyle, buttonStyle, textStyle } from '../style/mainStyle';
+import Header from '../components/Header';
+
 
 const Auth = () => {
-	// change to redux
-	const [user, setUser] = useState(null);
-  	const [name, setName] = useState("");
-  	const [nameTooLong, setNameTooLong] = useState(false);
-  	const [nameInvalidChars, setNameInvalidChars] = useState(false);
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const { user, name, nameTooLong, nameInvalidChars } = useSelector((state) => state.auth);
+	const [localName, setLocalName] = useState('');
 
-  	const userConnect = async () => {
-    	if (name === "") return ;
-    	
-		const response = await connect(name);
-    	
-		if (response.status === 400 && response.data === "Player's username is too long") {
-      		setNameInvalidChars(false);
-      		setNameTooLong(true);
-    	} else if (response.status === 400 && response.data === "Player's username contains special characters") {
-      		setNameTooLong(false);
-      		setNameInvalidChars(true);
-    	} else if (response.status === 200) {
-      		setNameInvalidChars(false);
-      		setNameTooLong(false);
-      		setUser(name);
-    	}
-  	}
-
-	const buttonStyle = {
-
+	const handleAuth = () => {
+		console.log('trying to login');
+		dispatch(setName(localName)); // First, set the name in Redux state
+        dispatch(userConnect(localName)); // Then, attempt to login
 	}
 
-	const textFieldStyle = {
-
+	useEffect(() => {
+		if (user !== null) {
+			console.log('auth successful, goto main menu');
+			navigate('/main_menu');
+		}
+	}, [user, navigate]);
+	
+	const inputStyle = {
+		// complete that
 	}
 
 	const typoStyle = {
-
+		// complete that
 	}
 
   	if (user === null) {
     	return (
-			<div>
-				<TextField variant="outlined" placeholder="name" value={name} onChange={(e)=>{setName(event.target.value);}} />
-				<br/>
-				{nameTooLong && <div><br/><Typography>Name is too long.</Typography></div>}
-				{nameInvalidChars && <div><br/><Typography>Name cannot contain special characters.</Typography></div>}
-				<br/>
-				
-				<button onClick={()=>{userConnect()}}>Go !</button>
+			<div style={mainContainerStyle}>
+				<Header/>
+				<div style={landingPageStyle}>
+					<div style={blockStyle}>
+						<p style={textStyle} >Time To Register Comrade !</p>
+						<input 
+							style={inputStyle}
+							type='text'
+							placeholder='enter your pseudo'
+							value={localName}
+							onChange={(e) => setLocalName(e.target.value)}
+						/>
+						<button onClick={handleAuth} style={buttonStyle}>Go !</button>
+					</div>
+				</div>
 			</div>
 		);
-  	} else {
-    	return <div><Home user={user} setUser={setUser}/></div>;
-  	}
+  	} 
 }
 
 export default Auth;
