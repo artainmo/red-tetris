@@ -13,7 +13,6 @@ export const joinRoom = (socket, roomId) => {
   	socket.emit("joinRoom", roomId);
 }
 
-
 export const askNewPiece = (socket, roomId) => {
   	socket.emit('askNewPiece', roomId);
 }
