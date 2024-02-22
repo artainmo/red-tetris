@@ -40,9 +40,18 @@ const Stopwatch = () => {
 
 		return `${hours}:${minutes}:${seconds}`;	
 	}
+
+	const stopwatchContainerStyle = {
+		backgroundColor: 'yellow',
+		width: '100%',
+		height: '50%',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center'
+	}
 	
 	return (
-		<div>
+		<div style={stopwatchContainerStyle}>
 			<h2>Stopwatch</h2>
 			<div>{formatTime(time)}</div>
 			<button onClick={startTimer} disabled={isRunning}>Start</button>

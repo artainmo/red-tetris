@@ -1,17 +1,23 @@
 import React, { useState } from "react";
 import PlayersArray from "./PlayersArray";
 import { mainMenuPannelStyle } from "../style/menuStyle";
+import { useNavigate } from "react-router-dom";
 
 const LeftMenuPannel = () => {
 	
 	const [isSoloHovered, setIsSoloHovered] = useState(false);
 	const [isMultiHovered, setIsMultiHovered] = useState(false);
+
+	const navigate = useNavigate();
+
 	
-	const handleSoloClick = () => {
-		console.log('try to join solo game');
+	
+	const handleSoloMatchmaking = () => {
+		console.log('solo player - handle matchmaking');
+
 	}
 
-	const handleMultiClick = () => {
+	const handleMultiMatchmaking = () => {
 		console.log('try to join multiplayer game');
 	}
 
@@ -64,12 +70,12 @@ const LeftMenuPannel = () => {
 				<div style={emptyDivStyle}></div>
 				<div style={buttonsStyle}>
 					<button 
-						onClick={handleSoloClick} 
+						onClick={handleSoloMatchmaking} 
 						style={{...menuButtonStyle, ...soloButtonStyle}}
 						onMouseEnter={() => setIsSoloHovered(true)}
 						onMouseLeave={() => setIsSoloHovered(false)}>Solo</button>
 					<button 
-						onClick={handleMultiClick} 
+						onClick={handleMultiMatchmaking} 
 						style={{...menuButtonStyle, ...multiButtonStyle}}
 						onMouseEnter={() => setIsMultiHovered(true)}
 						onMouseLeave={() => setIsMultiHovered(false)}>Multiplayer</button>

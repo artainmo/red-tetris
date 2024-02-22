@@ -53,3 +53,12 @@ export const listenNextGame = (socket, setGame) => {
 		setGame(nextGame);
 	});
 }
+
+/* this will send the input of a given player to the backend for it to handle the logic of the game */
+
+export const sendPlayerInput = (socket, keyPressed) => {
+	console.log(`send player input = ${keyPressed} to backend`);
+	socket.emit('playerInput',
+		{}
+	);
+}

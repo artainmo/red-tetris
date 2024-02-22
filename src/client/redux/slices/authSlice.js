@@ -22,7 +22,7 @@ export const userConnect = createAsyncThunk(
 	}
 );
 
-export const authSlice = createSlice({
+const authSlice = createSlice({
 	name: 'auth',
 	initialState,
 	reducers: {
