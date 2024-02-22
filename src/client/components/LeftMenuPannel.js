@@ -14,7 +14,6 @@ const LeftMenuPannel = () => {
 	
 	const handleSoloMatchmaking = () => {
 		console.log('solo player - handle matchmaking');
-
 	}
 
 	const handleMultiMatchmaking = () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setName, userConnect } from '../redux/slices/authSlice';
+import { userConnect } from '../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { mainContainerStyle, landingPageStyle, blockStyle, buttonStyle, textStyle } from '../style/mainStyle';
 import Header from '../components/Header';
@@ -9,50 +9,60 @@ import Header from '../components/Header';
 const Auth = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+
 	const { user, name, nameTooLong, nameInvalidChars } = useSelector((state) => state.auth);
+	
 	const [localName, setLocalName] = useState('');
+	const [emptyInputErrMsg, setEmptyInputErrMsg] = useState(false);
+	const [connectionAttempt, setConnectionAttempt] = useState(false);
 
 	const handleAuth = () => {
-		console.log('trying to login');
-		dispatch(setName(localName)); // First, set the name in Redux state
-        dispatch(userConnect(localName)); // Then, attempt to login
+		setConnectionAttempt(true);
+		(async () => {
+			await dispatch(userConnect(localName));
+		})();
 	}
 
 	useEffect(() => {
-		if (user !== null) {
-			console.log('auth successful, goto main menu');
-			navigate('/main_menu');
+		if (connectionAttempt) {
+			// add some redirect logic there
 		}
-	}, [user, navigate]);
+	}, [user, navigate, connectionAttempt]);
 	
 	const inputStyle = {
-		// complete that
+		backgroundColor: 'white',
+		border: 'none',
+		borderRadius: '20px',
+		fontSize: '16px',
+		padding: '10px 20px',
+		margin: '24px'
 	}
 
-	const typoStyle = {
-		// complete that
+	const errMsgStyle = {
+		color: 'white',
+		fontSize: '12px',
 	}
 
-  	if (user === null) {
-    	return (
-			<div style={mainContainerStyle}>
-				<Header/>
-				<div style={landingPageStyle}>
-					<div style={blockStyle}>
-						<p style={textStyle} >Time To Register Comrade !</p>
-						<input 
-							style={inputStyle}
-							type='text'
-							placeholder='enter your pseudo'
-							value={localName}
-							onChange={(e) => setLocalName(e.target.value)}
-						/>
-						<button onClick={handleAuth} style={buttonStyle}>Go !</button>
-					</div>
+	return (
+		<div style={mainContainerStyle}>
+			<Header/>
+			<div style={landingPageStyle}>
+				<div style={blockStyle}>
+					<p style={textStyle} >Time To Register Comrade !</p>
+					<input 
+						style={inputStyle}
+						type='text'
+						placeholder='enter your pseudo'
+						value={localName}
+						onChange={(e) => setLocalName(e.target.value)}
+					/>
+					{nameTooLong && <p style={errMsgStyle}>Please enter a shorter username</p>}
+					{emptyInputErrMsg && <p style={errMsgStyle}>Empty inputs are invalid</p>}
+					<button onClick={handleAuth} style={buttonStyle}>Go !</button>
 				</div>
 			</div>
-		);
-  	} 
+		</div>
+	);
 }
 
 export default Auth;

@@ -15,9 +15,9 @@ const App = () => {
         <Provider store={store}>
             <Router>
                 <Routes>
-                    <Route path='/' element={<Game />} />
+                    <Route path='/' element={<LandingPage />} />
                     <Route path='/auth' element={<Auth />} />
-                    <Route path='/main_menu' element={
+                    <Route path='/main_menu/:id' element={
                         <AuthGuard>
                             <MainMenu />
                         </AuthGuard>

@@ -3,7 +3,6 @@ import { connect } from "../../api/http.api";
 
 const initialState = {
 	user: null,
-	name: "",
 	nameTooLong: false,
 	nameInvalidChars: false
 }
@@ -26,14 +25,12 @@ const authSlice = createSlice({
 	name: 'auth',
 	initialState,
 	reducers: {
-		setName: (state, action) => {
-			state.name = action.payload;
-		},
+		// no need for reducers there, all is handled asynchronously by extraReducers
 	},
 	extraReducers: (builder) => {
 		builder
 		.addCase(userConnect.fulfilled, (state, action) => { // case success
-			state.user = state.name;
+			state.user = action.payload.data.username;
 			state.nameInvalidChars = false;
 			state.nameTooLong = false;
 		})
@@ -49,5 +46,4 @@ const authSlice = createSlice({
 	}
 });
 
-export const { setName } = authSlice.actions;
 export default authSlice;

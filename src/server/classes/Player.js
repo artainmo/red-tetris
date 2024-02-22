@@ -3,6 +3,7 @@ const { Game } = require(__dirname + '/Game.js');
 
 class Player {
 	async connect(username) { //Create new account or connect to already existing one
+		
 		if (username.length > 19) {
 			throw new Error("Player's username is too long");
 		}

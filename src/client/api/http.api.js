@@ -4,10 +4,17 @@ axios.defaults.baseURL = API_ENDPOINT + "/rest";
 
 export const connect = async (name) => {
  	try {
-    	const response = await axios.get("/connect/" + name);
-		return {status: response.status, data: response.data};
- 	} catch (e) {
-		return {status: e.response.status, data: e.response.data};
+    	const response = await axios.get(`/connect/${encodeURIComponent(name)}`);
+		return {
+			status: response.status, 
+			data: response.data
+		};
+ 	} catch (err) {
+		if (err.response) {
+			throw err.response.data;
+		} else {
+			throw new Error("An unexpected error occurred");
+		}
   	}
 }
 
