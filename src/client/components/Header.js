@@ -1,10 +1,21 @@
 import React from "react";
-import '../style/header.css';
 
 const Header = () => {
 
+	const headerStyle = {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'black',
+		color: 'white',
+		width: '100vw',
+		height: '80px',
+		margin: 0,
+		padding: 0
+	}
+	
 	return (
-		<div className="header">
+		<div className="header" style={headerStyle}>
 			<h1>Red Tetris</h1>
 		</div>
 	);

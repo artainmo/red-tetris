@@ -1,44 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateGameTime } from "../redux/slices/gameTimeSlice";
 
 const Stopwatch = () => {
 
-	const [time, setTime] = useState(0);
-	const [isRunning, setIsRunning] = useState(null);
-
-	const startTimer = () => {
-		setIsRunning(true);
-	}
+	const dispatch = useDispatch();
+	const currentTime = useSelector((state) => state.gameTime.currentTime);
+	const isGameActive = useSelector((state) => state.gameTime.isGameActive);
 	
-	const stopTimer = () => {
-		setIsRunning(false);
-	}
-
-	const resetTimer = () => {
-		setTime(0);
-		setIsRunning(false);
-	}
-
 	useEffect(() => {
 		let interval = null;
 
-		if (isRunning) {
+		if (isGameActive) {
 			interval = setInterval(() => {
-				setTime(prevTime => prevTime + 1000); // Update time every 10 milliseconds
-		}, 1000);
-		} else if (!isRunning && time !== 0) 
-		{
-		clearInterval(interval);
-    }
+                dispatch(updateGameTime());
+            }, 1000);
+		} else {
+			clearInterval(interval);
+		}
 
-    return () => clearInterval(interval); // Cleanup interval on component unmount
-	}, [isRunning, time])
+		return () => clearInterval(interval);
+
+	}, [isGameActive, dispatch]);
 
 	const formatTime = (time) => {
 		const seconds = `0${Math.floor((time / 1000) % 60)}`.slice(-2);
 		const minutes = `0${Math.floor((time / 60000) % 60)}`.slice(-2);
 		const hours = `0${Math.floor(time / 3600000)}`.slice(-2);
 
-		return `${hours}:${minutes}:${seconds}`;	
+		return `${hours}:${minutes}:${seconds}`;
 	}
 
 	const stopwatchContainerStyle = {
@@ -47,16 +37,13 @@ const Stopwatch = () => {
 		height: '50%',
 		display: 'flex',
 		alignItems: 'center',
-		justifyContent: 'center'
+		justifyContent: 'center',
 	}
 	
 	return (
 		<div style={stopwatchContainerStyle}>
 			<h2>Stopwatch</h2>
-			<div>{formatTime(time)}</div>
-			<button onClick={startTimer} disabled={isRunning}>Start</button>
-			<button onClick={stopTimer} disabled={!isRunning}>Stop</button>
-			<button onClick={resetTimer}>Reset</button>
+			<div>{formatTime(currentTime)}</div>
 		</div>
 	);
 }

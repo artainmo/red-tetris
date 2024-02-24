@@ -7,6 +7,7 @@ const GRID_WIDTH = 10;
 
 const TetrisBoard = () => {
 
+	/* creates a 2 dimension array of Cell components that compose the board */
 	const initBoard = () => {
 		const board = [];
 		for (let y = 0; y < GRID_LENGTH; y++) {
@@ -21,22 +22,26 @@ const TetrisBoard = () => {
 
 	const [board, setBoard] = useState(initBoard());
 
+	/* connect to socket when starting the game */
+	useEffect(() => {
+		
+	}, []);
 
 	/* handling the player input with WASD keys of the keyboard */
 	useEffect(() => {
 		const handleKeyDown = (event) => {
 			switch (event.key) {
 				case 'w':
-					sendPlayerInput();
+					// sendPlayerInput();
 					break;
 				case 'a':
-					sendPlayerInput();
+					// sendPlayerInput();
 					break;
 				case 's':
-					sendPlayerInput();
+					// sendPlayerInput();
 					break;
 				case 'd':
-					sendPlayerInput();
+					// sendPlayerInput();
 					break;
 				default:
 					console.log('unrecognized key');
@@ -46,7 +51,7 @@ const TetrisBoard = () => {
 
 		window.addEventListener('keydown', handleKeyDown);
 		console.log('WASD keydown');
-		// suppress event to avoid leaks
+		/* suppress event to avoid leaks */
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown);
 		}

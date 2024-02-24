@@ -4,6 +4,7 @@ import StopWatch from '../components/Stopwatch';
 import NextPiece from "../components/NextPiece";
 import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
 import TetrisBoard from "./TetrisBoard";
+import GameActionsPannel from "../components/GameActionsPannel";
 
 const Game = () => {
 	
@@ -31,11 +32,18 @@ const Game = () => {
 		height: '90%',
 		display: 'flex',
 	}
+
+	const startPannelStyle = {
+
+	}
 	
 	return (
 		<div style={mainContainerStyle}>
 			<Header />
 			<div style={landingPageStyle}>
+				<div style={startPannelStyle}>
+					<GameActionsPannel />
+				</div>
 				<div style={gameElemsStyle}>
 					<div style={leftPannelStyle}>
 						<TetrisBoard />
