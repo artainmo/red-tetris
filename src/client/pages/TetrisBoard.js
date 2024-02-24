@@ -24,7 +24,12 @@ const TetrisBoard = () => {
 
 	/* connect to socket when starting the game */
 	useEffect(() => {
-		
+
+	}, []);
+
+	/* retrieve the new game struct every GRAVITY TIME or every time player do something */
+	useEffect(() => {
+
 	}, []);
 
 	/* handling the player input with WASD keys of the keyboard */
