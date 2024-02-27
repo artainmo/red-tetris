@@ -1,33 +1,65 @@
-class Piece {
-	constructor(type=null, direction=null, position=null) {
-    	this._type = type;
-    	this._direction = direction;
-      	this._position = position;
+/*
+	Piece is used to generate a random piece to the board game every time it is necessary
 
-      	this._types = ["I", "O", "T", "S", "Z", "J", "L"];
-      	this._directions = ["left", "up", "down", "right"];
-      	this._positions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+	Letters are used to indicate every type of tetromino that are used by the original tetris game.
+	Check at this website : https://tetris.fandom.com/wiki/Tetromino#I for more detailled information
+
+	Positions are used to indicate where the piece will be displayed on the grid (it is centered, 
+	but it depends on the shape of the piece)
+*/
+
+import { TetroShape } from "./TetroShape";
+
+class Piece {
+	constructor(type) {
+    	this._type = type;
+      	this._offset = null;
+		this._tetroShape = null;
+		this.generatePiece(type);
 	}
 
-    get_piece() {
-      	return {
-        	type: this._type,
-        	direction: this._direction,
-        	position: this._position
-      	}
-    }
+	/* generate a new piece */
+	generatePiece(type) {
+		this._offset = this.determineOffset();
+		this._tetroShape = new TetroShape(type);
+	}
 
-    generate_random_piece() {
-    	this._type = this._types[Math.floor(Math.random() * 7)];
-    	this._direction = this._directions[Math.floor(Math.random() * 4)];
-    	this._position = this._positions[Math.floor(Math.random() * 10)];
+	determineOffset() {
+		if (this._type === 'O') {
+			this._offset = 3;
+		} else {
+			this._offset = 2;
+		}
+	}
 
-    	return {
-        	type: this._type,
-        	direction: this._direction,
-        	position: this._position
-      	}
-    }
+	getPieceType() {
+		return this._type;
+	}
+
+	getPieceOffset() {
+		return this._offset;
+	}
+
+	// useful ? 
+	getPieceTetroshape() {
+		return this._tetroShape;
+	}
+
+	// useful ?
+	getPiece() {
+		return {
+		  	type: this._type,
+		  	offset: this._offset,
+			tetroShape: this._tetroShape
+		};
+  	}
+
+	/* debug purpose only */
+	displayPiece() {
+		console.log('new piece : ');
+		console.log(`type = ${this._type}`);
+		console.log(`offset index = ${this._offset}`);
+	}
 }
 
 module.exports.Piece = Piece;
