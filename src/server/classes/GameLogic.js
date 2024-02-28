@@ -1,13 +1,22 @@
 import { Piece } from "./Piece";
 import { PieceBasket } from "./PieceBasket"
+import { GravityController } from "./GravityController";
+
+const LOCK_DELAY = 500;
+const GRID_LENGTH = 20;
+const GRID_WIDTH = 10;
 
 class GameLogic {
 	
-	constructor(rows = 20, cols = 10) {
-		this._rows = rows;
-    	this._cols = cols;
+	constructor() {
+		this._rows = GRID_WIDTH;
+    	this._cols = GRID_LENGTH;
     	this._grid = this.createEmptyGrid();
 		this._pieceBasket = new PieceBasket();
+		this._putToPile = false;
+		this._lockDelay = LOCK_DELAY;
+		this._currentLockedDelay = this._lockDelay;
+		this._gravityController = new GravityController(this.processGravity.bind(this), 500);
 	};
 
 	createEmptyGrid() {
@@ -18,33 +27,48 @@ class GameLogic {
 		return grid;
 	}
 
-	/* take an input from the player (wasd key) and decide if 
-	rotation is possible on the matrix representing the board */
-	canPieceRotate(direction) {
-		
-
-
-
-		return true;
+	startGame() {
+		this.gravityController.start();
+		this.addNewPieceToGrid();
 	}
 
-	/* when the lower line is full (no cell is empty), then it will remove the line */
-	clearLine() { // to test and account for destroyed in the middle of the board
-		let previousLine = new Array(this._rows);
-		let currentLine = new Array(this._rows);
+	stopGame() {
+		this._gravityController.stop();
+	}
 
-		for (let row = 0; row < this._rows.lenght; row++) {
-			for (let col = 0; col < this._cols.lenght; col++) {
-				currentLine[col] = this._grid[row][col];
-				if (row !== 0) {
-					this._grid[row][col] = previousLine[col];
+	pauseGame() {
+
+	}
+
+	resumeGame() {
+		
+	}
+
+	/* after a piece is set in the pile, check wether a line is full and need to be cleared */
+	shouldClearLine() { // to test
+		for (let row = 0; row < this._rows; row++) {
+			let isFull = 0;
+			for (let col = 0; col < this._cols; col++) {
+				if (this._grid[row][col] !== 'BG') {
+					isFull++;
 				}
 			}
-			previousLine = currentLine;
+			if (isFull === this._rows) {
+				this.clearLine(row);
+			}
+		}
+	}
+
+	/* when the full line is full, then it will remove the line and apply gravity to the upper */
+	clearLine(lineNum) { // to test
+		for (let row = lineNum; row > 0; row--) {
+			for (let col = 0; col < this._cols; col++) {
+				this._grid[row][col] = this._grid[row - 1][col];
+			}
 		}
 
-		for (let i = 0; i < this._cols.lenght; i++) {
-			this._grid[0][i] = 'BG';
+		for (let col = 0; col < this._cols; col++) {
+			this._grid[0][col] = 'BG';
 		}
 	}
 
@@ -73,9 +97,22 @@ class GameLogic {
 		return true;
 	}
 
-	/* handles when a player pressed a WASD key, or gravity of tetrominoes */
+	/* handles when a player pressed a WASD key */
 	processPlayerInput(direction) {
 
+	}
+
+	/*  handles gravity at a pace decided by the frontend */
+	processGravity() {
+
+	}
+
+	/* check whether the piece must put to the stack */
+	shouldPieceBePutToPile() {
+		
+		
+		
+		this.addNewPieceToGrid();
 	}
 
 	/* simple getter to obtain the current grid */

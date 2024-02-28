@@ -12,50 +12,55 @@ class TetroShape {
 		switch (tetroType) {
 			case ('I'):
 				return ([
-					[1, 1, 1, 1]
+					[0, 0, 0, 0],
+					[1, 1, 1, 1],
+					[0, 0, 0, 0],
+					[0, 0, 0, 0]
 				])
 			case ('O'):
 				return ([
-					[1, 1],
-					[1, 1]
+					[0, 1, 1],
+					[0, 1, 1],
+					[0, 0, 0]
 				])
 			case ('T'):
 				return ([
 					[0, 1, 0],
-					[1, 1, 1]
+					[1, 1, 1],
+					[0, 0, 0]
 				])
 			case ('S'):
 				return ([
 					[0, 1, 1],
-					[1, 1, 0]
+					[1, 1, 0],
+					[0, 0, 0]
 				])
 			case ('Z'):
 				return ([
 					[1, 1, 0],
-					[0, 1, 1]
+					[0, 1, 1],
+					[0, 0, 0]
 				])
 			case ('J'):
 				return ([
 					[1, 0, 0],
-					[1, 1, 1]
+					[1, 1, 1],
+					[0, 0, 0]
 				])
 			case ('L'):
 				return ([
 					[0, 0, 1],
-					[1, 1, 1]
+					[1, 1, 1],
+					[0, 0, 0]
 				])
 			default:
 				console.log('problem there');
-				return [];
+				return ([]);
 		}
 	}
 	
 	rotateGridClockwise () {
 		this._shape = this.rotateMatrixClockwise(this._shape);
-	}
-
-	rotateGridAntiClockwise () {
-		this._shape = this.rotateMatrixAntiClockwise(this._shape);
 	}
 	
 	getShape () {
@@ -66,10 +71,6 @@ class TetroShape {
 		return this.rotateMatrixClockwise(this._shape);
 	}
 
-	getAntiClockwiseRotatedShape () {
-		return this.rotateMatrixCounterClockwise(this._shape);
-	}
-
 	/* matrix calculation tools */
 	rotateMatrixClockwise(matrix) {
         const transposed = matrix[0].map((_, i) => matrix.map(row => row[i]));
@@ -78,12 +79,20 @@ class TetroShape {
         return rotated;
     }
 
-	rotateMatrixCounterClockwise(matrix) {
-        const transposed = matrix[0].map((_, i) => matrix.map(row => row[i]));
-        const rotated = transposed.reverse();
+	// rotateGridAntiClockwise () {
+	// 	this._shape = this.rotateMatrixAntiClockwise(this._shape);
+	// }
 
-        return rotated;
-    }
+	// getAntiClockwiseRotatedShape () {
+	// 	return this.rotateMatrixCounterClockwise(this._shape);
+	// }
+
+	// rotateMatrixCounterClockwise(matrix) {
+    //     const transposed = matrix[0].map((_, i) => matrix.map(row => row[i]));
+    //     const rotated = transposed.reverse();
+
+    //     return rotated;
+    // }
 }
 
 module.exports.TetroShape = TetroShape;

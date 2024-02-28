@@ -13,25 +13,40 @@ import { TetroShape } from "./TetroShape";
 class Piece {
 	constructor(type) {
     	this._type = type;
-      	this._offset = null;
-		this._tetroShape = null;
-		this.generatePiece(type);
-	}
-
-	/* generate a new piece */
-	generatePiece(type) {
-		this._offset = this.determineOffset();
+      	this._offset = {
+			x: 2,
+			y: 9
+		};
 		this._tetroShape = new TetroShape(type);
 	}
 
-	determineOffset() {
-		if (this._type === 'O') {
-			this._offset = 3;
-		} else {
-			this._offset = 2;
+	/* send new piece state to check whether it is compatible */
+	sendNewPieceState() {
+		return this._tetroShape.getClockwiseRotatedShape();
+	}
+
+	/* apply when gravity */
+	decrementOffsetY() {
+		if (this._offset.y > 0) {
+			this._offset.y--;
 		}
 	}
 
+	/* apply when rotating */
+	triggersClockwiseRotation() {
+		this._tetroShape.rotateGridClockwise();
+	}
+
+	/* apply when moving piece to the left */
+	triggersLeftShift() {
+		this._offset.y--;
+	}
+
+	/* apply when moving piece to the right */
+	triggersRightShift() {
+		this._offset.y++;
+	}
+	
 	getPieceType() {
 		return this._type;
 	}
@@ -40,25 +55,24 @@ class Piece {
 		return this._offset;
 	}
 
-	// useful ? 
-	getPieceTetroshape() {
-		return this._tetroShape;
+	getPieceX() {
+		return this._offset.x;
 	}
 
-	// useful ?
-	getPiece() {
-		return {
-		  	type: this._type,
-		  	offset: this._offset,
-			tetroShape: this._tetroShape
-		};
-  	}
+	getPieceY() {
+		return this._offset.y;
+	}
+
+	// useful ? 
+	getShape() {
+		return this._tetroShape.getShape();
+	}
 
 	/* debug purpose only */
 	displayPiece() {
 		console.log('new piece : ');
 		console.log(`type = ${this._type}`);
-		console.log(`offset index = ${this._offset}`);
+		console.log(`offset index x - y = ${this._offset.x} - ${this._offset.y}`);
 	}
 }
 
