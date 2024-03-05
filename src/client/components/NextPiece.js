@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
+import { createGrid } from "../logic/board.logic";
 
 const NextPiece = () => {
-
 	
-	
+	/* at setup, retrieve the grid for a piece */
 	useEffect(() => {
-
-	});	
+		
+	}, []);
 	
 	const nextPieceStyle = {
 		backgroundColor: 'red',

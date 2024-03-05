@@ -2,9 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { connect } from "../../api/socket.api";
 
 const initialState = {
-	socket: null,
-	status: 'disconnected',
-	error: null
+	sockets: {},
 }
 
 export const socketConnect = createAsyncThunk(

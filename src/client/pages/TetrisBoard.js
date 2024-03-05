@@ -1,57 +1,87 @@
-import React, {useState, useEffect} from "react";
-import { sendPlayerInput } from "../api/socket.api";
-import Cell from "./Cell";
+/**/
 
-const GRID_LENGTH = 20;
-const GRID_WIDTH = 10;
+import React, {useState, useEffect} from "react";
+import { createGrid, gridToBoard } from "../logic/board.logic";
+import useLockDelay from "../logic/hooks/useLockDelay";
+import useGravity from "../logic/hooks/useGravity";
+import { processLockDelay } from "../logic/lockDelay.logic";
+import { processGravity } from "../logic/gravity.logic";
+import { processPlayerInput } from "../logic/playerInputs.logic";
+import Cell from "./Cell";
+import { useSelector } from "react-redux";
+
+const GRAVITY_INTERVAL = 500;
+const LOCK_DELAY = 500;
 
 const TetrisBoard = () => {
 
-	/* creates a 2 dimension array of Cell components that compose the board */
-	const initBoard = () => {
-		const board = [];
-		for (let y = 0; y < GRID_LENGTH; y++) {
-			const row = [];
-			for (let x = 0; x < GRID_WIDTH; x++) {
-				row.push(<Cell key={`${x}-${y}`} cellColor={null} />);
-			}
-			board.push(<div key={y} style={{display: 'flex'}}>{row}</div>);
-		}
-		return board;
-	}
+	const [grid, setGrid] = useState(createGrid());
+	const [board, setBoard] = useState(gridToBoard(grid));
 
-	const [board, setBoard] = useState(initBoard());
+	const { start: startGravity, stop: stopGravity, 
+		reset: resetGravity, resume: resumeGravity } = useGravity(processGravity, GRAVITY_INTERVAL);
+	const { start: startLockDelay, reset: resetLockDelay, clear: clearLockDelay,
+		pause: pauseLockDelay, resume: resumeLockDelay} = useLockDelay(processLockDelay, LOCK_DELAY);
+
+	const { isGameActive, isGamePaused } =  useSelector((state) => state.gameTime);
 
 	/* connect to socket when starting the game */
 	useEffect(() => {
-
+		// TODO
 	}, []);
 
-	/* retrieve the new game struct every GRAVITY TIME or every time player do something */
+	/* react when game started or ended */
 	useEffect(() => {
+		if (isGameActive) {
+			startGravity();
+		} else {
+			stopGravity();
+		}
+	}, [isGameActive, startGravity, stopGravity]);
 
-	}, []);
+	/* react when game is paused or resumed */
+	useEffect(() => {
+		if (isGamePaused) {
+			stopGravity();
+			pauseLockDelay();
+		} else if (isGameActive) {
+			resumeGravity();
+			resumeLockDelay();
+		}
+	}, [isGamePaused, isGameActive, stopGravity, resumeGravity, pauseLockDelay, resumeLockDelay]);
+
+	/* everytime the grid is updated (gravity, player input), rerendering happens */
+	useEffect(() => {
+		setBoard(gridToBoard(grid));
+	}, [grid]);
 
 	/* handling the player input with WASD keys of the keyboard */
 	useEffect(() => {
+		if (!isGameActive || isGamePaused) {
+			return;
+		}
+
 		const handleKeyDown = (event) => {
+			let inputType;
 			switch (event.key) {
 				case 'w':
-					// sendPlayerInput();
+					inputType = 'up';
 					break;
 				case 'a':
-					// sendPlayerInput();
+					inputType = 'left';
 					break;
 				case 's':
-					// sendPlayerInput();
+					inputType = 'down';
 					break;
 				case 'd':
-					// sendPlayerInput();
+					inputType = 'up';
 					break;
 				default:
-					console.log('unrecognized key');
+					console.log('unrecognized key'); // update that
 					break;
 			}
+			const updatedGrid = processPlayerInput(inputType, grid);
+			setGrid(updatedGrid);
 		}
 
 		window.addEventListener('keydown', handleKeyDown);
@@ -60,7 +90,7 @@ const TetrisBoard = () => {
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown);
 		}
-	}, []);
+	}, [isGameActive, isGamePaused]);
 
 	const boardStyle = {
 		backgroundColor: 'black'
