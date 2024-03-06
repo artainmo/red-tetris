@@ -1,24 +1,38 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+
+/* objects : contains info keyed by game_id */
 const initialState = {
-	socket: null,
-	nextPiece: null,
-	currentPiece: null
+	nextPieces: {},
+	currentPieces: {},
+	status: {},
+	error: {}
 }
 
-export const fetchNewPiece = createAsyncThunk(
-	'piece/fetchNewPiece',
-	async (name, , {rejectWithValue}) => {
-
+export const getNextPiece = createAsyncThunk(
+	'piece/getNextPiece',
+	async (sessionId, {rejectWithValue}) => {
 		try {
-			const response = await connect(name);
+			const response = await getNextPiece(sessionId); // check if that exists
 			return response;
 		} catch (err) {
-			return rejectWithValue(err.response.data);
+			return rejectWithValue(err.toString()); // check this
 		}
 	}
 );
 
-const pieceSlice = createSlice(
+const pieceSlice = createSlice({
+	name: 'piece',
+	initialState,
+	reducers: {
 
-);
+	},
+	extraReducers: (builder) => {
+		builder
+		.addCase()
+		.addCase()
+		.addCase()
+	}
+});
+
+export default pieceSlice;

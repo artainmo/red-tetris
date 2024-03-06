@@ -41,7 +41,6 @@ export const listenOtherPlayerGameStructure = (socket, setOtherPlayerGameStructu
   	});
 }
 
-
 export const sendNextGame = (socket, roomId, nextGame) => {
   	socket.emit('sendNextGame', {roomId: roomId, nextGame: nextGame});
 }
@@ -52,13 +51,4 @@ export const listenNextGame = (socket, setGame) => {
 		console.log("Next incoming game");
 		setGame(nextGame);
 	});
-}
-
-/* this will send the input of a given player to the backend for it to handle the logic of the game */
-
-export const sendPlayerInput = (socket, keyPressed) => {
-	console.log(`send player input = ${keyPressed} to backend`);
-	socket.emit('playerInput',
-		{}
-	);
 }

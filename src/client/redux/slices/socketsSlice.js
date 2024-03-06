@@ -1,16 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { connect } from "../../api/socket.api";
+import { connect, disconnect } from "../../api/socket.api";
 
 const initialState = {
-	sockets: {},
+	socket: null,
+	status: 'disconnected',
+	error: null
 }
 
 export const socketConnect = createAsyncThunk(
 	'socket/socketConnect',
-	async ({rejectWithValue}) => {
+	async (_, {rejectWithValue}) => {
 		try {
-			const response = await connect();
-			return response;
+			const socket = await connect();
+			return socket;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
 		}
@@ -21,13 +23,25 @@ const socketSlice = createSlice({
 	name: 'socket',
 	initialState,
 	reducers: {
-		// no reducers needed, just extraReducers
+		manualDisconnect(state) {
+			if (state.socket) {
+				disconnect(state.socket);
+				state.socket = null;
+				state.status = 'disconnected';
+			}
+		},
+		displaySocketState(state) {
+			if (state.socket && state.status === 'connected') {
+				console.log('socket is connected');
+			} else {
+				console.log('socket is disconnected');
+			}
+		}
 	},
 	extraReducers: (builder) => {
 		builder
-		.addCase(socketConnect.pending, (state, action) => {
+		.addCase(socketConnect.pending, (state) => {
 			state.status = 'connecting';
-            state.error = null;
 		})
 		.addCase(socketConnect.fulfilled, (state, action) => {
 			state.socket = action.payload;
@@ -36,9 +50,12 @@ const socketSlice = createSlice({
 		})
 		.addCase(socketConnect.rejected, (state, action) => {
 			state.socket = null;
-			state.error = action.payload || 'failed to connect';
+			state.status = 'disconnected';
+			state.error = action.payload;
 		})
 	}
 });
+
+export const { manualDisconnect, displaySocketState } = socketSlice.actions;
 
 export default socketSlice;
