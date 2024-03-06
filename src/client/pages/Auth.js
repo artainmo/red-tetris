@@ -1,47 +1,68 @@
-import React, { useState } from 'react';
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Typography from '@mui/material/Typography';
-import { connect } from "../api/http.api"
-import Home from './Home'
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { userConnect } from '../redux/slices/authSlice';
+import { useNavigate } from 'react-router-dom';
+import { mainContainerStyle, landingPageStyle, blockStyle, buttonStyle, textStyle } from '../style/mainStyle';
+import Header from '../components/Header';
+
 
 const Auth = () => {
-  const [user, setUser] = useState(null);
-  const [name, setName] = useState("");
-  const [nameTooLong, setNameTooLong] = useState(false);
-  const [nameInvalidChars, setNameInvalidChars] = useState(false);
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
-  const userConnect = async () => {
-    if (name === "") return ;
-    const response = await connect(name);
-    if (response.status === 400 && response.data === "Player's username is too long") {
-      setNameInvalidChars(false);
-      setNameTooLong(true);
-    } else if (response.status === 400 && response.data === "Player's username contains special characters") {
-      setNameTooLong(false);
-      setNameInvalidChars(true);
-    } else if (response.status === 200) {
-      setNameInvalidChars(false);
-      setNameTooLong(false);
-      setUser(name);
-    }
-  }
+	const { user, name, nameTooLong, nameInvalidChars } = useSelector((state) => state.auth);
+	
+	const [localName, setLocalName] = useState('');
+	const [emptyInputErrMsg, setEmptyInputErrMsg] = useState(false);
+	const [connectionAttempt, setConnectionAttempt] = useState(false);
 
-  if (user === null) {
-    return (<div>
-              <TextField variant="outlined" placeholder="name" value={name}
-                    onChange={(e)=>{setName(event.target.value);}} />
-              <br/>
-              {nameTooLong && <div><br/><Typography>Name is too long.</Typography></div>}
-              {nameInvalidChars && <div><br/><Typography>Name cannot contain special characters.</Typography></div>}
-              <br/>
-              <Button variant="outlined" onClick={()=>{userConnect()}}>
-                Connect
-              </Button>
-            </div>);
-  } else {
-    return <div><Home user={user} setUser={setUser}/></div>
-  }
+	const handleAuth = () => {
+		setConnectionAttempt(true);
+		(async () => {
+			await dispatch(userConnect(localName));
+		})();
+	}
+
+	useEffect(() => {
+		if (connectionAttempt) {
+			// add some redirect logic there
+		}
+	}, [user, navigate, connectionAttempt]);
+	
+	const inputStyle = {
+		backgroundColor: 'white',
+		border: 'none',
+		borderRadius: '20px',
+		fontSize: '16px',
+		padding: '10px 20px',
+		margin: '24px'
+	}
+
+	const errMsgStyle = {
+		color: 'white',
+		fontSize: '12px',
+	}
+
+	return (
+		<div style={mainContainerStyle}>
+			<Header/>
+			<div style={landingPageStyle}>
+				<div style={blockStyle}>
+					<p style={textStyle} >Time To Register Comrade !</p>
+					<input 
+						style={inputStyle}
+						type='text'
+						placeholder='enter your pseudo'
+						value={localName}
+						onChange={(e) => setLocalName(e.target.value)}
+					/>
+					{nameTooLong && <p style={errMsgStyle}>Please enter a shorter username</p>}
+					{emptyInputErrMsg && <p style={errMsgStyle}>Empty inputs are invalid</p>}
+					<button onClick={handleAuth} style={buttonStyle}>Go !</button>
+				</div>
+			</div>
+		</div>
+	);
 }
 
 export default Auth;

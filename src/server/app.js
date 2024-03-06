@@ -6,23 +6,23 @@ const { Piece } = require(__dirname + '/classes/Piece.js');
 
 const app = express();
 
-/* only for dev purpose (remove after !)
+// /* only for dev purpose (remove after !)
 const cors = require('cors');
 app.use(cors());
 
 const corsOptions = {
-  origin: true,
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204,
-  allowedHeaders: ['Access-Control-Allow-Origin'],
+  	origin: true,
+  	optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204,
+  	allowedHeaders: ['Access-Control-Allow-Origin'],
 }
 
 // app.get('/', cors(corsOptions), function (req, res, next) {
 //   //res.json({msg: 'This is CORS-enabled for only example.com.'})
 // })
-* */
+// * */
 
 const server = app.listen(3000, () => {
-  console.log(`App listening at http://localhost:3000`);
+  	console.log(`App listening at http://localhost:3000`);
 });
 
 /*
@@ -35,7 +35,7 @@ app.use(express.static(path_to_bundled_files));
 
 //Send our bundled single-page-application frontend in one HTTP request when on homepage
 app.get('/', (req, res) => {
-  res.sendFile('index.html', { root: path_to_bundled_files});
+  	res.sendFile('index.html', { root: path_to_bundled_files});
 });
 
 //Create a router to separate all the HTTP requests aimed at communicating with the database
@@ -44,165 +44,168 @@ app.use('/rest', router);
 
 router.use(express.json()) //Parse incoming json bodies
 
-router.get('/connect/:name', async (req,res,next) => {
-  const name = req.params.name;
-  const player = new Player();
+router.get('/connect/:name', async (req, res, next) => {
+  	const name =  decodeURIComponent(req.params.name);
+  	const player = new Player();
 
-  try {
-    await player.connect(name);
-    res.status(200).send(`Connection success of ${name}`)
-  } catch (e) {
-    console.log(e.message)
-    res.status(400).send(e.message)
-  }
+  	try {
+    	await player.connect(name);
+		res.status(200).json({
+			message: `Connection success of ${name}`,
+            username: name
+		});
+  	} catch (e) {
+    	console.log(e.message);
+		res.status(400).json({ message: e.message });
+  	}
 });
 
 router.get('/games/:name', async (req,res,next) => {
-  const name = req.params.name;
-  const player = new Player();
+  	const name = req.params.name;
+  	const player = new Player();
 
-  await player.connect(name);
-  const games = await player.getAllPastGames();
-  res.status(200).json(games);
+  	await player.connect(name);
+  	const games = await player.getAllPastGames();
+  	res.status(200).json(games);
 });
 
 router.get('/game/search/:name', async (req,res,next) => {
-  const name = req.params.name;
-  const player = new Player();
+  	const name = req.params.name;
+  	const player = new Player();
 
-  await player.connect(name);
-  const game = await player.searchGame();
-  res.status(200).json(game);
+  	await player.connect(name);
+  	const game = await player.searchGame();
+  	res.status(200).json(game);
 });
 
 router.post('/game/wait/join', async (req,res,next) => {
-  const body = req.body;
-  const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    body._player2_score);
+  	const body = req.body;
+  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
+    	body._player2_score);
 
-  const newGame = await game.waitForSomeoneToJoin();
-  if (newGame === false) {
-    res.status(400).send("This game hasn't been joined");
-  } else {
-    res.status(200).json(newGame);
-  }
+  	const newGame = await game.waitForSomeoneToJoin();
+  	if (newGame === false) {
+    	res.status(400).send("This game hasn't been joined");
+  	} else {
+    	res.status(200).json(newGame);
+  	}
 });
 
 router.patch('/game/start', async (req,res,next) => {
-  const body = req.body;
-  const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    body._player2_score);
+  	const body = req.body;
+  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
+    	body._player2_score);
 
-  const ret = await game.start_play();
-  if (ret === false) {
-    res.status(400).send("Unable to start this game");
-  } else {
-    res.status(200).send(`Game started between ${body._player1} and ${body._player2}`);
-  }
+  	const ret = await game.start_play();
+  	if (ret === false) {
+    	res.status(400).send("Unable to start this game");
+  	} else {
+    	res.status(200).send(`Game started between ${body._player1} and ${body._player2}`);
+  	}
 });
 
 router.post('/game/wait/start', async (req,res,next) => {
-  const body = req.body;
-  const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    body._player2_score);
+  	const body = req.body;
+  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
+    	body._player2_score);
 
-  const ret = await game.waitGameStart();
-  if (ret === false) {
-    res.status(400).send("This game has not been started");
-  } else {
-    res.status(200).send(`${body._player1} started the game`);
-  }
+  	const ret = await game.waitGameStart();
+  	if (ret === false) {
+    	res.status(400).send("This game has not been started");
+  	} else {
+    	res.status(200).send(`${body._player1} started the game`);
+  	}
 });
 
 router.post('/game/score/:score1/:score2?', async (req,res,next) => {
-  const score1 = req.params.score1;
-  const score2 = req.params.score2 || null;
-  const body = req.body;
-  const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    body._player2_score);
+  	const score1 = req.params.score1;
+  	const score2 = req.params.score2 || null;
+  	const body = req.body;
+  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
+    	body._player2_score);
 
-  const newGame = await game.finalScore(score1, score2);
-  if (newGame === false) {
-    res.status(400).send("Final game score cannot be added");
-  } else {
-    res.status(200).json(newGame);
-  }
+  	const newGame = await game.finalScore(score1, score2);
+  	if (newGame === false) {
+    	res.status(400).send("Final game score cannot be added");
+  	} else {
+    	res.status(200).json(newGame);
+  	}
 });
 
 router.patch('/game/quit/:name', async (req,res,next) => {
-  const name = req.params.name;
-  const body = req.body;
-  const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    body._player2_score);
+  	const name = req.params.name;
+  	const body = req.body;
+  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
+    	body._player2_score);
 
-  const newGame = await game.quit(name);
-  if (newGame === false) {
-    res.status(400).send(`Nobody quit`);
-  } else {
-    res.status(200).json(newGame);
-  }
+  	const newGame = await game.quit(name);
+  	if (newGame === false) {
+    	res.status(400).send(`Nobody quit`);
+  	} else {
+    	res.status(200).json(newGame);
+  	}
 });
 
 router.post('/game/next', async (req,res,next) => {
-  const body = req.body;
-  const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    body._player2_score);
+  	const body = req.body;
+  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
+    	body._player2_score);
 
-  game.display()
-  const newGame = await game.next_game();
-  if (newGame === false) {
-    res.status(400).send("This game is not finished. Can't go to next game.");
-  } else {
-    res.status(200).json(newGame);
-  }
+  	game.display()
+  	const newGame = await game.next_game();
+  	if (newGame === false) {
+    	res.status(400).send("This game is not finished. Can't go to next game.");
+  	} else {
+    	res.status(200).json(newGame);
+  	}
 });
 
 router.patch('/game/wait/quit', async (req,res,next) => {
-  const body = req.body;
-  const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    body._player2_score);
+  	const body = req.body;
+  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
+    	body._player2_score);
 
-  const newGame = await game.waitForSomeoneToQuit();
-  if (newGame === false) {
-    res.status(400).send("This game cannot be quited");
-  } else {
-    res.status(200).json(newGame);
-  }
+  	const newGame = await game.waitForSomeoneToQuit();
+  	if (newGame === false) {
+    	res.status(400).send("This game cannot be quited");
+  	} else {
+    	res.status(200).json(newGame);
+  	}
 });
 
 
 //Setting up the websockets with socket.io
 const io = socketio(server, {
-  cors: {
-    origin: true,
-    methods: "*",
-  }
+  	cors: {
+    	origin: true,
+    	methods: "*",
+  	}
 });
 
 io.on('connection', async (socket) => {
-  console.log('A user connected to websocket');
-  socket.on('disconnect', () => {
-    console.log('A user disconnected from websocket and thus left its room');
-  });
+  	console.log('A user connected to websocket');
+  	socket.on('disconnect', () => {
+    	console.log('A user disconnected from websocket and thus left its room');
+});
 
-  socket.on('joinRoom', (roomId) => {
+socket.on('joinRoom', (roomId) => {
     console.log('A user joined the room named ' + roomId);
     socket.join(roomId);
-  });
+});
 
-  socket.on('askNewPiece', (roomId) => {
+socket.on('askNewPiece', (roomId) => {
     console.log("Sending new piece to " + roomId);
-    const piece = (new Piece()).generate_random_piece()
+    const piece = (new Piece()).generate_random_piece();
     io.to(roomId).emit('newPiece', piece);
-  });
+});
 
-  socket.on('sendPersonalGameStructure', (data) => {
+socket.on('sendPersonalGameStructure', (data) => {
     socket.broadcast.to(data.roomId).emit('otherPlayerGameStructure',
-                                            data.gameStructure);
-  });
+        data.gameStructure);
+});
 
-  socket.on('sendNextGame', (data) => {
-    console.log("Sending next game");
-    socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame);
-  });
+socket.on('sendNextGame', (data) => {
+		console.log("Sending next game");
+    	socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame);
+  	});
 });
