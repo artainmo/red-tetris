@@ -1,11 +1,11 @@
 /* processGravity is triggered by the custom hook useGravity every 500ms */
 
-import { deepCopyGrid } from "./board.logic";
+import { deepCopyGrid } from "./grid.logic";
 
-export const processGravity = (grid, direction) => {
+export const processGravity = (grid, offset_x, offset_y, pieceGrid) => {
 	const newGrid = deepCopyGrid(grid);
-
-	// add logic to modify the grid
+	
+	
 
 	return newGrid;
 }

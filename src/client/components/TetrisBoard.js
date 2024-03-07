@@ -1,7 +1,7 @@
 /**/
 
 import React, {useState, useEffect} from "react";
-import { createGrid, gridToBoard } from "../logic/board.logic";
+import { createGrid, gridToBoard } from "../logic/grid.logic";
 import useLockDelay from "../logic/hooks/useLockDelay";
 import useGravity from "../logic/hooks/useGravity";
 import { processLockDelay } from "../logic/lockDelay.logic";
@@ -12,11 +12,13 @@ import { useSelector } from "react-redux";
 
 const GRAVITY_INTERVAL = 500;
 const LOCK_DELAY = 500;
+const GRID_LENGTH = 20;
+const GRID_WIDTH = 10;
 
 const TetrisBoard = () => {
 
 	const [grid, setGrid] = useState(createGrid());
-	const [board, setBoard] = useState(gridToBoard(grid));
+	const [board, setBoard] = useState(gridToBoard(grid, GRID_WIDTH, GRID_LENGTH));
 
 	const { start: startGravity, stop: stopGravity, 
 		reset: resetGravity, resume: resumeGravity } = useGravity(processGravity, GRAVITY_INTERVAL);

@@ -1,10 +1,9 @@
 /**/
 
-import { deepCopyGrid } from "./board.logic";
+import { deepCopyGrid } from "./grid.logic";
 
 export const processPlayerInput = (grid, direction) => {
 	const newGrid = deepCopyGrid(grid);
 
 
 }
-

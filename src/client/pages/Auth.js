@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { userConnect } from '../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { mainContainerStyle, landingPageStyle, blockStyle, buttonStyle, textStyle } from '../style/mainStyle';
-import Header from '../components/Header';
+import Header from '../components/shared/Header';
 
 
 const Auth = () => {

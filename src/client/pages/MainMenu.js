@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
+import Header from "../components/shared/Header";
 import LeftMenuPannel from "../components/LeftMenuPannel";
 import RightMenuPannel from "../components/RightMenuPannel";
 import { mainContainerStyle, landingPageStyle } from '../style/mainStyle';

@@ -1,7 +1,12 @@
 import React, { useEffect } from "react";
-import { createGrid } from "../logic/board.logic";
+import { useDispatch, useSelector } from "react-redux";
+import { createGrid } from "../logic/grid.logic";
 
 const NextPiece = () => {
+	
+	const dispatch = useDispatch();
+	const { currentSession } = useSelector((state) => state.gameSessions); // update this
+	const { nextPiece, status } = useSelector((state) => state.piece); // update this 
 	
 	/* at setup, retrieve the grid for a piece */
 	useEffect(() => {
@@ -19,7 +24,7 @@ const NextPiece = () => {
 	
 	return (
 		<div style={nextPieceStyle}>
-			add the nextPiece elem there
+			
 		</div>
 	);
 }
