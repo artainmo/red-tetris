@@ -8,8 +8,14 @@
 class Piece {
 	constructor(type) {
     	this._type = type;
+
+			// Directions and positions are handled by the front as they are always the same
+			// this._directions = ["left", "up", "down", "right"];
+		 	// this._positions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+			// this._direction = this._directions[Math.floor(Math.random() * 4)];
+      // this._position = this._positions[Math.floor(Math.random() * 10)];
 	}
-	
+
 	getPieceType() {
 		return this._type;
 	}

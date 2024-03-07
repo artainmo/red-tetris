@@ -1,8 +1,9 @@
 import { Piece } from "./Piece";
 
-/* a piece basket hold 7 pieces that represents every type of tetromino
-once the piece basket is empty, it will fetch 7 pieces that will be displayed randomly
-to the players */
+/*
+** A piece basket hold 7 pieces that represents every type of tetromino.
+** Players will receive one random piece of the basket until it empties and has to be refilled.
+*/
 
 class PieceBasket {
 
@@ -10,7 +11,7 @@ class PieceBasket {
 		this.pieces = [];
 		this.fullfillPieceBasket();
 	}
-	
+
 	fullfillPieceBasket() {
 		const pieceTypeArray = ["I", "O", "T", "S", "Z", "J", "L"];
 

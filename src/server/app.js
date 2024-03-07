@@ -199,30 +199,38 @@ const io = socketio(server, {
   	}
 });
 
+var pieceBaskets = {};
+
 io.on('connection', async (socket) => {
   	console.log('A user connected to websocket');
-  	socket.on('disconnect', () => {
+
+    socket.on('disconnect', () => {
     	console.log('A user disconnected from websocket and thus left its room');
-});
+    });
 
-socket.on('joinRoom', (roomId) => {
-    console.log('A user joined the room named ' + roomId);
-    socket.join(roomId);
-});
+    //Each room represents a game, the roomId is game's id
+    //All players of same game connect to same room
+    socket.on('joinRoom', (roomId) => {
+        console.log('A user joined the room named ' + roomId);
+        socket.join(roomId);
+    });
 
-socket.on('askNewPiece', (roomId) => {
-    console.log("Sending new piece to " + roomId);
-    const piece = (new Piece()).generate_random_piece();
-    io.to(roomId).emit('newPiece', piece);
-});
+    socket.on('askNewPiece', (roomId) => {
+        console.log("Sending new piece to " + roomId);
+        if (!(roomId in pieceBaskets)) {
+          pieceBaskets[roomId] = new PieceBasket()
+        }
+        const piece = pieceBaskets[roomId].pickPieceInPieceBasket()
+        io.to(roomId).emit('newPiece', piece); //Broadcast to all room members the same new piece
+    });
 
-socket.on('sendPersonalGameStructure', (data) => {
-    socket.broadcast.to(data.roomId).emit('otherPlayerGameStructure',
-        data.gameStructure);
-});
+    socket.on('sendPersonalGameStructure', (data) => {
+        socket.broadcast.to(data.roomId).emit('otherPlayerGameStructure',
+            data.gameStructure); //Broadcast to all room members the game structures of all players
+    });
 
-socket.on('sendNextGame', (data) => {
-		console.log("Sending next game");
-    	socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame);
-  	});
+    socket.on('sendNextGame', (data) => {
+    		console.log("Sending next game");
+        socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame); //Broadcast to all room members the next game, whereby last winner will become host
+    });
 });
