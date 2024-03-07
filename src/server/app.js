@@ -84,7 +84,7 @@ router.get('/game/solo/:name', async (req,res,next) => {
 
   	await player.connect(name);
   	const game = await player.createSoloGame();
-    if game == false {
+    if (game == false) {
       res.status(500).send("Internal error: solo game could not be locked.");
     } else {
       res.status(200).json(game);
@@ -93,8 +93,8 @@ router.get('/game/solo/:name', async (req,res,next) => {
 
 router.post('/game/wait/join', async (req,res,next) => {
   	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    	body._player2_score);
+  	const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
+          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
 
   	const newGame = await game.waitForSomeoneToJoin();
   	if (newGame === false) {
@@ -106,8 +106,8 @@ router.post('/game/wait/join', async (req,res,next) => {
 
 router.patch('/game/start', async (req,res,next) => {
   	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    	body._player2_score);
+    const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
+          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
 
   	const ret = await game.start_play();
   	if (ret === false) {
@@ -119,8 +119,8 @@ router.patch('/game/start', async (req,res,next) => {
 
 router.post('/game/wait/start', async (req,res,next) => {
   	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    	body._player2_score);
+    const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
+          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
 
   	const ret = await game.waitGameStart();
   	if (ret === false) {
@@ -130,14 +130,18 @@ router.post('/game/wait/start', async (req,res,next) => {
   	}
 });
 
-router.post('/game/score/:score1/:score2?', async (req,res,next) => {
+router.post('/game/score/:score1/:score2/:score3/:score4/:score5/:score6', async (req,res,next) => {
   	const score1 = req.params.score1;
   	const score2 = req.params.score2 || null;
+    const score3 = req.params.score3 || null;
+    const score4 = req.params.score4 || null;
+    const score5 = req.params.score5 || null;
+    const score6 = req.params.score6 || null;
   	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    	body._player2_score);
+    const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
+          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
 
-  	const newGame = await game.finalScore(score1, score2);
+  	const newGame = await game.finalScore(score1, score2, score3, score4, score5, score6);
   	if (newGame === false) {
     	res.status(400).send("Final game score cannot be added");
   	} else {
@@ -148,8 +152,8 @@ router.post('/game/score/:score1/:score2?', async (req,res,next) => {
 router.patch('/game/quit/:name', async (req,res,next) => {
   	const name = req.params.name;
   	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    	body._player2_score);
+    const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
+          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
 
   	const newGame = await game.quit(name);
   	if (newGame === false) {
@@ -161,8 +165,8 @@ router.patch('/game/quit/:name', async (req,res,next) => {
 
 router.post('/game/next', async (req,res,next) => {
   	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    	body._player2_score);
+    const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
+          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
 
   	game.display()
   	const newGame = await game.next_game();
@@ -175,8 +179,8 @@ router.post('/game/next', async (req,res,next) => {
 
 router.patch('/game/wait/quit', async (req,res,next) => {
   	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
-    	body._player2_score);
+    const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
+          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
 
   	const newGame = await game.waitForSomeoneToQuit();
   	if (newGame === false) {
