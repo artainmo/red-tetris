@@ -3,7 +3,7 @@ const { Game } = require(__dirname + '/Game.js');
 
 class Player {
 	async connect(username) { //Create new account or connect to already existing one
-		
+
 		if (username.length > 19) {
 			throw new Error("Player's username is too long");
 		}
@@ -50,7 +50,7 @@ class Player {
 	}
 
 	async searchGame() {
-		const game = new Game;
+		const game = new Game();
 		const db = new database();
 		const openGames = await db.query("SELECT * FROM game WHERE locked = false AND player2_id IS NULL");
 		if (openGames.rows.length !== 0) { //Join existing game
@@ -67,6 +67,20 @@ class Player {
 			console.log(`${this._username} created a joinable game`)
 		}
 		db.close_connection();
+		return game;
+	}
+
+	async createSoloGame() {
+		const game = new Game();
+		const db = new database();
+		await db.query("INSERT INTO game (player1_id) VALUES ($1);", [this._username]);
+		const newGame = await db.query("SELECT id FROM game WHERE locked = false AND player1_id = $1 AND player2_id IS NULL;", [this._username]);
+		game.id = newGame.rows[0].id
+		game.player1 = this._username;
+		db.close_connection();
+		if !game.start_play() { //Lock the game down so that no-one will join
+			return false
+		}
 		return game;
 	}
 }

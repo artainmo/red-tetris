@@ -78,6 +78,19 @@ router.get('/game/search/:name', async (req,res,next) => {
   	res.status(200).json(game);
 });
 
+router.get('/game/solo/:name', async (req,res,next) => {
+  	const name = req.params.name;
+  	const player = new Player();
+
+  	await player.connect(name);
+  	const game = await player.createSoloGame();
+    if game == false {
+      res.status(500).send("Internal error: solo game could not be locked.");
+    } else {
+      res.status(200).json(game);
+    }
+});
+
 router.post('/game/wait/join', async (req,res,next) => {
   	const body = req.body;
   	const game = new Game(body._id, body._player1, body._player2, body._player1_score,
