@@ -1,5 +1,6 @@
 /* Handles the conversion from grid to board */
 
+import React from "react";
 import Cell from "../components/Cell";
 
 const COLOR_BG = '#3565d0';
@@ -11,11 +12,12 @@ const COLOR_S = '#5717e0';
 const COLOR_T = '#e74208';
 const COLOR_Z = '#a808e7';
 
-export const gridToBoard = (grid, width, lenght) => {
+export const gridToBoard = (grid, width, length) => {
 	const board = [];
 	for (let y = 0; y < width; y++) {
-		for (let x = 0; x < lenght; x++) {
-			const cellColor = grid[y][x] !== 'BG' ? COLOR_BG : getCellColor(grid[y][x]);
+		const row = [];
+		for (let x = 0; x < length; x++) {
+			const cellColor = grid[y][x] === 'BG' ? COLOR_BG : getCellColor(grid[y][x]);
 			row.push(<Cell key={`${x}-${y}`} cellColor={cellColor} />);
 		}
 		board.push(<div key={y} style={{display: 'flex'}}>{row}</div>);

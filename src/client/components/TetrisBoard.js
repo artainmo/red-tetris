@@ -1,7 +1,8 @@
 /**/
 
 import React, {useState, useEffect} from "react";
-import { createGrid, gridToBoard } from "../logic/grid.logic";
+import { gridToBoard } from "../logic/board.logic";
+import { createGrid } from "../logic/grid.logic";
 import useLockDelay from "../logic/hooks/useLockDelay";
 import useGravity from "../logic/hooks/useGravity";
 import { processLockDelay } from "../logic/lockDelay.logic";
@@ -17,7 +18,7 @@ const GRID_WIDTH = 10;
 
 const TetrisBoard = () => {
 
-	const [grid, setGrid] = useState(createGrid());
+	const [grid, setGrid] = useState(createGrid(GRID_WIDTH, GRID_LENGTH));
 	const [board, setBoard] = useState(gridToBoard(grid, GRID_WIDTH, GRID_LENGTH));
 
 	const { start: startGravity, stop: stopGravity, 

@@ -10,8 +10,6 @@ const LeftMenuPannel = () => {
 
 	const navigate = useNavigate();
 
-	
-	
 	const handleSoloMatchmaking = () => {
 		console.log('solo player - handle matchmaking');
 	}

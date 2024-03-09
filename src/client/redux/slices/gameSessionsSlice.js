@@ -47,6 +47,6 @@ const gameSessionsSlice = createSlice({
 	}
 });
 
-export const { displayGameSliceState } = timeSlice.actions; // reducers here
+export const { displayGameSliceState } = gameSessionsSlice.actions; // reducers here
 
 export default gameSessionsSlice;
