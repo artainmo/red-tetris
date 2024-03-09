@@ -6,7 +6,7 @@ export const connect = async (name) => {
  	try {
     	const response = await axios.get(`/connect/${encodeURIComponent(name)}`);
 		return {
-			status: response.status, 
+			status: response.status,
 			data: response.data
 		};
  	} catch (err) {
@@ -64,12 +64,20 @@ export const gameStart = async (game) => {
 	}
 }
 
-export const gameFinalScore = async (game, score1, score2=null) => {
+export const gameFinalScore = async (game, score1, score2=null, score3=null, score4=null, score5=null, score6=null) => {
 	try {
     if (score2 === null) {
       var response = await axios.post(`/game/score/${score1}`, game);
-    } else {
+    } else if (score3 === null) {
       var response = await axios.post(`/game/score/${score1}/${score2}`, game);
+    } else if (score4 === null) {
+      var response = await axios.post(`/game/score/${score1}/${score2}/${score3}`, game);
+    } else if (score5 === null) {
+      var response = await axios.post(`/game/score/${score1}/${score2}/${score3}/${score4}`, game);
+    } else if (score6 === null) {
+      var response = await axios.post(`/game/score/${score1}/${score2}/${score3}/${score4}/${score5}`, game);
+    } else {
+      var response = await axios.post(`/game/score/${score1}/${score2}/${score3}/${score4}/${score5}/${score6}`, game);
     }
 		return {status: response.status, data: response.data};
 	} catch (e) {

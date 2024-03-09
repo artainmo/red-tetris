@@ -3,7 +3,7 @@ const { Game } = require(__dirname + '/Game.js');
 
 class Player {
 	async connect(username) { //Create new account or connect to already existing one
-		
+
 		if (username.length > 19) {
 			throw new Error("Player's username is too long");
 		}
@@ -43,22 +43,47 @@ class Player {
 		const sql_games = await db.query("SELECT * FROM game WHERE locked = true AND player1_id = $1 OR player2_id = $1", [this._username]);
 		for (let i=0; i<sql_games.rows.length; i++) {
 			let game = sql_games.rows[i];
-			games.push(new Game(game.id, game.player1_id, game.player2_id, game.player1_score, game.player2_score));
+			games.push(new Game(game.id, game.player1_id, game.player2_id, game.player3_id, game.player4_id, game.player5_id, game.player6_id,
+						game.player1_score, game.player2_score, game.player3_score, game.player4_score, game.player5_score, game.player6_score));
 		}
 		db.close_connection();
 		return games;
 	}
 
 	async searchGame() {
-		const game = new Game;
+		const game = new Game();
 		const db = new database();
-		const openGames = await db.query("SELECT * FROM game WHERE locked = false AND player2_id IS NULL");
+		const openGames = await db.query("SELECT * FROM game WHERE locked = false AND player6_id IS NULL");
 		if (openGames.rows.length !== 0) { //Join existing game
-			await db.query("UPDATE game SET player2_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 			game.id = openGames.rows[0].id
 			game.player1 = openGames.rows[0].player1_id;
-			game.player2 = this._username;
-			console.log(`${this._username}: ${this._username} joined ${game.player1}'s game`)
+			if (!openGames.rows[0].player2_id) {
+				await db.query("UPDATE game SET player2_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
+				game.player2 = this._username;
+			} else if (!openGames.rows[0].player3_id) {
+				await db.query("UPDATE game SET player3_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
+				game.player2 = openGames.rows[0].player2_id;
+				game.player3 = this._username;
+			} else if (!openGames.rows[0].player4_id) {
+				await db.query("UPDATE game SET player4_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
+				game.player2 = openGames.rows[0].player2_id;
+				game.player3 = openGames.rows[0].player3_id;
+				game.player4 = this._username;
+			} else if (!openGames.rows[0].player5_id) {
+				await db.query("UPDATE game SET player5_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
+				game.player2 = openGames.rows[0].player2_id;
+				game.player3 = openGames.rows[0].player3_id;
+				game.player4 = openGames.rows[0].player4_id;
+				game.player5 = this._username;
+			} else {
+				await db.query("UPDATE game SET player6_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
+				game.player2 = openGames.rows[0].player2_id;
+				game.player3 = openGames.rows[0].player3_id;
+				game.player4 = openGames.rows[0].player4_id;
+				game.player5 = openGames.rows[0].player5_id;
+				game.player6 = this._username;
+			}
+			console.log(`${this._username} joined ${game.player1}'s game`)
 		} else { //Create joinable game
 			await db.query("INSERT INTO game (player1_id) VALUES ($1);", [this._username]);
 			const newGame = await db.query("SELECT id FROM game WHERE locked = false AND player1_id = $1 AND player2_id IS NULL;", [this._username]);
@@ -67,6 +92,20 @@ class Player {
 			console.log(`${this._username} created a joinable game`)
 		}
 		db.close_connection();
+		return game;
+	}
+
+	async createSoloGame() {
+		const game = new Game();
+		const db = new database();
+		await db.query("INSERT INTO game (player1_id) VALUES ($1);", [this._username]);
+		const newGame = await db.query("SELECT id FROM game WHERE locked = false AND player1_id = $1 AND player2_id IS NULL;", [this._username]);
+		game.id = newGame.rows[0].id;
+		game.player1 = this._username;
+		db.close_connection();
+		if (!game.start_play()) { //Lock the game down so that no-one will join
+			return false;
+		}
 		return game;
 	}
 }
