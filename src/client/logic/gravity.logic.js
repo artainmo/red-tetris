@@ -2,10 +2,21 @@
 
 import { deepCopyGrid } from "./grid.logic";
 
-export const processGravity = (grid, offset_x, offset_y, pieceGrid) => {
+export const processGravity = (grid, pieceGrid, offsetX, offsetY) => {
 	const newGrid = deepCopyGrid(grid);
 	
-	
+	if (canPieceFall(newGrid, pieceGrid, offsetX, offsetY)) {
+		newGrid = applyGravity(newGrid, pieceGrid, offsetX, offsetY);
+	}
 
 	return newGrid;
+}
+
+export const applyGravity = (newGrid, pieceGrid, offsetX, offsetY) => {
+
+}
+
+/* check whether or not the piece can move */
+export const canPieceFall = (newgrid, pieceGrid, offsetX, offsetY) => {
+	
 }

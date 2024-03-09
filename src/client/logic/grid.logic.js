@@ -14,6 +14,3 @@ export const deepCopyGrid = (grid) => {
 	return newGrid;
 }
 
-export const canPieceMove = () => {
-
-}

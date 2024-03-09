@@ -3,9 +3,11 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 /* objects : contains info keyed by game_id */
 const initialState = {
 	nextPieces: {},
+	nextPiecesOffsetX: {},
+	nextPiecesOffsetY: {},
 	currentPieces: {},
 	status: {},
-	error: {}
+	errors: {}
 }
 
 export const getNextPiece = createAsyncThunk(
