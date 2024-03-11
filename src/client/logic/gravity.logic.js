@@ -13,10 +13,10 @@ export const processGravity = (grid, pieceGrid, offsetX, offsetY) => {
 }
 
 export const applyGravity = (newGrid, pieceGrid, offsetX, offsetY) => {
-
+	return newGrid; // update this, placeholder
 }
 
 /* check whether or not the piece can move */
 export const canPieceFall = (newgrid, pieceGrid, offsetX, offsetY) => {
-	
+	return false; // update this, placeholder
 }

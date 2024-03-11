@@ -5,8 +5,8 @@ import { createGrid } from "../logic/grid.logic";
 const NextPiece = () => {
 	
 	const dispatch = useDispatch();
-	const { currentSession } = useSelector((state) => state.gameSessions); // update this
-	const { nextPiece, status } = useSelector((state) => state.piece); // update this 
+	// const { currentSession } = useSelector((state) => state.gameSessions); // update this
+	// const { nextPiece, status } = useSelector((state) => state.piece); // update this 
 	
 	/* at setup, retrieve the grid for a piece */
 	useEffect(() => {

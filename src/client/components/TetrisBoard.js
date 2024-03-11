@@ -18,14 +18,17 @@ const GRID_WIDTH = 10;
 
 const TetrisBoard = () => {
 
+	/* creates an empty grid, then convert it to board */
 	const [grid, setGrid] = useState(createGrid(GRID_WIDTH, GRID_LENGTH));
 	const [board, setBoard] = useState(gridToBoard(grid, GRID_WIDTH, GRID_LENGTH));
 
+	/* custom hooks for gravity and lock delay */
 	const { start: startGravity, stop: stopGravity, 
 		reset: resetGravity, resume: resumeGravity } = useGravity(processGravity, GRAVITY_INTERVAL);
 	const { start: startLockDelay, reset: resetLockDelay, clear: clearLockDelay,
 		pause: pauseLockDelay, resume: resumeLockDelay} = useLockDelay(processLockDelay, LOCK_DELAY);
 
+	/* checks whether the game is active or not */
 	const { isGameActive, isGamePaused } =  useSelector((state) => state.gameTime);
 
 	/* connect to socket when starting the game */

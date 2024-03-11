@@ -9,6 +9,10 @@ export const createGrid = (width, lenght) => {
 }
 
 export const deepCopyGrid = (grid) => {
+	if (!grid) {
+		console.log('grid undefined');
+	}
+	
 	const newGrid = grid.map(row => [...row]);
 
 	return newGrid;
