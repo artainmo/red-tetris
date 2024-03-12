@@ -16,7 +16,7 @@ dev_back:
 	npm install && npm run dev_back
 
 dev_back_front:
-	cd test; python3 front_hot-reload.py
+	cd test/utils; python3 front_hot-reload.py
 
 refresh_front:
 	npm run build
