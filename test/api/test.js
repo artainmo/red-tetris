@@ -18,28 +18,148 @@ console.log = function(d) {
 
 async function test() {
   var response = {status: 400, data: "failed"};
-	console.log("---------- Database refresh ----------")
-	execSync(`cd ${__dirname}/../.. && make refresh_database`, { encoding: 'utf-8' });
+  console.log("---------- Database refresh ----------")
+  execSync(`cd ${__dirname}/../.. && make refresh_database`, { encoding: 'utf-8' });
 
-	console.log("---------- Account creation ----------")
+  console.log("---------- Account creation ----------")
   var response = await axios.get("/connect/Alfred");
-  console.log(response.status + " : " + response.data);
+  console.log(response.status + ":");
+  console.log(response.data);
   var response = await axios.get("/connect/Conrad");
-  console.log(response.status + " : " + response.data);
-  var response = await axios.get("/connect/Alfred");
-  console.log(response.status + " : " + response.data);
+  console.log(response.status + ":");
+  console.log(response.data);
+  var response = await axios.get("/connect/Philip");
+  console.log(response.status + ":");
+  console.log(response.data);
   try {
     var response = await axios.get("/connect/dwdwdwdwdwdewfregtgt4gfrwfefeefefewfewffw");
   } catch (e) {
-    console.log(e.response.status + " : " + e.response.data);
+  	console.log(e.response.status + ":");
+  	console.log(e.response.data);
   }
   try {
     var response = await axios.get("/connect/dd%20dd");
   } catch (e) {
-    console.log(e.response.status + " : " + e.response.data);
+  	console.log(e.response.status + ":");
+  	console.log(e.response.data);
   }
 
-	console.log("---------- Matchmaking ----------")
+
+
+  console.log("---------- Matchmaking ----------")
+  console.log('Create solo game for Alfred:')
+  var response = await axios.get("/game/solo/Alfred");
+  console.log(response.status + ":");
+  console.log(response.data);
+  //process.exit()
+  console.log('Conrad searches a game:')
+  var response = await axios.get("/game/search/Conrad");
+  console.log(response.status + ":");
+  console.log(response.data); 
+  console.log('Philip searches a game:')
+  var response = await axios.get("/game/search/Philip");
+  console.log(response.status + ":");
+  console.log(response.data);
+  var game = response.data;
+  //process.exit()
+  console.log('Start the game:')
+  var response = await axios.patch("/game/start", game);
+  console.log(response.status + ":");
+  console.log(response.data);
+  //process.exit()
+  console.log('Conrad quits its game:');
+  var response = await axios.patch("/game/quit/Conrad", game);
+  console.log(response.status + ":");
+  console.log(response.data);
+  game = response.data
+  //process.exit()
+  console.log('Philip creates a game')
+  var response = await axios.get("/game/search/Philip");
+  game = response.data
+  console.log('Verify if someone joined the game:');
+  try {
+  	var response = await axios.post("/game/wait/join", game);
+  } catch(e) {
+  	console.log(e.response.status + ":");
+  	console.log(e.response.data);
+  }
+  console.log('Conrad joins the game');
+  var response = await axios.get("/game/search/Conrad");
+  console.log('Verify if someone joined the game:');
+  var response = await axios.post("/game/wait/join", game);
+  console.log(response.status + ":");
+  console.log(response.data);
+  game = response.data
+  //var response = await axios.patch("/game/start", game); //Lock the game to avoid errors in future
+  //process.exit()
+  console.log('Verify if someone quitted the game:')
+  try {
+  	var response = await axios.patch("/game/wait/quit", game);
+  } catch(e) {
+  	console.log(e.response.status + ":");
+  	console.log(e.response.data);
+  }
+  console.log('Conrad quits the game');
+  var response = await axios.patch("/game/quit/Conrad", game);
+  console.log('Verify if someone quitted the game:')
+  var response = await axios.patch("/game/wait/quit", game);
+  console.log(response.status + ":");
+  console.log(response.data);
+  game = response.data
+  //process.exit() 
+  console.log('Verify if game got started:')
+  try {
+  	var response = await axios.post("/game/wait/start", game);
+  } catch(e) {
+  	console.log(e.response.status + ":");
+  	console.log(e.response.data);
+  }
+  console.log('Conrad joins the game')
+  var response = await axios.get("/game/search/Conrad");
+  game = response.data
+  console.log('Start the game:')
+  var response = await axios.patch("/game/start", game);
+  console.log('Verify if game got started:')
+  var response = await axios.post("/game/wait/start", game);
+  console.log(response.status + ":");
+  console.log(response.data);
+  //process.exit()
+  console.log("Send final game score to database wrongfully:")
+  var response = await axios.post("/game/score/12/73", game);
+  console.log(response.status + ":");
+  console.log(response.data);
+  game = response.data
+  //process.exit()
+  console.log('Get next game:');
+  var response = await axios.post("/game/next", game);
+  console.log(response.status + ":");
+  console.log(response.data);
+  game = response.data
+  var response = await axios.patch("/game/start", game);
+  var response = await axios.post("/game/score/42/19", game);
+  console.log('Conrad creates new game')
+  var response = await axios.get("/game/search/Conrad");
+  game = response.data
+  console.log('Try to get next game of unfinished game:')
+  try {
+  	var response = await axios.post("/game/next", game);
+  } catch(e) {
+  	console.log(e.response.status + ":");
+  	console.log(e.response.data);
+  }
+  //process.exit()
+  console.log("Get all games of conrad")
+  var response = await axios.get("/games/Conrad");
+  console.log(response.status + ":");
+  console.log(response.data);
+  console.log("Get all games of no-one")
+  var response = await axios.get("/games/Noone");
+  console.log(response.status + ":");
+  console.log(response.data);
+  
+
+
+  process.exit()
   var gamePlayer1 = (await axios.get("/game/search/Alfred")).data;
   console.log(gamePlayer1);
   const child = fork("test_child.js");

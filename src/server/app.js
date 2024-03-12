@@ -50,13 +50,13 @@ router.get('/connect/:name', async (req, res, next) => {
 
   	try {
     	await player.connect(name);
-		res.status(200).json({
-			message: `Connection success of ${name}`,
-            username: name
-		});
+		  res.status(200).json({
+			                       message: `Connection success of ${name}`,
+                             username: name
+		                      });
   	} catch (e) {
     	console.log(e.message);
-		res.status(400).json({ message: e.message });
+		  res.status(400).json({ message: e.message });
   	}
 });
 
@@ -84,11 +84,7 @@ router.get('/game/solo/:name', async (req,res,next) => {
 
   	await player.connect(name);
   	const game = await player.createSoloGame();
-    if (game == false) {
-      res.status(500).send("Internal error: solo game could not be locked.");
-    } else {
-      res.status(200).json(game);
-    }
+    res.status(200).json(game);
 });
 
 router.post('/game/wait/join', async (req,res,next) => {
@@ -98,7 +94,7 @@ router.post('/game/wait/join', async (req,res,next) => {
 
   	const newGame = await game.waitForSomeoneToJoin();
   	if (newGame === false) {
-    	res.status(400).send("This game hasn't been joined");
+    	res.status(400).json(game);
   	} else {
     	res.status(200).json(newGame);
   	}
@@ -111,9 +107,9 @@ router.patch('/game/start', async (req,res,next) => {
 
   	const ret = await game.start_play();
   	if (ret === false) {
-    	res.status(400).send("Unable to start this game");
+    	res.status(400).send("Unable to start this game.");
   	} else {
-    	res.status(200).send(`Game started between ${body._player1} and ${body._player2}`);
+    	res.status(200).send(`Game started between ${body._player1} and ${body._player2} and ${body._player3} and ${body._player4} and ${body._player5} and ${body._player6}.`);
   	}
 });
 
@@ -124,14 +120,14 @@ router.post('/game/wait/start', async (req,res,next) => {
 
   	const ret = await game.waitGameStart();
   	if (ret === false) {
-    	res.status(400).send("This game has not been started");
+    	res.status(400).send("This game has not been started.");
   	} else {
-    	res.status(200).send(`${body._player1} started the game`);
+    	res.status(200).send(`${body._player1} started the game.`);
   	}
 });
 
-router.post('/game/score/:score1/:score2/:score3/:score4/:score5/:score6', async (req,res,next) => {
-  	const score1 = req.params.score1;
+router.post('/game/score/:score1?/:score2?/:score3?/:score4?/:score5?/:score6?', async (req,res,next) => {
+  	const score1 = req.params.score1 || null;
   	const score2 = req.params.score2 || null;
     const score3 = req.params.score3 || null;
     const score4 = req.params.score4 || null;
@@ -143,7 +139,7 @@ router.post('/game/score/:score1/:score2/:score3/:score4/:score5/:score6', async
 
   	const newGame = await game.finalScore(score1, score2, score3, score4, score5, score6);
   	if (newGame === false) {
-    	res.status(400).send("Final game score cannot be added");
+    	res.status(400).json(game);
   	} else {
     	res.status(200).json(newGame);
   	}
@@ -157,7 +153,7 @@ router.patch('/game/quit/:name', async (req,res,next) => {
 
   	const newGame = await game.quit(name);
   	if (newGame === false) {
-    	res.status(400).send(`Nobody quit`);
+    	res.status(400).json(game); //As nobody quitted send initial game back
   	} else {
     	res.status(200).json(newGame);
   	}
@@ -168,7 +164,7 @@ router.post('/game/next', async (req,res,next) => {
     const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
           body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
 
-  	game.display()
+  	// game.display() //debug
   	const newGame = await game.next_game();
   	if (newGame === false) {
     	res.status(400).send("This game is not finished. Can't go to next game.");
@@ -184,7 +180,7 @@ router.patch('/game/wait/quit', async (req,res,next) => {
 
   	const newGame = await game.waitForSomeoneToQuit();
   	if (newGame === false) {
-    	res.status(400).send("This game cannot be quited");
+    	res.status(400).json(game);
   	} else {
     	res.status(200).json(newGame);
   	}
