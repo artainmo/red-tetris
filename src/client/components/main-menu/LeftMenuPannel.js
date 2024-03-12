@@ -1,21 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PlayersArray from "./PlayersArray";
-import { mainMenuPannelStyle } from "../style/menuStyle";
+import { mainMenuPannelStyle } from "../../style/menuStyle";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { createSoloGameThunk } from "../../redux/slices/currentGameSlice";
 
 const LeftMenuPannel = () => {
 	
 	const [isSoloHovered, setIsSoloHovered] = useState(false);
 	const [isMultiHovered, setIsMultiHovered] = useState(false);
+	const [gameCreated, setgameCreated] = useState(false);
+
+	const username = useSelector((state) => state.auth.user);
+	const gameId = useSelector((state) => state.currentGame.id);
 
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
-	const handleSoloMatchmaking = () => {
-		console.log('solo player - handle matchmaking');
+	/* create a solo game and store it to the currentGame slice */
+	const handleSoloGameCreation = () => {
+		console.log('solo player - game creation');
+		dispatch(createSoloGameThunk(username));
+		setgameCreated(true);
 	}
 
-	const handleMultiMatchmaking = () => {
-		console.log('try to join multiplayer game');
+	/* redirect to game when game has been created */
+	useEffect(() => {
+		if (gameCreated && gameId && username) {
+			navigate(`/game/${gameId}`);
+			setgameCreated(false);
+		}	
+	}, [navigate, gameCreated, gameId, username]);
+
+	const handleMatchmakingForMultiplayer = () => {
+		console.log('starting matchmaking process for multiplayer');
 	}
 
 	const menuButtonStyle = {
@@ -67,12 +85,12 @@ const LeftMenuPannel = () => {
 				<div style={emptyDivStyle}></div>
 				<div style={buttonsStyle}>
 					<button 
-						onClick={handleSoloMatchmaking} 
+						onClick={handleSoloGameCreation} 
 						style={{...menuButtonStyle, ...soloButtonStyle}}
 						onMouseEnter={() => setIsSoloHovered(true)}
 						onMouseLeave={() => setIsSoloHovered(false)}>Solo</button>
 					<button 
-						onClick={handleMultiMatchmaking} 
+						onClick={handleMatchmakingForMultiplayer} 
 						style={{...menuButtonStyle, ...multiButtonStyle}}
 						onMouseEnter={() => setIsMultiHovered(true)}
 						onMouseLeave={() => setIsMultiHovered(false)}>Multiplayer</button>

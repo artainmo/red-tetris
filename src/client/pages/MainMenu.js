@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import Header from "../components/shared/Header";
-import LeftMenuPannel from "../components/LeftMenuPannel";
-import RightMenuPannel from "../components/RightMenuPannel";
+import LeftMenuPannel from "../components/main-menu/LeftMenuPannel";
+import RightMenuPannel from "../components/main-menu/RightMenuPannel";
 import { mainContainerStyle, landingPageStyle } from '../style/mainStyle';
 
 const MainMenu = () => {

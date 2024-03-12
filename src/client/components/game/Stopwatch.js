@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateGameTime } from "../redux/slices/gameTimeSlice";
+import { updateGameTime } from "../../redux/slices/gameTimeSlice";
 
 const Stopwatch = () => {
 

@@ -10,7 +10,7 @@ const Auth = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const { user, name, nameTooLong, nameInvalidChars } = useSelector((state) => state.auth);
+	const { isAuthenticated, user, nameTooLong, nameInvalidChars, nameEmpty } = useSelector((state) => state.auth);
 	
 	const [localName, setLocalName] = useState('');
 	const [emptyInputErrMsg, setEmptyInputErrMsg] = useState(false);
@@ -24,10 +24,15 @@ const Auth = () => {
 	}
 
 	useEffect(() => {
-		if (connectionAttempt) {
-			// add some redirect logic there
+		/* debug stuff */
+		console.log(`connection attempt = ${connectionAttempt}`);
+		console.log(`user = ${user}`);
+		console.log(`isAuthenticated = ${isAuthenticated}`);
+		
+		if (connectionAttempt && user && isAuthenticated) {
+			navigate('/main_menu');
 		}
-	}, [user, navigate, connectionAttempt]);
+	}, [user, navigate, connectionAttempt, isAuthenticated]);
 	
 	const inputStyle = {
 		backgroundColor: 'white',

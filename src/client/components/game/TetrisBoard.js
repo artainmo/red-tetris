@@ -1,13 +1,13 @@
 /**/
 
 import React, {useState, useEffect} from "react";
-import { gridToBoard } from "../logic/board.logic";
-import { createGrid } from "../logic/grid.logic";
-import useLockDelay from "../logic/hooks/useLockDelay";
-import useGravity from "../logic/hooks/useGravity";
-import { processLockDelay } from "../logic/lockDelay.logic";
-import { processGravity } from "../logic/gravity.logic";
-import { processPlayerInput } from "../logic/playerInputs.logic";
+import { gridToBoard } from "../../logic/board.logic";
+import { createGrid } from "../../logic/grid.logic";
+import useLockDelay from "../../logic/hooks/useLockDelay";
+import useGravity from "../../logic/hooks/useGravity";
+import { processLockDelay } from "../../logic/lockDelay.logic";
+import { processGravity } from "../../logic/gravity.logic";
+import { processPlayerInput } from "../../logic/playerInputs.logic";
 import Cell from "./Cell";
 import { useSelector } from "react-redux";
 

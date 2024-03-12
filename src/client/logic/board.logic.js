@@ -1,7 +1,7 @@
 /* Handles the conversion from grid to board */
 
 import React from "react";
-import Cell from "../components/Cell";
+import Cell from "../components/game/Cell";
 
 const COLOR_BG = '#3565d0';
 const COLOR_I = '#cc0f0f';

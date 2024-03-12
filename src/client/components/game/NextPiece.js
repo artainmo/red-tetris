@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createGrid } from "../logic/grid.logic";
+import { createGrid } from "../../logic/grid.logic";
 
 const NextPiece = () => {
 	
