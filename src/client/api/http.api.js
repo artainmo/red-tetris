@@ -23,8 +23,17 @@ export const getGames = async (name) => {
 	return {status: response.status, data: response.data};
 }
 
+/*
+** Search a game. If a game exists, join it.
+** Else create a game and wait for others to join.
+*/
 export const searchGame = async (name) => {
 	const response = await axios.get("/game/search/" + name);
+	return {status: response.status, data: response.data};
+}
+
+export const createSoloGame = async (name) => {
+	const response = await axios.get("/game/solo/" + name);
 	return {status: response.status, data: response.data};
 }
 

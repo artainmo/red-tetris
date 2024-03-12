@@ -1,7 +1,7 @@
 import os
 import time
 
-directory = "../src/client"
+directory = "../../src/client"
 
 # Store the initial file modification times
 initial_times = {}

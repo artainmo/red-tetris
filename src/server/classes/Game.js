@@ -52,11 +52,11 @@ class Game {
 			}
 		}
 		if (new_number_players <= initial_number_players) {
-			console.log(`No one joined ${this._player1}'s game`);
+			console.log(`${this._player1}: No one joined ${this._player1}'s game`);
 			db.close_connection();
 			return false;
 		} else {
-			console.log(`Someone joined ${this._player1}'s game`);
+			console.log(`${this._player1}: Someone joined ${this._player1}'s game`);
 			db.close_connection();
 			return this;
 		}
@@ -89,11 +89,11 @@ class Game {
 			}
 		}
 		if (new_number_players >= initial_number_players) {
-			console.log(`No one quited ${this._player1}'s game`);
+			console.log(`${this._player1}: No one quited ${this._player1}'s game`);
 			db.close_connection();
 			return false;
 		} else {
-			console.log(`${this._player1}: Someone quited ${this.player1}'s game`);
+			console.log(`${this._player1}: Someone quited ${this._player1}'s game`);
 			db.close_connection();
 			return this;
 		}
@@ -111,7 +111,7 @@ class Game {
 			db.close_connection();
 			return false;
 		} else {
-			console.log(`${this.player1} started the game`);
+			console.log(`${this._player2}: ${this._player1} started the game`);
 			db.close_connection();
 			return true;
 		}
@@ -125,7 +125,7 @@ class Game {
 		const db = new database();
 		await db.query("UPDATE game SET locked = true WHERE id = $1", [this._id])
 		db.close_connection();
-		console.log(`Game started between ${this._player1} and ${this._player2}`)
+		console.log(`${this._player1}: Game started between ${this._player1} and ${this._player2} and ${this._player3}`)
 		return true
 	}
 
@@ -158,7 +158,7 @@ class Game {
 			await db.query("UPDATE game SET player6_score = $1 WHERE id = $2;", [this._player6_score, this._id]);
 		}
 		db.close_connection();
-		console.log(`Game of ${this._player1} and ${this._player2} scored ${this._player1_score} and ${this._player2_score}`);
+		console.log(`Game of ${this._player1} and ${this._player2} and ${this._player3} scored ${this._player1_score} and ${this._player2_score} and ${this._player3_score}`);
 		return this;
 	}
 
@@ -168,13 +168,13 @@ class Game {
 			return false;
 		}
 		const db = new database();
-		scores = [this._player1_score, this._player2_score, this._player3_score, this._player4_score,
-					this._player5_score, this._player6_score]
-		players = [this._player1, this._player2, this._player3, this._player4, this._player5, this._player6]
-		var winner = (0, null, null) //The winner needs to be found as he will be host of next game
+		var scores = [this._player1_score, this._player2_score, this._player3_score, this._player4_score,
+					this._player5_score, this._player6_score];
+		var players = [this._player1, this._player2, this._player3, this._player4, this._player5, this._player6];
+		var winner = [0, null, null]; //The winner needs to be found as he will be host of next game
 		for (let i = 0; i < 6; i++) {
 			if (scores[i] > winner[0]) {
-				winner = (scores[i], players[i], i)
+				winner = [scores[i], players[i], i];
 			}
 		}
 		players[winner[2]] = players[0]
@@ -193,65 +193,59 @@ class Game {
 	}
 
 	async reorder_players(start) {
-		const players = [this._player1, this._player2, this._player3, this._player4, this._player5, this._player6];
-		const _players = ["player1_id", "player2_id", "player3_id", "player4_id", "player5_id", "player6_id"];
+		//const players = [this._player1, this._player2, this._player3, this._player4, this._player5, this._player6];
+		//const _players = ["player1_id", "player2_id", "player3_id", "player4_id", "player5_id", "player6_id"];
+		const db = new database();
 
-		for (var i = start; i < 5 && players[i + 1]; i++) {
-			await db.query("UPDATE game SET $1 = $2 WHERE id = $3", [_players[i], players[i + 1], this._id]);
+		//console.log(`${this._player1} | ${this._player2} | ${this._player3} | ${this._player4}`)
+		for (var i = start; i < 5; i++) {
+			//console.log(`${i}: ${this._player1} | ${this._player2} | ${this._player3} | ${this._player4}`)
 			if (i == 0) {
 				this._player1 = this._player2;
+				await db.query("UPDATE game SET player1_id = $1 WHERE id = $2", [this._player2, this._id]);
 			} else if (i == 1) {
 				this._player2 = this._player3;
+				await db.query("UPDATE game SET player2_id = $1 WHERE id = $2", [this._player3, this._id]);
 			} else if (i == 2) {
 				this._player3 = this._player4;
+				await db.query("UPDATE game SET player3_id = $1 WHERE id = $2", [this._player4, this._id]);
 			} else if (i == 3) {
 				this._player4 = this._player5;
+				await db.query("UPDATE game SET player4_id = $1 WHERE id = $2", [this._player5, this._id]);
 			} else if (i == 4) {
 				this._player5 = this._player6;
+				await db.query("UPDATE game SET player5_id = $1 WHERE id = $2", [this._player6, this._id]);
 			}
 		}
-		if (players[i]) {
-			await db.query("UPDATE game SET $1 = null WHERE id = $2", [_players[i], this._id]);
-			if (i == 1) {
-				this._player2 = null;
-			} else if (i == 2) {
-				this._player3 = null;
-			} else if (i == 3) {
-				this._player4 = null;
-			} else if (i == 4) {
-				this._player5 = null;
-			} else if (i == 5) {
-				this._player6 = null;
-			}
-		}
+		//console.log(`${this._player1} | ${this._player2} | ${this._player3} | ${this._player4}`)
+		db.close_connection();
 	}
 
 	async quit(username) {
-		const db = new database();
 		if (username === this._player1) {
 			if (this._player2 !== null) {
-				reorder_players(0);
+				await this.reorder_players(0);
 			} else {
+				const db = new database();
 				await db.query("DELETE FROM game WHERE id = $1", [this._id]);
+				db.close_connection();
 				this._player1 = null;
 			}
 		} else if (username === this._player2) {
-			reorder_players(1);
+			await this.reorder_players(1);
 		} else if (username === this._player3) {
-			reorder_players(2);
+			await this.reorder_players(2);
 		} else if (username === this._player4) {
-			reorder_players(3);
+			await this.reorder_players(3);
 		} else if (username === this._player5) {
-			reorder_players(4);
+			await this.reorder_players(4);
 		} else if (username === this._player6) {
-			reorder_players(5);
+			await this.reorder_players(5);
 		} else {
 			console.log(`${username} is unable to quit ${this._player1} and ${this._player2}'s game`)
-			db.close_connection();
 			return false;
 		}
-		db.close_connection();
-		console.log(`${username} quited the game. ${this._player1} is host`)
+		console.log(`${username} quited the game. Game now looks like ${this._player1}, ${this._player2}, ${this._player3}`)
 		return this;
 	}
 
@@ -279,12 +273,60 @@ class Game {
 		return this._player2;
 	}
 
+	set player3(value) {
+		this._player3 = value;
+	}
+
+	get player3() {
+		return this._player3;
+	}
+
+	set player4(value) {
+		this._player4 = value;
+	}
+
+	get player4() {
+		return this._player4;
+	}
+
+	set player5(value) {
+		this._player5 = value;
+	}
+
+	get player5() {
+		return this._player5;
+	}
+
+	set player6(value) {
+		this._player6 = value;
+	}
+
+	get player6() {
+		return this._player6;
+	}
+
 	get player1_score() {
 		return this._player1_score;
 	}
 
 	get player2_score() {
 		return this._player2_score;
+	}
+
+	get player3_score() {
+		return this._player3_score;
+	}
+
+	get player4_score() {
+		return this._player4_score;
+	}
+
+	get player5_score() {
+		return this._player5_score;
+	}
+
+	get player6_score() {
+		return this._player6_score;
 	}
 }
 

@@ -23,6 +23,10 @@ async function test() {
 	await player.connect("Alfred");
     const player2 = new Player();
 	await player2.connect("Conrad");
+    const player3 = new Player();
+	await player3.connect("Philip");
+    const player4 = new Player();
+	await player4.connect("Jack");
 	var _player = new Player();
 	await _player.connect("Alfred");
 	try {
@@ -32,38 +36,58 @@ async function test() {
 	try { const _player = new Player(); await _player.connect("dd dd"); }
 	catch(e) { console.log(e.message); }
 
-	console.log("---------- Matchmaking ----------")
+  console.log("---------- Matchmaking ----------")
   let gamePlayer1 = await player.searchGame();
-  gamePlayer1.waitForSomeoneToJoin();
-  sleep(4000);
+  await gamePlayer1.waitForSomeoneToJoin();
+  await gamePlayer1.waitForSomeoneToJoin();
+  //sleep(4000);
   let gamePlayer2 = await player2.searchGame();
-  sleep(4000);
-  gamePlayer2.waitGameStart()
+  await gamePlayer1.waitForSomeoneToJoin();
+  //sleep(4000);
+  await gamePlayer2.waitGameStart()
   await gamePlayer1.start_play();
   await gamePlayer1.finalScore(10,32);
   console.log("")
 
-	let game2Player2 = await player2.searchGame();
+  let soloGamePlayer1 = await player.createSoloGame();
+  let soloGamePlayer2 = await player2.searchGame();
+  await soloGamePlayer2.quit(player2.name)
+  await soloGamePlayer1.finalScore(1);
+  console.log("")
+
+  let game2Player2 = await player2.searchGame();
   await game2Player2.start_play();
   await game2Player2.finalScore(44);
-  sleep(4000);
-	let game2Player1 = await player.searchGame();
-  sleep(2000);
-  await game2Player1.quit(player.name)
+  //sleep(4000);
+  let game2Player1 = await player.searchGame();
+  game2Player2 = await player2.searchGame();
+  await game2Player1.waitForSomeoneToJoin();
+  let game2Player3 = await player3.searchGame();
+  await game2Player1.waitForSomeoneToJoin();
+  await game2Player2.waitForSomeoneToJoin();
+  //sleep(2000);	
+  await game2Player2.start_play();
+  await game2Player2.finalScore(23, 54, 33);
   console.log("")
 
   let game3Player2 = await game2Player2.next_game();
-  game3Player2.waitForSomeoneToJoin();
-  sleep(4000);
-  game2Player1 = await player.searchGame();
-  sleep(4000);
+  let game3Player4 = await player4.searchGame()
+  await game3Player2.waitForSomeoneToJoin();
   await game3Player2.start_play();
-  game3Player2.waitForSomeoneToQuit();
-  sleep(4000);
-  await game2Player1.quit(player.name);
-  await game3Player2.finalScore(36);
-  await game3Player2.quit(player2.name);
-  sleep(4000);
+  await game3Player4.waitForSomeoneToQuit();
+  //sleep(4000);
+  game3Player2 = await game3Player2.quit(player2.name);
+  await game3Player4.waitForSomeoneToQuit();
+  await game3Player4.waitForSomeoneToQuit();
+  //sleep(4000);
+  game3Player2 = await game3Player2.quit(player.name);
+  await game3Player4.waitForSomeoneToQuit();
+  await game3Player4.waitForSomeoneToQuit();
+  game3Player2 = await game3Player2.finalScore(36, 34);
+  game3Player2 = await game3Player2.quit(player4.name);
+  await game3Player4.waitForSomeoneToQuit();
+  await game3Player4.waitForSomeoneToQuit();
+  //sleep(4000);
 
 	console.log("---------- Visualize scores ----------")
 	console.log(player2.name);
@@ -72,7 +96,7 @@ async function test() {
 		let game = gamesPlayer2[i];
 		console.log(`${game.player1} vs ${game.player2} -> ${game.player1_score} - ${game.player2_score}`);
 	}
-  console.log("")
+    console.log("")
 
 	console.log(player.name);
 	const gamesPlayer1 = await player.getAllPastGames();

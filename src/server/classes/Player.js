@@ -61,35 +61,35 @@ class Player {
 				await db.query("UPDATE game SET player2_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player2 = this._username;
 			} else if (!openGames.rows[0].player3_id) {
-				await db.query("UPDATE game SET player3_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player2 = openGames.rows[0].player2_id;
+				await db.query("UPDATE game SET player3_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player3 = this._username;
 			} else if (!openGames.rows[0].player4_id) {
-				await db.query("UPDATE game SET player4_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player2 = openGames.rows[0].player2_id;
 				game.player3 = openGames.rows[0].player3_id;
+				await db.query("UPDATE game SET player4_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player4 = this._username;
 			} else if (!openGames.rows[0].player5_id) {
-				await db.query("UPDATE game SET player5_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player2 = openGames.rows[0].player2_id;
 				game.player3 = openGames.rows[0].player3_id;
 				game.player4 = openGames.rows[0].player4_id;
+				await db.query("UPDATE game SET player5_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player5 = this._username;
 			} else {
-				await db.query("UPDATE game SET player6_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player2 = openGames.rows[0].player2_id;
 				game.player3 = openGames.rows[0].player3_id;
 				game.player4 = openGames.rows[0].player4_id;
 				game.player5 = openGames.rows[0].player5_id;
+				await db.query("UPDATE game SET player6_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
 				game.player6 = this._username;
 			}
-			console.log(`${this._username} joined ${game.player1}'s game`)
+			console.log(`${this._username}: ${this._username} joined ${game.player1}'s game`)
 		} else { //Create joinable game
 			await db.query("INSERT INTO game (player1_id) VALUES ($1);", [this._username]);
 			const newGame = await db.query("SELECT id FROM game WHERE locked = false AND player1_id = $1 AND player2_id IS NULL;", [this._username]);
 			game.id = newGame.rows[0].id
 			game.player1 = this._username;
-			console.log(`${this._username} created a joinable game`)
+			console.log(`${this._username}: ${this._username} created a joinable game`)
 		}
 		db.close_connection();
 		return game;
@@ -103,9 +103,10 @@ class Player {
 		game.id = newGame.rows[0].id;
 		game.player1 = this._username;
 		db.close_connection();
-		if (!game.start_play()) { //Lock the game down so that no-one will join
+		if (!await game.start_play()) { //Lock the game down so that no-one will join
 			return false;
 		}
+		console.log(`${this._username}: ${game.player1} started a solo game`)
 		return game;
 	}
 }

@@ -34,7 +34,7 @@ class database {
 	}
 
 	async close_connection() {
-		// await this._pool.end();  // generates error : Cannot use a pool after calling end on the pool
+		await this._pool.end();  // generates error : Cannot use a pool after calling end on the pool
 	}
 
 	async createDatabase() {
