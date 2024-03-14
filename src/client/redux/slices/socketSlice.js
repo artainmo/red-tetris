@@ -7,7 +7,7 @@ const initialState = {
 	error: null
 }
 
-export const socketConnect = createAsyncThunk(
+export const socketConnectThunk = createAsyncThunk(
 	'socket/socketConnect',
 	async (_, {rejectWithValue}) => {
 		try {
@@ -40,15 +40,15 @@ const socketSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
-		.addCase(socketConnect.pending, (state) => {
+		.addCase(socketConnectThunk.pending, (state) => {
 			state.status = 'connecting';
 		})
-		.addCase(socketConnect.fulfilled, (state, action) => {
+		.addCase(socketConnectThunk.fulfilled, (state, action) => {
 			state.socket = action.payload;
 			state.status = 'connected';
 			state.error = null;
 		})
-		.addCase(socketConnect.rejected, (state, action) => {
+		.addCase(socketConnectThunk.rejected, (state, action) => {
 			state.socket = null;
 			state.status = 'disconnected';
 			state.error = action.payload;

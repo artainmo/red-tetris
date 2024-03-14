@@ -3,6 +3,7 @@
 import { deepCopyGrid } from "./grid.logic";
 
 export const processGravity = (grid, pieceGrid, offsetX, offsetY) => {
+	console.log('processGravity : first line');
 	const newGrid = deepCopyGrid(grid);
 	
 	if (canPieceFall(newGrid, pieceGrid, offsetX, offsetY)) {

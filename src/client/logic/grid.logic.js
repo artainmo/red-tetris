@@ -2,8 +2,8 @@
 	Store the logic for the grid system underlying the tetris game gameplay
 */
 
-export const createGrid = (width, lenght) => {
-	const grid = new Array(width).fill(null).map(() => new Array(lenght).fill('BG'));
+export const createGrid = (width, length) => {
+	const grid = new Array(width).fill(null).map(() => new Array(length).fill('BG'));
 
 	return grid;
 }
@@ -15,6 +15,7 @@ export const deepCopyGrid = (grid) => {
 	
 	const newGrid = grid.map(row => [...row]);
 
+	console.log(`newGrid = ${newGrid}`);
+
 	return newGrid;
 }
-

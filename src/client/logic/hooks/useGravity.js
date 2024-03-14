@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const useGravity = (updateFunction, gravityDelay) => {
+const useGravity = (updateFunction, updateArgs = []) => {
 	const [isRunning, setIsRunning] = useState(false);
 	const gravityTimeoutIdRef = useRef(null);
 	const remainingTimeRef = useRef(gravityDelay);
@@ -18,7 +18,7 @@ const useGravity = (updateFunction, gravityDelay) => {
 		if (!gravityTimeoutIdRef.current) {
 		  	lastStartTimeRef.current = Date.now();
 		  	const updateAndRestart = () => {
-				updateFunction();
+				updateFunction(...updateArgs);
 				gravityTimeoutIdRef.current = null;
 				if (isRunning) {
 			  		start();
@@ -26,7 +26,7 @@ const useGravity = (updateFunction, gravityDelay) => {
 			};
 			gravityTimeoutIdRef.current = setTimeout(updateAndRestart, remainingTimeRef.current);
 		}
-	}, [isRunning, updateFunction]);
+	}, [isRunning, updateFunction, updateArgs]);
 
 	const reset = useCallback(() => {
 		stop();

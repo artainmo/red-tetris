@@ -4,6 +4,7 @@ import { mainMenuPannelStyle } from "../../style/menuStyle";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createSoloGameThunk } from "../../redux/slices/currentGameSlice";
+import { socketConnectThunk } from "../../redux/slices/socketSlice";
 
 const LeftMenuPannel = () => {
 	
@@ -17,10 +18,10 @@ const LeftMenuPannel = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	/* create a solo game and store it to the currentGame slice */
+	/* create a solo game and store it to the currentGame slice, then connect to socket to exhange data with server */
 	const handleSoloGameCreation = () => {
-		console.log('solo player - game creation');
 		dispatch(createSoloGameThunk(username));
+		dispatch(socketConnectThunk());
 		setgameCreated(true);
 	}
 

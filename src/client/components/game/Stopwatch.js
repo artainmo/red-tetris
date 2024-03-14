@@ -42,7 +42,6 @@ const Stopwatch = () => {
 	
 	return (
 		<div style={stopwatchContainerStyle}>
-			<h2>Stopwatch</h2>
 			<div>{formatTime(currentTime)}</div>
 		</div>
 	);
