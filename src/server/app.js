@@ -2,7 +2,7 @@ const express = require('express');
 const socketio = require('socket.io');
 const { Player } = require(__dirname + '/classes/Player.js');
 const { Game } = require(__dirname + '/classes/Game.js');
-const { Piece } = require(__dirname + '/classes/Piece.js');
+const { PieceBasket } = require(__dirname + '/classes/PieceBasket.js');
 
 const app = express();
 
@@ -205,7 +205,7 @@ io.on('connection', async (socket) => {
     });
 
     //Each room represents a game, the roomId is game's id
-    //All players of same game connect to same room
+    //All players of same game must connect to same room
     socket.on('joinRoom', (roomId) => {
         console.log('A user joined the room named ' + roomId);
         socket.join(roomId);
