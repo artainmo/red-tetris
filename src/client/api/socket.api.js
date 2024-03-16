@@ -70,29 +70,104 @@ export const listenNewPiece = (socket, setNewPiece) => {
 
 
 /*
-** gameStructure will consist of a double array representing the rows of pieces.
-** And each array element will represent a piece via an object with the
-** attributes, type and direction.
+** Each player should be able to see other players' games.
+** Thus each player needs to send his game to other players.
+** This function allows a player to send his game to the other players of the room/game.
+** The gameStructure paramater should look like this for example:
+{
+  player: 'Philip',
+  structure: [ [ 'I', 'BG', 'BG' ], [ 'BG', 'BG', 'BG' ], [ 'BG', 'T', 'BG' ] ]
+}
+** The structure of the game is represented in a double array with BG indicating
+** background and other letters indicating a tetrimono type.
 */
 export const sendPersonalGameStructure = (socket, roomId, gameStructure) => {
   	socket.emit('sendPersonalGameStructure',
       	{roomId: roomId, gameStructure: gameStructure});
 }
+/*
+** Does not return.
+*/
 
+/*
+** This function receives the gameStructure that got sent by other players
+** in the room with sendPersonalGameStructure.
+*/
 export const listenOtherPlayerGameStructure = (socket, setOtherPlayerGameStructure) => {
   	socket.on('otherPlayerGameStructure', (data) => {
     	setOtherPlayerGameStructure(data);
   	});
 }
+/*
+** Does not explicitly return.
+** However, takes 'setOtherPlayerGameStructure' which is supposed to come from:
+** 'const [otherPlayerGameStructure, setOtherPlayerGameStructure] = useState(null);'.
+** Thus the new game structure send by socket should be found in 'otherPlayerGameStructure'.
+** The otherPlayerGameStructure object looks like this for example:
+{
+  player: 'Philip',
+  structure: [ [ 'I', 'BG', 'BG' ], [ 'BG', 'BG', 'BG' ], [ 'BG', 'T', 'BG' ] ]
+}
+*/
 
+/*
+** After a game finishes the host of the game should ask for a new game via HTTP request.
+** Once he has the new game he can send it via the sockets to other players in the same room.
+** This function sends the next game to other players of the room via sockets.
+** The nextGame object is expected to look similar to what the HTTP requests return:
+{
+  _id: '69c2c703-ad74-456a-9856-7ec767b2b0df',
+  _player1: 'Alfred',
+  _player2: 'Conrad',
+  _player3: 'Philip',
+  _player4: null,
+  _player5: null,
+  _player6: null,
+  _player1_score: null,
+  _player2_score: null,
+  _player3_score: null,
+  _player4_score: null,
+  _player5_score: null,
+  _player6_score: null
+}
+*/
 export const sendNextGame = (socket, roomId, nextGame) => {
   	socket.emit('sendNextGame', {roomId: roomId, nextGame: nextGame});
 }
+/*
+** Does not return.
+*/
 
+/*
+** This function receives the next game that got sent by host via sendNextGame.
+** Players other than the host who are in same room should receive it.
+*/
 export const listenNextGame = (socket, setGame) => {
-	console.log("Listening to incoming game");
+	//console.log("Listening to incoming game");
 	socket.on('nextGame', (nextGame) => {
-		console.log("Next incoming game");
+		//console.log("Next incoming game");
 		setGame(nextGame);
 	});
 }
+/*
+** Does not explicitly return.
+** However, takes 'setGame' which is supposed to come from:
+** 'const [game, setGame] = useState(null);'.
+** Thus the new game send by socket should be found in 'game'.
+** The game object looks like this for example:
+{
+  _id: '69c2c703-ad74-456a-9856-7ec767b2b0df',
+  _player1: 'Alfred',
+  _player2: 'Conrad',
+  _player3: 'Philip',
+  _player4: null,
+  _player5: null,
+  _player6: null,
+  _player1_score: null,
+  _player2_score: null,
+  _player3_score: null,
+  _player4_score: null,
+  _player5_score: null,
+  _player6_score: null
+}
+*/
