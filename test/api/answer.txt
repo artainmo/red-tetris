@@ -14,7 +14,7 @@
 Create solo game for Alfred:
 200:
 {
-  _id: '9b6c214c-364c-4bc7-b1d0-4e6880814afb',
+  _id: 'fb41852b-e909-4b86-a79e-df49bf9f60d4',
   _player1: 'Alfred',
   _player2: null,
   _player3: null,
@@ -31,7 +31,7 @@ Create solo game for Alfred:
 Conrad searches a game:
 200:
 {
-  _id: '8c03afa7-0727-405b-afb9-7a8877c6cc4f',
+  _id: 'f10ca008-09dc-4227-a889-395c2fc4f839',
   _player1: 'Conrad',
   _player2: null,
   _player3: null,
@@ -48,7 +48,7 @@ Conrad searches a game:
 Philip searches a game:
 200:
 {
-  _id: '8c03afa7-0727-405b-afb9-7a8877c6cc4f',
+  _id: 'f10ca008-09dc-4227-a889-395c2fc4f839',
   _player1: 'Conrad',
   _player2: 'Philip',
   _player3: null,
@@ -68,7 +68,7 @@ Game started between Conrad and Philip and null and null and null and null.
 Conrad quits its game:
 200:
 {
-  _id: '8c03afa7-0727-405b-afb9-7a8877c6cc4f',
+  _id: 'f10ca008-09dc-4227-a889-395c2fc4f839',
   _player1: 'Philip',
   _player2: null,
   _player3: null,
@@ -86,7 +86,7 @@ Philip creates a game
 Verify if someone joined the game:
 400:
 {
-  _id: '1a42582d-842b-4b13-b52d-85e23941e359',
+  _id: '185dd9fe-0836-44d9-b9c3-90dddad10d18',
   _player1: 'Philip',
   _player2: null,
   _player3: null,
@@ -104,7 +104,7 @@ Conrad joins the game
 Verify if someone joined the game:
 200:
 {
-  _id: '1a42582d-842b-4b13-b52d-85e23941e359',
+  _id: '185dd9fe-0836-44d9-b9c3-90dddad10d18',
   _player1: 'Philip',
   _player2: 'Conrad',
   _player3: null,
@@ -121,7 +121,7 @@ Verify if someone joined the game:
 Verify if someone quitted the game:
 400:
 {
-  _id: '1a42582d-842b-4b13-b52d-85e23941e359',
+  _id: '185dd9fe-0836-44d9-b9c3-90dddad10d18',
   _player1: 'Philip',
   _player2: 'Conrad',
   _player3: null,
@@ -139,7 +139,7 @@ Conrad quits the game
 Verify if someone quitted the game:
 200:
 {
-  _id: '1a42582d-842b-4b13-b52d-85e23941e359',
+  _id: '185dd9fe-0836-44d9-b9c3-90dddad10d18',
   _player1: 'Philip',
   _player2: null,
   _player3: null,
@@ -164,7 +164,7 @@ Philip started the game.
 Send final game score to database wrongfully:
 200:
 {
-  _id: '1a42582d-842b-4b13-b52d-85e23941e359',
+  _id: '185dd9fe-0836-44d9-b9c3-90dddad10d18',
   _player1: 'Philip',
   _player2: 'Conrad',
   _player3: null,
@@ -181,7 +181,7 @@ Send final game score to database wrongfully:
 Get next game:
 200:
 {
-  _id: '681dcd05-ba8a-41cf-8712-7107bca788ca',
+  _id: '4cfd1072-71cd-4981-9bb0-e7f44bb32bcc',
   _player1: 'Conrad',
   _player2: 'Philip',
   _player3: null,
@@ -203,7 +203,7 @@ Get all games of conrad
 200:
 [
   {
-    _id: '1a42582d-842b-4b13-b52d-85e23941e359',
+    _id: '185dd9fe-0836-44d9-b9c3-90dddad10d18',
     _player1: 'Philip',
     _player2: 'Conrad',
     _player3: null,
@@ -218,7 +218,7 @@ Get all games of conrad
     _player6_score: null
   },
   {
-    _id: '681dcd05-ba8a-41cf-8712-7107bca788ca',
+    _id: '4cfd1072-71cd-4981-9bb0-e7f44bb32bcc',
     _player1: 'Conrad',
     _player2: 'Philip',
     _player3: null,

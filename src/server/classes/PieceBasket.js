@@ -1,4 +1,4 @@
-import { Piece } from "./Piece";
+const { Piece } = require("./Piece");
 
 /*
 ** A piece basket hold 7 pieces that represents every type of tetromino.
@@ -22,7 +22,7 @@ class PieceBasket {
 		}
 	}
 
-	addPieceToBasket() {
+	addPieceToBasket(type) {
 		const newPiece = new Piece(type);
 		this.pieces.push(newPiece);
 	}
@@ -38,7 +38,7 @@ class PieceBasket {
 			this.fullfillPieceBasket();
 		}
 
-		const randomPieceIndex = getRandomIntInclusive(0, this.pieces.length - 1);
+		const randomPieceIndex = this.getRandomIntInclusive(0, this.pieces.length - 1);
 		console.log(`randomPieceIndex = ${randomPieceIndex}`); // debug
 
 		const pickedPiece = this.pieces[randomPieceIndex];
