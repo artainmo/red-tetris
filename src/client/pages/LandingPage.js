@@ -1,5 +1,5 @@
 import React from "react";
-import Header from '../components/Header';
+import Header from '../components/shared/Header';
 import { useNavigate } from "react-router-dom";
 import { mainContainerStyle, landingPageStyle, blockStyle, buttonStyle, textStyle } from '../style/mainStyle';
 
@@ -21,7 +21,7 @@ const LandingPage = () => {
 				</div>
 			</div>
 		</div>
-	);
+	)
 }
 
 export default LandingPage;

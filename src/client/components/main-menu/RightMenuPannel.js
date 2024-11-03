@@ -1,5 +1,5 @@
 import React from "react";
-import { mainMenuPannelStyle } from "../style/menuStyle";
+import { mainMenuPannelStyle } from "../../style/menuStyle";
 import ScoresArray from "./ScoresArray";
 
 const RightMenuPannel = () => {

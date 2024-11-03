@@ -5,7 +5,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { getGames } from "../api/http.api";
-import SearchGame from "./SearchGame";
+import SearchGame from "../pages/SearchGame";
 
 const Home = ({user, setUser}) => {
   const [games, setGames] = useState([]);

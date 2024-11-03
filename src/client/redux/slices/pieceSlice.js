@@ -1,20 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
+import { askNewPiece, listenNewPiece } from "../../api/socket.api";
 
 /* objects : contains info keyed by game_id */
 const initialState = {
 	nextPieces: {},
 	currentPieces: {},
 	status: {},
-	error: {}
+	errors: {}
 }
 
-export const getNextPiece = createAsyncThunk(
+export const getNextPieceThunk = createAsyncThunk(
 	'piece/getNextPiece',
-	async (sessionId, {rejectWithValue}) => {
+	async (socket, gameId, {rejectWithValue}) => {
 		try {
-			const response = await getNextPiece(sessionId); // check if that exists
-			return response;
+			askNewPiece(socket, gameId);
+			const response = await listenNewPiece(socket, ); // refacto/update this
+
 		} catch (err) {
 			return rejectWithValue(err.toString()); // check this
 		}
@@ -29,9 +30,15 @@ const pieceSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
-		.addCase()
-		.addCase()
-		.addCase()
+		.addCase(getNextPieceThunk.pending, (state, action) => {
+
+		})
+		.addCase(getNextPieceThunk.fulfilled, (state, action) => {
+
+		})
+		.addCase(getNextPieceThunk.rejected, (state, action) => {
+
+		})
 	}
 });
 

@@ -1,6 +1,11 @@
+/*
+	This component is handling matchmaking for multiplayer 
+	and the frontend part of game creation for single players
+*/
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from '../components/Header';
+import Header from '../components/shared/Header';
 import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
 
 const Lobby = () => {
@@ -9,7 +14,7 @@ const Lobby = () => {
 
 	const navigate = useNavigate();
 
-	// used to add the ... dynamically in the matchmaking text
+	// used to add the "..." dynamically in the matchmaking text
 	useEffect(() => {
 		let dotCount = 0;
 		const interval = setInterval(() => {

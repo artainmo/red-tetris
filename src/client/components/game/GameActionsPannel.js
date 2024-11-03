@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { startGame, endGame, resumeGame, pauseGame } from "../redux/slices/gameTimeSlice";
+import { startGame, endGame, resumeGame, pauseGame } from "../../redux/slices/gameTimeSlice";
 
 const GameActionsPannel = () => {
 

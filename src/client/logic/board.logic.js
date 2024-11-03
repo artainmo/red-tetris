@@ -1,25 +1,23 @@
-/*
-	Store the logic for the 
-*/
+/* Handles the conversion from grid to board */
 
-import Cell from "../pages/Cell";
+import React from "react";
+import Cell from "../components/game/Cell";
 
-const GRID_LENGTH = 20;
-const GRID_WIDTH = 10;
 const COLOR_BG = '#3565d0';
+const COLOR_I = '#cc0f0f';
+const COLOR_J = '#1cd211';
+const COLOR_L = '#95e011';
+const COLOR_O = '#f6c709';
+const COLOR_S = '#5717e0';
+const COLOR_T = '#e74208';
+const COLOR_Z = '#a808e7';
 
-export const createGrid = () => {
-	const grid = new Array(GRID_WIDTH).fill(null).map(() => new Array(GRID_LENGTH).fill('BG'));
-
-	return grid;
-}
-
-export const gridToBoard = (grid) => {
+export const gridToBoard = (grid, width, length) => {
 	const board = [];
-	for (let y = 0; y < GRID_WIDTH; y++) {
-
-		for (let x = 0; x < GRID_LENGTH; x++) {
-			const cellColor = grid[y][x] !== 'BG' ? COLOR_BG : getCellColor(grid[y][x]);
+	for (let y = 0; y < width; y++) {
+		const row = [];
+		for (let x = 0; x < length; x++) {
+			const cellColor = grid[y][x] === 'BG' ? COLOR_BG : getCellColor(grid[y][x]);
 			row.push(<Cell key={`${x}-${y}`} cellColor={cellColor} />);
 		}
 		board.push(<div key={y} style={{display: 'flex'}}>{row}</div>);
@@ -27,22 +25,24 @@ export const gridToBoard = (grid) => {
 	return board;
 }
 
-export const deepCopyGrid = (grid) => {
-	const newGrid = grid.map(row => [...row]);
-
-	return newGrid;
-}
-
 export const getCellColor = (color) => {
 	switch (color) {
-		case (''):
-			break;
+		case ('I'):
+			return COLOR_I;
+		case ('J'):
+			return COLOR_J;
+		case ('L'):
+			return COLOR_L;
+		case ('O'):
+			return COLOR_O;
+		case ('S'):
+			return COLOR_S;
+		case ('T'):
+			return COLOR_T;
+		case ('Z'):
+			return COLOR_Z;
 		default:
 			console.log('wrong color');
 			return COLOR_BG;
 	}
-}
-
-export const canPieceMove = () => {
-
 }

@@ -14,7 +14,7 @@ export const connect = async (name) => {
 			data: response.data
 		};
  	} catch (err) {
-		return {status: e.response.status, data: e.response.data};
+		return err;
   }
 }
 /*
@@ -47,20 +47,20 @@ export const createSoloGame = async (name) => {
 {
   status: 200,
   game: {
-          _id: '69c2c703-ad74-456a-9856-7ec767b2b0df',
-          _player1: 'Alfred',
-          _player2: null,
-          _player3: null,
-          _player4: null,
-          _player5: null,
-          _player6: null,
-          _player1_score: null,
-          _player2_score: null,
-          _player3_score: null,
-          _player4_score: null,
-          _player5_score: null,
-          _player6_score: null
-        }
+			_id: '69c2c703-ad74-456a-9856-7ec767b2b0df',
+			_player1: 'Alfred',
+			_player2: null,
+			_player3: null,
+			_player4: null,
+			_player5: null,
+			_player6: null,
+			_player1_score: null,
+			_player2_score: null,
+			_player3_score: null,
+			_player4_score: null,
+			_player5_score: null,
+			_player6_score: null
+		}
 }
 */
 

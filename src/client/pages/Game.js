@@ -1,10 +1,10 @@
 import React from "react";
-import Header from "../components/Header";
-import StopWatch from '../components/Stopwatch';
-import NextPiece from "../components/NextPiece";
+import Header from "../components/shared/Header";
+import StopWatch from '../components/game/Stopwatch';
+import NextPiece from "../components/game/NextPiece";
 import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
-import TetrisBoard from "./TetrisBoard";
-import GameActionsPannel from "../components/GameActionsPannel";
+import TetrisBoard from "../components/game/TetrisBoard";
+import GameActionsPannel from "../components/game/GameActionsPannel";
 
 const Game = () => {
 	

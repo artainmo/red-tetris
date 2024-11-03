@@ -1,8 +1,14 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 const AuthGuard = ({ children }) => {
-	console.log('guard activated and passed');
+	const isAuthenticated = useSelector((state) => state.auth.user);
+
+	if (!isAuthenticated) {
+		console.log('authGuard : access denied !!!');
+		return <Navigate to="/auth" replace />;
+	}
 	
 	return children;
 }

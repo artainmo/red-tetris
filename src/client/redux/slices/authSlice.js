@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { connect } from "../../api/http.api";
 
 const initialState = {
+	isAuthenticated: false,
 	user: null,
 	nameTooLong: false,
 	nameInvalidChars: false
@@ -10,13 +11,20 @@ const initialState = {
 export const userConnect = createAsyncThunk(
 	'auth/userConnect',
 	async (name, {rejectWithValue}) => {
-		if (name === "") return rejectWithValue("name cannot be empty");
-
 		try {
 			const response = await connect(name);
-			return response;
+			
+			if (response.status === 200) {
+				return response.data;
+			} else {
+				return rejectWithValue(response.data);
+			}
 		} catch (err) {
-			return rejectWithValue(err.response.data);
+			if (err.response && err.response.data) {
+				return rejectWithValue(err.response.data);
+			} else {
+				return rejectWithValue({message: 'unknow error happened'});
+			}
 		}
 	}
 );
@@ -29,12 +37,14 @@ const authSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
-		.addCase(userConnect.fulfilled, (state, action) => { // case success
-			state.user = action.payload.data.username;
+		.addCase(userConnect.fulfilled, (state, action) => {
+			state.user = action.payload.username;
 			state.nameInvalidChars = false;
 			state.nameTooLong = false;
+			state.isAuthenticated = true;
 		})
-		.addCase(userConnect.rejected, (state, action) => { // case err
+		.addCase(userConnect.rejected, (state, action) => { // debug
+			console.log(action.payload);
 			if (action.payload === "Player's username is too long") {
 				state.nameTooLong = true;
 				state.nameInvalidChars = false;
