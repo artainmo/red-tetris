@@ -50,13 +50,13 @@ router.get('/connect/:name', async (req, res, next) => {
 
   	try {
     	await player.connect(name);
-		  res.status(200).json({
-			                       message: `Connection success of ${name}`,
-                             username: name
-		                      });
+		res.status(200).json({
+			message: `Connection success of ${name}`,
+            username: name
+		});
   	} catch (e) {
     	console.log(e.message);
-		  res.status(400).json({ message: e.message });
+		res.status(400).json({ message: e.message });
   	}
 });
 

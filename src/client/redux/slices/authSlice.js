@@ -5,20 +5,26 @@ const initialState = {
 	isAuthenticated: false,
 	user: null,
 	nameTooLong: false,
-	nameInvalidChars: false,
-	nameEmpty: false
+	nameInvalidChars: false
 }
 
 export const userConnect = createAsyncThunk(
 	'auth/userConnect',
 	async (name, {rejectWithValue}) => {
-		if (name === "") return rejectWithValue("Name cannot be empty");
-
 		try {
 			const response = await connect(name);
-			return response;
+			
+			if (response.status === 200) {
+				return response.data;
+			} else {
+				return rejectWithValue(response.data);
+			}
 		} catch (err) {
-			return rejectWithValue(err.response.data);
+			if (err.response && err.response.data) {
+				return rejectWithValue(err.response.data);
+			} else {
+				return rejectWithValue({message: 'unknow error happened'});
+			}
 		}
 	}
 );
@@ -32,25 +38,19 @@ const authSlice = createSlice({
 	extraReducers: (builder) => {
 		builder
 		.addCase(userConnect.fulfilled, (state, action) => {
-			state.user = action.payload.data.username;
+			state.user = action.payload.username;
 			state.nameInvalidChars = false;
 			state.nameTooLong = false;
-			state.nameEmpty = false;
 			state.isAuthenticated = true;
 		})
-		.addCase(userConnect.rejected, (state, action) => {
+		.addCase(userConnect.rejected, (state, action) => { // debug
+			console.log(action.payload);
 			if (action.payload === "Player's username is too long") {
 				state.nameTooLong = true;
 				state.nameInvalidChars = false;
-				state.nameEmpty = false;
 			} else if (action.payload === "Player's username contains special characters") {
 				state.nameTooLong = false;
 				state.nameInvalidChars = true;
-				state.nameEmpty = false;
-			} else if (action.payload === "Name cannot be empty") {
-				state.nameTooLong = false;
-				state.nameInvalidChars = false;
-				state.nameEmpty = true;
 			}
 		})
 	}

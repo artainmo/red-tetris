@@ -5,29 +5,30 @@ import { useNavigate } from 'react-router-dom';
 import { mainContainerStyle, landingPageStyle, blockStyle, buttonStyle, textStyle } from '../style/mainStyle';
 import Header from '../components/shared/Header';
 
-
 const Auth = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const { isAuthenticated, user, nameTooLong, nameInvalidChars, nameEmpty } = useSelector((state) => state.auth);
+	const { isAuthenticated, user, nameTooLong, nameInvalidChars } = useSelector((state) => state.auth);
 	
 	const [localName, setLocalName] = useState('');
 	const [emptyInputErrMsg, setEmptyInputErrMsg] = useState(false);
 	const [connectionAttempt, setConnectionAttempt] = useState(false);
 
 	const handleAuth = () => {
+		if (!localName) {
+			setEmptyInputErrMsg(true);
+			return;
+		}
 		setConnectionAttempt(true);
-		(async () => {
-			await dispatch(userConnect(localName));
-		})();
+		dispatch(userConnect(localName));
 	}
 
 	useEffect(() => {
 		/* debug stuff */
-		console.log(`connection attempt = ${connectionAttempt}`);
-		console.log(`user = ${user}`);
-		console.log(`isAuthenticated = ${isAuthenticated}`);
+		// console.log(`connection attempt = ${connectionAttempt}`);
+		// console.log(`user = ${user}`);
+		// console.log(`isAuthenticated = ${isAuthenticated}`);
 		
 		if (connectionAttempt && user && isAuthenticated) {
 			navigate('/main_menu');
@@ -44,7 +45,7 @@ const Auth = () => {
 	}
 
 	const errMsgStyle = {
-		color: 'white',
+		color: 'red',
 		fontSize: '12px',
 	}
 
@@ -59,10 +60,14 @@ const Auth = () => {
 						type='text'
 						placeholder='enter your pseudo'
 						value={localName}
-						onChange={(e) => setLocalName(e.target.value)}
+						onChange={(e) => {
+							setLocalName(e.target.value);
+							setEmptyInputErrMsg(false);
+						}}
 					/>
 					{nameTooLong && <p style={errMsgStyle}>Please enter a shorter username</p>}
 					{emptyInputErrMsg && <p style={errMsgStyle}>Empty inputs are invalid</p>}
+					{nameInvalidChars && <p style={errMsgStyle}>Invalid characters</p>}
 					<button onClick={handleAuth} style={buttonStyle}>Go !</button>
 				</div>
 			</div>

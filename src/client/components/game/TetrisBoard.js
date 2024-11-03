@@ -26,7 +26,7 @@ const TetrisBoard = () => {
 
 	/* storing socket, players and roomId */
 	const socket = useSelector((state) => state.socket.socket);
-	const roomId = useSelector((state) => state.currentGame.id);
+	const roomId = useSelector((state) => state.currentGame.id); // works
 	const player1 = useSelector((state) => state.currentGame.players[0]); // update for multiplayer
 
 	/* handle ask for a piece logic */
@@ -34,7 +34,7 @@ const TetrisBoard = () => {
 
 	useEffect(() => {
 		if (askNewPiece) {
-			
+			// add new piece logic
 		}
 	}, [askNewPiece]);
 
