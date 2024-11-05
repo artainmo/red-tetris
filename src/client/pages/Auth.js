@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { userConnect } from '../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
-import { mainContainerStyle, landingPageStyle, blockStyle, buttonStyle, textStyle } from '../style/mainStyle';
-import Header from '../components/shared/Header';
+import { colors } from '../style/colors';
+import Button from '../components/shared/Button';
+import { redOctoberRegular } from '../style/fonts';
 
 const Auth = () => {
 	const dispatch = useDispatch();
@@ -25,11 +26,6 @@ const Auth = () => {
 	}
 
 	useEffect(() => {
-		/* debug stuff */
-		// console.log(`connection attempt = ${connectionAttempt}`);
-		// console.log(`user = ${user}`);
-		// console.log(`isAuthenticated = ${isAuthenticated}`);
-		
 		if (connectionAttempt && user && isAuthenticated) {
 			navigate('/main_menu');
 		}
@@ -49,12 +45,75 @@ const Auth = () => {
 		fontSize: '12px',
 	}
 
+	const authMainContainerStyle = {
+		width: '100vw',
+		height: '100vh',
+		backgroundColor: colors.backgroundDarkGrey,
+		margin: 0,
+		padding: '40px',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'column',
+	}
+
+	const mainPartContainerStyle = {
+		width: '100%',
+		height: 'calc(100vh - 40px)',
+		margin: 0,
+		padding: 0,
+		paddingTop: '40px',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'column',
+		boxSizing: 'border-box',
+	}
+
+	const buttonPartContainerStyle = {
+		width: '100%',
+		height: '40px',
+		display: 'flex',
+		justifyContent: 'flex-end',
+		alignItems: 'center',
+	}
+
+	const textsContainerStyle = {
+		width: '100%',
+		height: 'auto',
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'column',
+
+	}
+
+	const whiteStyle = {
+		...redOctoberRegular,
+		color: colors.white,
+		fontSize: '72px',
+		margin: 0,
+		padding: 0,
+		paddingBottom: '24px',
+	}
+
+	const redStyle = {
+		...redOctoberRegular,
+		color: colors.sovietRed,
+		fontSize: '48px',
+		margin: 0,
+		padding: 0,
+		paddingBottom: '24px',
+	}
+
 	return (
-		<div style={mainContainerStyle}>
-			<Header/>
-			<div style={landingPageStyle}>
-				<div style={blockStyle}>
-					<p style={textStyle} >Time To Register Comrade !</p>
+		<div style={authMainContainerStyle}>
+			<div style={mainPartContainerStyle}>
+				<div style={textsContainerStyle}>
+					<p style={whiteStyle}>Time to register</p>
+					<p style={redStyle}>Comrade !!!</p>
+				</div>
+				<div>
 					<input 
 						style={inputStyle}
 						type='text'
@@ -68,8 +127,15 @@ const Auth = () => {
 					{nameTooLong && <p style={errMsgStyle}>Please enter a shorter username</p>}
 					{emptyInputErrMsg && <p style={errMsgStyle}>Empty inputs are invalid</p>}
 					{nameInvalidChars && <p style={errMsgStyle}>Invalid characters</p>}
-					<button onClick={handleAuth} style={buttonStyle}>Go !</button>
 				</div>
+			</div>
+			<div style={buttonPartContainerStyle}>
+				<Button
+					textContent='Start'
+					onClick={() => {
+						handleAuth();
+					}}
+				/>
 			</div>
 		</div>
 	);

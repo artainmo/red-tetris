@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { createSoloGameThunk } from "../redux/slices/currentGameSlice";
+import { createSoloGameThunk } from "../../redux/slices/currentGameSlice";
 import { useSelector } from "react-redux";
 
 export const soloGameCreation = (username) => {

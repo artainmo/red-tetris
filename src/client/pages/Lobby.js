@@ -5,7 +5,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from '../components/shared/Header';
 import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
 
 const Lobby = () => {
@@ -14,7 +13,7 @@ const Lobby = () => {
 
 	const navigate = useNavigate();
 
-	// used to add the "..." dynamically in the matchmaking text
+	/* used to add the "..." dynamically in the matchmaking text */
 	useEffect(() => {
 		let dotCount = 0;
 		const interval = setInterval(() => {
@@ -31,6 +30,7 @@ const Lobby = () => {
 	}, []);
 
 	const handleCancelButton = () => {
+		// add some API call to remove the player form the match
 		navigate('/main_menu');
 	}
 
@@ -40,7 +40,6 @@ const Lobby = () => {
 	
 	return (
 		<div style={mainContainerStyle}>
-			<Header />
 			<div style={landingPageStyle}>
 				<p>{matchmakingText}</p>
 				<button style={cancelButtonStyle} onClick={handleCancelButton}>

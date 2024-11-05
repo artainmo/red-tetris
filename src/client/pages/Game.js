@@ -1,10 +1,8 @@
 import React from "react";
-import Header from "../components/shared/Header";
-import StopWatch from '../components/game/Stopwatch';
-import NextPiece from "../components/game/NextPiece";
+// import NextPiece from "../components/game/NextPiece";
 import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
-import TetrisBoard from "../components/game/TetrisBoard";
-import GameActionsPannel from "../components/game/GameActionsPannel";
+// import TetrisBoard from "../components/game/TetrisBoard";
+// import GameActionsPannel from "../components/game/GameActionsPannel";
 
 const Game = () => {
 	
@@ -39,18 +37,16 @@ const Game = () => {
 	
 	return (
 		<div style={mainContainerStyle}>
-			<Header />
 			<div style={landingPageStyle}>
 				<div style={startPannelStyle}>
-					<GameActionsPannel />
+					{/* <GameActionsPannel /> */}
 				</div>
 				<div style={gameElemsStyle}>
 					<div style={leftPannelStyle}>
-						<TetrisBoard />
+						{/* <TetrisBoard /> */}
 					</div>
 					<div style={rightPannelStyle}>
-						<NextPiece />
-						<StopWatch />
+						{/* <NextPiece /> */}
 					</div>
 				</div>
 			</div>
