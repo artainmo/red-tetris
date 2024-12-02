@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setGrid, setScore } from "../store/gameplaySlice";
+import { setGrid, setScore } from "../redux/slices/gameplaySlice";
 
 const useManageLines = (width, height) => {
 

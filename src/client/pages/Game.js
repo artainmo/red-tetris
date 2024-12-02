@@ -1,8 +1,7 @@
 import React from "react";
-// import NextPiece from "../components/game/NextPiece";
 import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
-// import TetrisBoard from "../components/game/TetrisBoard";
-// import GameActionsPannel from "../components/game/GameActionsPannel";
+import Board from "../components/game/Board";
+import GameActionsPannel from "../components/game/GameActionsPannel";
 
 const Game = () => {
 	
@@ -36,17 +35,17 @@ const Game = () => {
 	}
 	
 	return (
-		<div style={mainContainerStyle}>
+		<div style={mainContainerStyle}>			
 			<div style={landingPageStyle}>
 				<div style={startPannelStyle}>
-					{/* <GameActionsPannel /> */}
+					<GameActionsPannel />
 				</div>
 				<div style={gameElemsStyle}>
 					<div style={leftPannelStyle}>
-						{/* <TetrisBoard /> */}
+						<Board />
 					</div>
 					<div style={rightPannelStyle}>
-						{/* <NextPiece /> */}
+						
 					</div>
 				</div>
 			</div>

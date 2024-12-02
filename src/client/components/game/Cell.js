@@ -1,5 +1,5 @@
 import React from "react";
-import { CELL_COLORS } from "../utils/cellColors";
+import { CELL_COLORS } from "../../utils/cellColors";
 
 const Cell = ({colorCode}) => {
 	
@@ -10,7 +10,7 @@ const Cell = ({colorCode}) => {
 		border: '2px solid white',
 		boxSizing: 'border-box',
 	}
-	
+
 	return <div style={cellStyle}></div>;
 }
 

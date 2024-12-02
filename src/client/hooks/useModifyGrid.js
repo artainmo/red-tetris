@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import useManagePiece from "./useManagePiece";
 import useManageLines from "./useManageLines";
 import { useSelector, useDispatch } from 'react-redux';
-import { setActivePiece } from "../store/gameplaySlice";
+import { setActivePiece } from "../redux/slices/gameplaySlice";
 
 const useModifyGrid = (width, height) => {
 

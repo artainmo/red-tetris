@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import useModifyGrid from "../hooks/useModifyGrid";
+import React from "react";
+import useModifyGrid from "../../hooks/useModifyGrid";
 import Cell from "./Cell";
 
 const Board = () => {

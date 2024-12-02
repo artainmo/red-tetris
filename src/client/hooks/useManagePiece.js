@@ -1,13 +1,13 @@
 import { useEffect, useCallback } from "react";
 import { TETROMINOS } from "../utils/tetrominoes";
 import { PIECES_COLOR_CODES } from "../utils/piecesColorCodes";
-import { PIECE_STARTING_ORIENTATIONS } from "../utils/pieceStartingOrientations";
+import { PIECE_STARTING_ORIENTATIONS } from "../utils/pieceStartingOrientation";
 import { WALL_KICK_OFFSETS } from "../utils/wallKickOffsets";
 import useCollisionDetection from "./useCollisionDetection";
 import usePieceGenerator from "./usePieceGenerator";
 import { useDispatch, useSelector } from 'react-redux';
-import { setActivePiece, setActivePieceType, setPiecePosition, setOrientation, setGrid } from '../store/gameplaySlice';
-import { setIsGameOver } from "../store/gameplaySlice";
+import { setActivePiece, setActivePieceType, setPiecePosition} from '../redux/slices/gameplaySlice';
+import { setIsGameOver, setOrientation, setGrid } from "../redux/slices/gameplaySlice";
 
 const useManagePiece = (width, height) => {
 	

@@ -59,4 +59,5 @@ export const {
 	setRank,
 	setScore,
 } = gameplaySlice.actions;
-export default gameplaySlice.reducer;
+
+export default gameplaySlice;
