@@ -23,7 +23,7 @@ export const userConnect = createAsyncThunk(
 			if (err.response && err.response.data) {
 				return rejectWithValue(err.response.data);
 			} else {
-				return rejectWithValue({message: 'unknow error happened'});
+				return rejectWithValue({message: 'unknown error happened'});
 			}
 		}
 	}

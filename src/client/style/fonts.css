@@ -1,0 +1,18 @@
+/*
+	import the fonts red october and light and fat variants
+*/
+
+@font-face {
+	font-family: 'Red October';
+	src: url('../assets/fonts/RedOctober.ttf') format('truetype');
+}
+
+/* @font-face {
+	font-family: 'Red October';
+	src: url('../assets/fonts/RedOctober-Light.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'Red October';
+	src: url('../assets/fonts/RedOctober-Fat.ttf') format('truetype');
+} */

@@ -1,17 +1,17 @@
 import React from "react";
+import { CELL_COLORS } from "../../utils/cellColors";
 
-const Cell = ({cellColor}) => {
-
-	const cellStyle = {
-		width: '20px',
-    	height: '20px',
-    	border: 'solid red',
-    	backgroundColor: cellColor ? cellColor : 'transparent',
-	}
+const Cell = ({colorCode}) => {
 	
-	return (
-		<div style={cellStyle}></div>
-	)
+	const cellStyle = {
+		width: '100%',
+		height: '100%',
+		backgroundColor: CELL_COLORS[colorCode],
+		border: '2px solid white',
+		boxSizing: 'border-box',
+	}
+
+	return <div style={cellStyle}></div>;
 }
 
 export default Cell;

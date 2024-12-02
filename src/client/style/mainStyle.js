@@ -1,5 +1,4 @@
 // contains styles in js for the main element
-import backgroundImage from '../assets/USSR_Flag.jpeg';
 
 export const mainContainerStyle = {
 	margin: 0,
@@ -10,7 +9,7 @@ export const mainContainerStyle = {
 export const landingPageStyle = {
 	height: 'calc(100vh - 80px)',
 	width: '100%',
-	backgroundImage: `url(${backgroundImage})`,
+	backgroundImage: '',
 	backgroundSize: 'cover',
 	backgroundPosition: 'center',
 	backgroundRepeat: 'no-repeat',

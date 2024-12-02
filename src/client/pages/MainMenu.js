@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../components/shared/Header";
 import LeftMenuPannel from "../components/main-menu/LeftMenuPannel";
 import RightMenuPannel from "../components/main-menu/RightMenuPannel";
 import { mainContainerStyle, landingPageStyle } from '../style/mainStyle';
@@ -17,7 +16,6 @@ const MainMenu = () => {
 	
 	return (
 		<div style={mainContainerStyle}>
-			<Header />
 			<div style={landingPageStyle}>
 				<div style={pannelsStyle}>
 					<LeftMenuPannel />

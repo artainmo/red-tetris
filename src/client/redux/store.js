@@ -4,10 +4,12 @@ import currentGameSlice from "./slices/currentGameSlice";
 import gameSessionsSlice from "./slices/gameSessionsSlice";
 import gameTimeSlice from "./slices/gameTimeSlice";
 import socketSlice from "./slices/socketSlice";
+import gameplaySlice from "./slices/gameplaySlice";
 
 const store = configureStore({
 	reducer: {
 		auth: authSlice.reducer,
+		gameplay: gameplaySlice.reducer,
 		currentGame: currentGameSlice.reducer,
 		socket: socketSlice.reducer,
 		gameTime: gameTimeSlice.reducer,
@@ -15,4 +17,4 @@ const store = configureStore({
 	}
 });
 
-export default store; 
+export default store;
