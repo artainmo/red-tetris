@@ -216,7 +216,7 @@ io.on('connection', async (socket) => {
         if (!(roomId in pieceBaskets)) {
           pieceBaskets[roomId] = new PieceBasket()
         }
-        const piece = pieceBaskets[roomId].pickPieceInPieceBasket()
+        const piece = pieceBaskets[roomId].getNextPiece()
         io.to(roomId).emit('newPiece', piece); //Broadcast to all room members the same new piece
     });
 
