@@ -1,4 +1,5 @@
-/* hook to create a bag of random pieces. To be replace when integrating to the main project */
+/* 
+//hook to create a bag of random pieces. To be replace when integrating to the main project 
 
 import { useState } from "react";
 
@@ -9,9 +10,9 @@ const usePieceGenerator = () => {
 
 	const shuffleArrayWithFisherYatesPermutationAlgo = (arr) => {
 		for (let i = arr.length - 1; i > 0; i--) {
-			/* random number from 0 to i (included) */
+			// random number from 0 to i (included)
 			let j = Math.floor(Math.random() * (i + 1));
-			/* swap i index to the randomly chosen j index */
+			// swap i index to the randomly chosen j index
 			[arr[i], arr[j]] = [arr[j], arr[i]] ;
 		}
 		return arr;
@@ -35,3 +36,4 @@ const usePieceGenerator = () => {
 };
 
 export default usePieceGenerator;
+*/
