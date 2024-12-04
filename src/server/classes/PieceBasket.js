@@ -1,5 +1,3 @@
-const { Piece } = require("./Piece");
-
 /*
 ** A piece basket hold 7 pieces that represents every type of tetromino.
 ** Players will receive one random piece of the basket until it empties and has to be refilled.
@@ -8,50 +6,32 @@ const { Piece } = require("./Piece");
 class PieceBasket {
 
 	constructor() {
-		this.pieces = [];
-		this.fullfillPieceBasket();
+		this.bag = [];
+		this.PIECES_TYPE = ["I", "O", "T", "L", "J", "S", "Z"];
 	}
 
-	fullfillPieceBasket() {
-		const pieceTypeArray = ["I", "O", "T", "S", "Z", "J", "L"];
-
-		if (this.pieces.length === 0) {
-			for (let i = 0; i < pieceTypeArray.length; i++) {
-				this.addPieceToBasket(pieceTypeArray[i]);
-			}
+	#shuffleArrayWithFisherYatesPermutationAlgo = (arr) => {
+		for (let i = arr.length - 1; i > 0; i--) {
+			/* random number from 0 to i (included) */
+			let j = Math.floor(Math.random() * (i + 1));
+			/* swap i index to the randomly chosen j index */
+			[arr[i], arr[j]] = [arr[j], arr[i]] ;
 		}
+		return arr;
 	}
 
-	addPieceToBasket(type) {
-		const newPiece = new Piece(type);
-		this.pieces.push(newPiece);
-	}
-
-	removePieceInPieceBasket(index) {
-		if (index >= 0 && index < this.pieces.length) {
-			this.pieces.splice(index, 1);
+	const getNextPiece = () => {
+		if (this.bag.length === 0) {
+			const newBag = this.#shuffleArrayWithFisherYatesPermutationAlgo([...this.PIECES_TYPE]);
+			this.bag = newBag.slice(1); 
+			// console.log(newBag[0]);
+			return newBag[0]; 
 		}
-	}
-
-	pickPieceInPieceBasket() {
-		if (this.pieces.length === 0) {
-			this.fullfillPieceBasket();
-		}
-
-		const randomPieceIndex = this.getRandomIntInclusive(0, this.pieces.length - 1);
-		console.log(`randomPieceIndex = ${randomPieceIndex}`); // debug
-
-		const pickedPiece = this.pieces[randomPieceIndex];
-		this.removePieceInPieceBasket(randomPieceIndex);
-
-		return pickedPiece;
-	}
-
-	getRandomIntInclusive(min, max) {
-		const minCeiled = Math.ceil(min);
-		const maxFloored = Math.floor(max);
-		return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled);
-	}
+		const nextPiece = this.bag[0];
+		this.bag = this.bag.slice(1);
+		// console.log(nextPiece);
+		return nextPiece;
+	};
 }
 
 module.exports.PieceBasket = PieceBasket;
