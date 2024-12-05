@@ -20,7 +20,7 @@ class PieceBasket {
 		return arr;
 	}
 
-	const getNextPiece = () => {
+	getNextPiece = () => {
 		if (this.bag.length === 0) {
 			const newBag = this.#shuffleArrayWithFisherYatesPermutationAlgo([...this.PIECES_TYPE]);
 			this.bag = newBag.slice(1); 
