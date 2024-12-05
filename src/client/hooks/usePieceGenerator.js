@@ -1,5 +1,7 @@
-/* 
+
 //hook to create a bag of random pieces. To be replace when integrating to the main project 
+//!This code has also been put in the backend!
+
 
 import { useState } from "react";
 
@@ -36,4 +38,4 @@ const usePieceGenerator = () => {
 };
 
 export default usePieceGenerator;
-*/
+
