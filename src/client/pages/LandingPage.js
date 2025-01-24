@@ -21,15 +21,12 @@ const LandingPage = () => {
 	}
 
 	const titleContainerStyle = {
-		width: '304px',
 		height: '100%',
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
 		flexDirection: 'column',
-		margin: 0,
-		padding: 0,
-		paddingTop: '40px',
+		margin: 'auto'
 	}
 	
 	const redStyle = {
@@ -71,7 +68,7 @@ const LandingPage = () => {
 						Red
 					</p>
 				</div>
-				<div>
+				<div style={redContainerStyle}>
 					<p style={whiteStyle}>
 						Tetris
 					</p>
