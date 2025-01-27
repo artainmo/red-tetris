@@ -1,5 +1,5 @@
 import React from "react";
-import Button from "../components/shared/Button";
+import RedButton from "../components/shared/RedButton";
 import { useNavigate } from "react-router-dom";
 import { pageMainContainerStyle, startButtonContainerStyle } from "../style/pagesStyle";
 import RedTetrisTitle from "../components/shared/RedTetrisTitle";
@@ -13,7 +13,7 @@ const LandingPage = () => {
 		<div style={pageMainContainerStyle}>
 			<RedTetrisTitle/>
 			<div style={startButtonContainerStyle}>
-				<Button
+				<RedButton
 					textContent='Start'
 					onClick={() => {
 						navigate('/auth');

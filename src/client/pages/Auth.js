@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { userConnect } from '../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
-import { colors } from '../style/colors';
-import Button from '../components/shared/Button';
+import RedButton from '../components/shared/RedButton';
 import { whiteStyle, redStyle, pageMainContainerStyle, startButtonContainerStyle } from "../style/pagesStyle";
 
 const Auth = () => {
@@ -87,7 +86,7 @@ const Auth = () => {
 					{nameTooLong && <p style={errMsgStyle}>Please enter a shorter username</p>}
 					{emptyInputErrMsg && <p style={errMsgStyle}>Empty inputs are invalid</p>}
 					{nameInvalidChars && <p style={errMsgStyle}>Invalid characters</p>}
-					<Button style={startButtonContainerStyle}
+					<RedButton style={startButtonContainerStyle}
 						textContent='Start'
 						onClick={() => {
 							handleAuth();

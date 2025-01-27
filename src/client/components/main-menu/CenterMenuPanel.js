@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import PlayersArray from "./PlayersArray";
+import RoomsArray from "./RoomsArray";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createSoloGameThunk } from "../../redux/slices/currentGameSlice";
 import { socketConnectThunk } from "../../redux/slices/socketSlice";
 import { mainMenuPannelStyle } from "../../style/menuStyle";
+import RedButton from "../shared/RedButton";
+import YellowButton from "../shared/YellowButton";
 
 
 const CenterMenuPanel = () => {
@@ -39,67 +41,50 @@ const CenterMenuPanel = () => {
 		console.log('starting matchmaking process for multiplayer');
 	}
 
-	const menuButtonStyle = {
-		fontSize: '36px',
-		border: 'none',
-		borderRadius: '10px',
-		padding: '20px 40px',
-		cursor: 'pointer',
-		transition: 'all 0.3s',
-		marginTop: '12px',
-		marginBottom: '12px',
-		marginRight: '60px',
-		width: '280px'
-	}
-
-	const soloButtonStyle = {
-		backgroundColor: isSoloHovered? 'black' : 'white',
-		color: isSoloHovered? 'white' : 'black',
-	}
-
-	const multiButtonStyle = {
-		backgroundColor: isMultiHovered? 'black' : 'white',
-		color: isMultiHovered? 'white' : 'black',
-	}
-
-	const buttonDivStyle = {
-		width: '100%',
-		height: '50%',
-		display: 'flex'
-	}
-
-	const buttonsStyle = {
-		width: '50%',
-		height: '100%',
+	const middlePanelStyle = {
 		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
 		flexDirection: 'column',
+		width: '100%',
+		height: '100%',
+		justifyContent: 'center',
+		alignItems: 'center'
+	}
+	const buttonDivStyle = {
+		height: 'fit-content',
+		display: 'flex-column',
+		justifyContent: 'center',
 	}
 
-	const emptyDivStyle = {
-		width: '50%',
-		height: '100%',
-	}
+	// const buttonsStyle = {
+	// 	width: '100%',
+	// 	height: 'fit-content',
+	// 	display: 'flex',
+	// 	alignItems: 'center',
+
+	// 	flexDirection: 'column',
+	// }
 
 	return (
-		<div style={mainMenuPannelStyle}>
+		<div style={middlePanelStyle}>
 			<div style={buttonDivStyle}>
-				<div style={emptyDivStyle}></div>
-				<div style={buttonsStyle}>
-					<button 
+				<div>
+					<RedButton
+						textContent='Solo'
 						onClick={handleSoloGameCreation} 
-						style={{...menuButtonStyle, ...soloButtonStyle}}
 						onMouseEnter={() => setIsSoloHovered(true)}
-						onMouseLeave={() => setIsSoloHovered(false)}>Solo</button>
-					<button 
+						onMouseLeave={() => setIsSoloHovered(false)}/>
+				</div>
+				<div>
+					<YellowButton 
+						textContent='Join Multi'
 						onClick={handleMatchmakingForMultiplayer} 
-						style={{...menuButtonStyle, ...multiButtonStyle}}
 						onMouseEnter={() => setIsMultiHovered(true)}
-						onMouseLeave={() => setIsMultiHovered(false)}>Multiplayer</button>
+						onMouseLeave={() => setIsMultiHovered(false)}/>
 				</div>
 			</div>
-			<PlayersArray />
+			<div>
+				<RoomsArray />
+			</div>
 		</div>
 	);
 

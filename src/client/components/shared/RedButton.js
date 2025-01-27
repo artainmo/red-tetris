@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { redOctoberRegular } from "../../style/fonts";
 import { colors } from "../../style/colors";
 
-const Button = ({
+const RedButton = ({
 	textContent,
 	onClick,
 }) => {
@@ -31,6 +31,7 @@ const Button = ({
 		border: 'none',
     	cursor: 'pointer',
     	outline: 'none',
+		margin: 'auto'
 	}
 
 	return (
@@ -47,4 +48,4 @@ const Button = ({
 	);
 }
 
-export default Button;
+export default RedButton;
