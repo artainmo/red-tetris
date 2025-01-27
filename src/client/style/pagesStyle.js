@@ -17,6 +17,22 @@ export const whiteStyle = {
     padding: 0,
 }
 
+export const logoRedStyle = {
+    color: colors.sovietRed,
+    ...redOctoberRegular,
+    fontSize: '1.5rem',
+    margin: 0,
+    padding: 0,
+}
+
+export const logoWhiteStyle = {
+    color: colors.white,
+    ...redOctoberRegular,
+    fontSize: '1.5rem',
+    margin: 0,
+    padding: 0,
+}
+
 export const startButtonContainerStyle = {
     width: '100%',
     height: '40px',

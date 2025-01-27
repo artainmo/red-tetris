@@ -1,7 +1,8 @@
 import React from "react";
 import LeftMenuPannel from "../components/main-menu/LeftMenuPannel";
 import RightMenuPannel from "../components/main-menu/RightMenuPannel";
-import { mainContainerStyle, landingPageStyle } from '../style/mainStyle';
+import { whiteStyle, redStyle, pageMainContainerStyle, startButtonContainerStyle } from "../style/pagesStyle";
+import RedTetrisLogo from "../components/shared/RedTetrisLogo";
 
 const MainMenu = () => {
 	
@@ -15,13 +16,12 @@ const MainMenu = () => {
 	}
 	
 	return (
-		<div style={mainContainerStyle}>
-			<div style={landingPageStyle}>
+		<div style={pageMainContainerStyle}>
+			<RedTetrisLogo/>
 				<div style={pannelsStyle}>
 					<LeftMenuPannel />
 					<RightMenuPannel />
 				</div>
-			</div>
 		</div>
 	)
 }
