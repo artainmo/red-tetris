@@ -33,6 +33,22 @@ export const logoWhiteStyle = {
     padding: 0,
 }
 
+export const welcomeWhiteStyle = {
+    color: colors.white,
+    ...redOctoberRegular,
+    fontSize: '2rem',
+    margin: 'auto',
+    padding: 0,
+}
+
+export const redContainerStyle = {
+    width: '100%',
+    display: 'flex',
+    /*justifyContent: 'flex-end',*/
+    alignItems: 'center',
+    margin: 0
+}
+
 export const startButtonContainerStyle = {
     width: '100%',
     height: '40px',

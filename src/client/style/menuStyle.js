@@ -1,6 +1,6 @@
 
 export const mainMenuPannelStyle = {
-	backgroundColor: 'rgba(0, 0, 0, 0.65)',
+	backgroundColor: 'white',
     borderRadius: '16px',
 	width: 'calc(50% - 60px)',
 	height: 'calc(100% - 60px)',

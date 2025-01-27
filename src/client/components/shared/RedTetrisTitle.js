@@ -1,5 +1,5 @@
 import React from "react";
-import { whiteStyle, redStyle } from "../../style/pagesStyle";
+import { whiteStyle, redStyle, redContainerStyle } from "../../style/pagesStyle";
 
 const titleContainerStyle = {
     height: '100%',
@@ -8,13 +8,6 @@ const titleContainerStyle = {
     alignItems: 'center',
     flexDirection: 'column',
     margin: 'auto'
-}
-
-const redContainerStyle = {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
 }
 
 export default function RedTetrisTitle() {

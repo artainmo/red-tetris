@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import PlayersArray from "./PlayersArray";
-import { mainMenuPannelStyle } from "../../style/menuStyle";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createSoloGameThunk } from "../../redux/slices/currentGameSlice";
 import { socketConnectThunk } from "../../redux/slices/socketSlice";
+import { mainMenuPannelStyle } from "../../style/menuStyle";
 
-const LeftMenuPannel = () => {
+
+const RightMenuPanel = () => {
 	
+		
 	const [isSoloHovered, setIsSoloHovered] = useState(false);
 	const [isMultiHovered, setIsMultiHovered] = useState(false);
 	const [gameCreated, setgameCreated] = useState(false);
@@ -100,6 +102,7 @@ const LeftMenuPannel = () => {
 			<PlayersArray />
 		</div>
 	);
-};
 
-export default LeftMenuPannel;
+}
+
+export default RightMenuPanel;
