@@ -4,10 +4,11 @@ import CenterMenuPanel from "../components/main-menu/CenterMenuPanel";
 import RightMenuPanel from "../components/main-menu/RightMenuPanel";
 import { welcomeWhiteStyle, redContainerStyle, pageMainContainerStyle } from "../style/pagesStyle";
 import RedTetrisLogo from "../components/shared/RedTetrisLogo";
+import { useSelector } from "react-redux";
 
 const MainMenu = () => {
 	
-	const [username, setUsername] = useState('m3zh');
+	const username = useSelector((state) => state.auth.user);
 
 	const pannelsStyle = {
 		display: 'flex',
