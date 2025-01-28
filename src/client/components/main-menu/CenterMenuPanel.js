@@ -6,7 +6,7 @@ import { createSoloGameThunk } from "../../redux/slices/currentGameSlice";
 import { socketConnectThunk } from "../../redux/slices/socketSlice";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
-import { fullWhiteMenuPanelStyle, middleArrayContainerStyle } from "../../style/panelStyle";
+import { fullWhiteMenuPanelStyle, middlePanelStyle, middleArrayContainerStyle } from "../../style/panelStyle";
 
 const CenterMenuPanel = () => {
 	
@@ -38,17 +38,6 @@ const CenterMenuPanel = () => {
 
 	const handleMatchmakingForMultiplayer = () => {
 		console.log('starting matchmaking process for multiplayer');
-	}
-
-	const middlePanelStyle = {
-		width: '100%',
-		height: '100%',
-		margin: 'auto',
-		display: 'flex',
-		flexGrow: 1,
-		flexDirection: 'column',
-		alignItems: 'center',
-		justifyContent: 'center'
 	}
 
 	const buttonColStyle = {

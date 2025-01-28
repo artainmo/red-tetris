@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LeftMenuPanel from "../components/main-menu/LeftMenuPanel";
 import CenterMenuPanel from "../components/main-menu/CenterMenuPanel";
 import RightMenuPanel from "../components/main-menu/RightMenuPanel";
-import { welcomeWhiteStyle, redContainerStyle, pageMainContainerStyle } from "../style/pagesStyle";
+import { welcomeWhiteStyle, redContainerStyle, pageMainContainerStyle } from "../style/containersStyle";
 import { panelsStyle } from "../style/panelStyle";
 import RedTetrisLogo from "../components/shared/RedTetrisLogo";
 import { useSelector } from "react-redux";

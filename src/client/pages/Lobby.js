@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { pageMainContainerStyle, titleContainerStyle, redContainerStyle, whiteStyle, startButtonContainerStyle } from "../style/pagesStyle";
+import { pageMainContainerStyle, titleContainerStyle, redContainerStyle, whiteStyle, buttonContainerStyle } from "../style/containersStyle";
 const Lobby = () => {
 	
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
@@ -42,7 +42,7 @@ const Lobby = () => {
 					</p>
 				</div>
 			</div>
-			<div style={startButtonContainerStyle}>
+			<div style={buttonContainerStyle}>
 				<RedButton
 					textContent='Cancel'
 					onClick={handleCancelButton}

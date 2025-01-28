@@ -1,5 +1,5 @@
 import React from "react";
-import { whiteStyle, redStyle, redContainerStyle, titleContainerStyle } from "../../style/pagesStyle";
+import { whiteStyle, redStyle, redContainerStyle, titleContainerStyle } from "../../style/containersStyle";
 
 
 

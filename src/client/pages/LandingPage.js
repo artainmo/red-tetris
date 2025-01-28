@@ -1,7 +1,7 @@
 import React from "react";
 import RedButton from "../components/shared/RedButton";
 import { useNavigate } from "react-router-dom";
-import { pageMainContainerStyle, startButtonContainerStyle } from "../style/pagesStyle";
+import { pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
 import RedTetrisTitle from "../components/shared/RedTetrisTitle";
 
 const LandingPage = () => {
@@ -11,7 +11,7 @@ const LandingPage = () => {
 	return (
 		<div style={pageMainContainerStyle}>
 			<RedTetrisTitle/>
-			<div style={startButtonContainerStyle}>
+			<div style={buttonContainerStyle}>
 				<RedButton
 					textContent='Start'
 					onClick={() => {

@@ -31,6 +31,7 @@ const RedButton = ({
 		border: 'none',
     	cursor: 'pointer',
     	outline: 'none',
+		margin: '5px'
 	}
 
 	return (

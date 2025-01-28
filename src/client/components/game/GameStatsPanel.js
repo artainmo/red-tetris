@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { fullTransparentMenuPanelStyle } from "../../style/panelStyle";
-import { statsContainerStyle, stackedContainerStyle, smallWhiteStyle } from "../../style/pagesStyle";
+import { statsContainerStyle, stackedContainerStyle, smallWhiteStyle } from "../../style/containersStyle";
 
 const GameStatsPanel = () => {
 

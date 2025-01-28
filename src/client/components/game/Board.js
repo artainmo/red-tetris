@@ -41,11 +41,13 @@ const Board = () => {
 			<div style={fullTransparentMenuPanelStyle}>
 				<div style={boardContainerStyle}>
 					<div style={boardCellsContainerStyle}>
-						{grid.map((row, rowIndex) =>
-							row.map((cell, cellIndex) => (
-								<Cell key={`${rowIndex}-${cellIndex}`} colorCode={cell} />
-							))
-						)}
+						{
+							grid.map((row, rowIndex) =>
+								row.map((cell, cellIndex) => (
+									<Cell key={`${rowIndex}-${cellIndex}`} colorCode={cell} />
+								))
+							)
+						}
 					</div>
 				</div>
 			</div>

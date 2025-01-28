@@ -1,5 +1,6 @@
+import { margin, width } from "@mui/system";
 import { colors } from "./colors"
-import { redOctoberRegular } from "../style/fonts";
+import { redOctoberRegular } from "./fonts";
 
 export const redStyle = {
     color: colors.sovietRed,
@@ -84,7 +85,16 @@ export const statsContainerStyle = {
     textAlign: 'center'
 }
 
-export const startButtonContainerStyle = {
+export const inlineContainerStyle = {
+    height: '20%',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignSelf: 'flex-end',
+    margin: 0
+}
+
+export const buttonContainerStyle = {
     width: '100%',
     height: '40px',
     display: 'flex',

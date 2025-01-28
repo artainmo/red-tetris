@@ -1,5 +1,5 @@
 import React from "react";
-import { logoWhiteStyle, logoRedStyle } from "../../style/pagesStyle";
+import { logoWhiteStyle, logoRedStyle } from "../../style/containersStyle";
 
 const logoContainerStyle = {
     height: '100%',

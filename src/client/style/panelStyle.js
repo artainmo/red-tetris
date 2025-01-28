@@ -18,6 +18,17 @@ export const arrayContainerStyle = {
     padding: 'auto'
 }
 
+export const middlePanelStyle = {
+    width: '100%',
+    height: '100%',
+    margin: 'auto',
+    display: 'flex',
+    flexGrow: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center'
+}
+
 export const middleArrayContainerStyle = {
     width: '100%',
     height: '100%',
