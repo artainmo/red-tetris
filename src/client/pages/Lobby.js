@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
+import { landingPageStyle, arrayContainerStyle } from "../style/mainStyle";
 
 const Lobby = () => {
 	
@@ -39,7 +39,7 @@ const Lobby = () => {
 	}
 	
 	return (
-		<div style={mainContainerStyle}>
+		<div style={arrayContainerStyle}>
 			<div style={landingPageStyle}>
 				<p>{matchmakingText}</p>
 				<button style={cancelButtonStyle} onClick={handleCancelButton}>

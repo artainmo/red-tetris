@@ -1,11 +1,11 @@
 import React from "react"
 import ScoresArray from "./ScoresArray";
-import { mainMenuPannelStyle } from "../../style/menuStyle";
+import { fullWhiteMenuPanelStyle } from "../../style/panelStyle";
 
 const LeftMenuPanel = () => {
 
 	return (
-		<div style={mainMenuPannelStyle}>
+		<div style={fullWhiteMenuPanelStyle}>
 			<ScoresArray />
 		</div>
 	)

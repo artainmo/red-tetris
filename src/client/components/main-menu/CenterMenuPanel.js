@@ -4,10 +4,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createSoloGameThunk } from "../../redux/slices/currentGameSlice";
 import { socketConnectThunk } from "../../redux/slices/socketSlice";
-import { mainMenuPannelStyle } from "../../style/menuStyle";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
-
+import { fullWhiteMenuPanelStyle, middleArrayContainerStyle } from "../../style/panelStyle";
 
 const CenterMenuPanel = () => {
 	
@@ -42,48 +41,51 @@ const CenterMenuPanel = () => {
 	}
 
 	const middlePanelStyle = {
-		display: 'flex',
-		flexDirection: 'column',
 		width: '100%',
 		height: '100%',
-		justifyContent: 'center',
-		alignItems: 'center'
+		margin: 'auto',
+		display: 'flex',
+		flexGrow: 1,
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center'
 	}
-	const buttonDivStyle = {
+
+	const buttonColStyle = {
 		height: 'fit-content',
 		display: 'flex-column',
-		justifyContent: 'center',
+		justifyContent: 'space-around',
+		margin: 'auto',
+		padding: 'auto'
 	}
 
-	// const buttonsStyle = {
-	// 	width: '100%',
-	// 	height: 'fit-content',
-	// 	display: 'flex',
-	// 	alignItems: 'center',
-
-	// 	flexDirection: 'column',
-	// }
+	const buttonDivStyle = {
+		margin: '2rem',
+		padding: 'auto'
+	}
 
 	return (
 		<div style={middlePanelStyle}>
-			<div style={buttonDivStyle}>
-				<div>
-					<RedButton
-						textContent='Solo'
-						onClick={handleSoloGameCreation} 
-						onMouseEnter={() => setIsSoloHovered(true)}
-						onMouseLeave={() => setIsSoloHovered(false)}/>
+			<div style={middleArrayContainerStyle}>
+				<div style={buttonColStyle}>
+					<div style={buttonDivStyle}>
+						<RedButton
+							textContent='Solo'
+							onClick={handleSoloGameCreation} 
+							onMouseEnter={() => setIsSoloHovered(true)}
+							onMouseLeave={() => setIsSoloHovered(false)}/>
+					</div>
+					<div style={buttonDivStyle}>
+						<YellowButton 
+							textContent='Join Multi'
+							onClick={handleMatchmakingForMultiplayer} 
+							onMouseEnter={() => setIsMultiHovered(true)}
+							onMouseLeave={() => setIsMultiHovered(false)}/>
+					</div>
 				</div>
-				<div>
-					<YellowButton 
-						textContent='Join Multi'
-						onClick={handleMatchmakingForMultiplayer} 
-						onMouseEnter={() => setIsMultiHovered(true)}
-						onMouseLeave={() => setIsMultiHovered(false)}/>
+				<div style={fullWhiteMenuPanelStyle}>
+					<RoomsArray />
 				</div>
-			</div>
-			<div>
-				<RoomsArray />
 			</div>
 		</div>
 	);

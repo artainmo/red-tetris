@@ -1,5 +1,5 @@
 import React from "react";
-import { mainContainerStyle, arrayDivStyle, titleDivStyle, titleStyle, delimiterStyle, arrayDisplayDivStyle } from "../../style/panelStyle";
+import { arrayContainerStyle, arrayDivStyle, titleDivStyle, titleStyle, delimiterStyle, arrayDisplayDivStyle } from "../../style/panelStyle";
 import { useSelector } from "react-redux";
 
 const BestScoresArray = () => {
@@ -7,7 +7,7 @@ const BestScoresArray = () => {
 	const scores = useSelector((state) => Object.values(state.currentGame.scores))
 
 	return (
-		<div style={mainContainerStyle}>
+		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>
 				<div style={titleDivStyle}>
 					<h2 style={titleStyle}>Best Scores</h2>

@@ -1,6 +1,6 @@
 // contains styles in js for the main element
 
-export const mainContainerStyle = {
+export const arrayContainerStyle = {
 	margin: 0,
 	width: '100vw',
 	height: '100vh'

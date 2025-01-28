@@ -20,8 +20,8 @@ const YellowButton = ({
 
 	const buttonStyle = {
 		backgroundColor: isHovered ? colors.sovietRed : colors.sovietYellow,
-		width: '160px',
-		height: '40px',
+		width: '200px',
+		height: '50px',
 		borderRadius: '25px',
 		boxSizing: 'border-box',
 		display: 'flex',

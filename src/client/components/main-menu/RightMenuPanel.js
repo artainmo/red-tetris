@@ -1,12 +1,12 @@
 import React from "react";
 import BestScoresArray from "./BestScoresArray";
-import { mainMenuPannelStyle } from "../../style/menuStyle";
+import { fullWhiteMenuPanelStyle } from "../../style/panelStyle";
 
 
 const RightMenuPanel = () => {
 	
 	return (
-		<div style={mainMenuPannelStyle}>
+		<div style={fullWhiteMenuPanelStyle}>
 			<BestScoresArray />
 		</div>
 	);

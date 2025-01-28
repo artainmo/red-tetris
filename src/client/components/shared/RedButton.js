@@ -20,8 +20,8 @@ const RedButton = ({
 
 	const buttonStyle = {
 		backgroundColor: isHovered ? colors.sovietYellow : colors.sovietRed,
-		width: '160px',
-		height: '40px',
+		width: '200px',
+		height: '50px',
 		borderRadius: '25px',
 		boxSizing: 'border-box',
 		display: 'flex',
@@ -31,7 +31,6 @@ const RedButton = ({
 		border: 'none',
     	cursor: 'pointer',
     	outline: 'none',
-		margin: 'auto'
 	}
 
 	return (

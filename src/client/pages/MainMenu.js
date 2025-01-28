@@ -10,9 +10,9 @@ const MainMenu = () => {
 	
 	const username = useSelector((state) => state.auth.user);
 
-	const pannelsStyle = {
+	const panelsStyle = {
 		display: 'flex',
-		justifyContent: 'center',
+		justifyContent: 'space-between',
 		alignItems: 'center',
 		height: '100%',
 		width: '100%',
@@ -31,7 +31,7 @@ const MainMenu = () => {
 	return (
 		<div style={pageMainContainerStyle}>
 			<div style={redContainerStyle}>
-				<RedTetrisLogo/>
+				<RedTetrisLogo firstLine="Red" secondLine="Tetris" />
 				<div style={welcomeContainerStyle}>
 					<div style={redContainerStyle}>
 						<p style={welcomeWhiteStyle}>
@@ -45,7 +45,7 @@ const MainMenu = () => {
 					</div>
 				</div>
 			</div>
-			<div style={pannelsStyle}>
+			<div style={panelsStyle}>
 				<LeftMenuPanel />
 				<CenterMenuPanel />
 				<RightMenuPanel />

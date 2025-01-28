@@ -1,5 +1,5 @@
 import React from "react";
-import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
+import { landingPageStyle, arrayContainerStyle } from "../style/mainStyle";
 import Board from "../components/game/Board";
 import GameActionsPannel from "../components/game/GameActionsPannel";
 
@@ -35,7 +35,7 @@ const Game = () => {
 	}
 	
 	return (
-		<div style={mainContainerStyle}>			
+		<div style={arrayContainerStyle}>			
 			<div style={landingPageStyle}>
 				<div style={startPannelStyle}>
 					<GameActionsPannel />

@@ -5,22 +5,26 @@ const logoContainerStyle = {
     height: '100%',
     display: 'flex-column',
     justifyContent: 'flex-end',
+    flexGrow: 0,
     alignItems: 'center',
     alignSelf: 'center',
-    margin: 0,
+    margin: 'auto',
+    position: 'absolute',
+    top: '1rem',
+    left: '1rem'
 }
 
-export default function RedTetrisLogo() {
+export default function RedTetrisLogo({firstLine, secondLine}) {
     return (
         <div style={logoContainerStyle}>
             <div>
                 <p style={logoRedStyle}>
-                    Red
+                    {firstLine}
                 </p>
             </div>
             <div>
                 <p style={logoWhiteStyle}>
-                    Tetris
+                    {secondLine}
                 </p>
             </div>
         </div>

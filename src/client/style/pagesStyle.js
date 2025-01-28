@@ -46,7 +46,8 @@ export const redContainerStyle = {
     display: 'flex',
     /*justifyContent: 'flex-end',*/
     alignItems: 'center',
-    margin: 0
+    margin: 0,
+    marginBottom: '1rem'
 }
 
 export const startButtonContainerStyle = {
@@ -67,4 +68,5 @@ export const pageMainContainerStyle = {
     alignItems: 'center',
     flexDirection: 'column',
     boxSizing: 'border-box',
+    position: 'relative'
 }

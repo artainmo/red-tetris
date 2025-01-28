@@ -1,9 +1,39 @@
-export const mainContainerStyle = {
+export const arrayContainerStyle = {
     width: '100%',
     height: '100%',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    margin: 'auto',
+    padding: 'auto'
+}
+
+export const middleArrayContainerStyle = {
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 'auto',
+    padding: 'auto'
+}
+
+
+export const fullWhiteMenuPanelStyle = {
+	backgroundColor: 'white',
+    borderRadius: '16px',
+	width: '100%',
+	height: '100%',
+	marginRight: '3rem',
+	marginLeft: '3rem',
+    marginBottom: 0,
+    padding: 'auto',
+	display: 'flex',
+    flexGrow: 2,
+	flexDirection: 'column',
+	alignItems: 'center',
+	justifyContent: 'center'
 }
 
 export const arrayDivStyle = {

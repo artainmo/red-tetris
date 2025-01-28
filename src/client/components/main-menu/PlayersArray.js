@@ -1,10 +1,10 @@
 import React from "react";
-import { mainContainerStyle, arrayDivStyle, titleDivStyle, titleStyle, delimiterStyle, arrayDisplayDivStyle } from "../../style/panelStyle";
+import { arrayContainerStyle, arrayDivStyle, titleDivStyle, titleStyle, delimiterStyle, arrayDisplayDivStyle } from "../../style/panelStyle";
 
 const PlayersArray = () => {
 
 	return (
-		<div style={mainContainerStyle}>
+		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>
 				<div style={titleDivStyle}>
 					<h2 style={titleStyle}>Players Available</h2>
