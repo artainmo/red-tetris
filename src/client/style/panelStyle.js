@@ -1,3 +1,13 @@
+export 	const panelsStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: '100%',
+    width: '100%',
+    margin: 'auto',
+    marginTop: '2rem'
+}
+
 export const arrayContainerStyle = {
     width: '100%',
     height: '100%',
@@ -36,6 +46,21 @@ export const fullWhiteMenuPanelStyle = {
 	justifyContent: 'center'
 }
 
+export const fullTransparentMenuPanelStyle = {
+    borderRadius: '16px',
+	width: '100%',
+	height: '100%',
+	marginRight: '3rem',
+	marginLeft: '3rem',
+    marginBottom: 0,
+    padding: 'auto',
+	display: 'flex',
+    flexGrow: 2,
+	flexDirection: 'column',
+	alignItems: 'center',
+	justifyContent: 'center'
+}
+
 export const arrayDivStyle = {
     backgroundColor: 'white',
     color: 'black',
@@ -57,12 +82,4 @@ export const delimiterStyle = {
     backgroundColor: 'black',
     width: '100%',
     marginBottom: '10px',
-}
-
-export const arrayDisplayDivStyle = {
-
-}
-
-export const titleDivStyle = {
-    
 }

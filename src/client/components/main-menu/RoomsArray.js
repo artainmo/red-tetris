@@ -1,5 +1,5 @@
 import React from "react";
-import { arrayContainerStyle, arrayDivStyle, titleDivStyle, titleStyle, delimiterStyle, arrayDisplayDivStyle } from "../../style/panelStyle";
+import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "../../style/panelStyle";
 import { useSelector } from "react-redux";
 import Button from "../shared/RedButton";
 
@@ -10,11 +10,11 @@ const RoomsArray = () => {
 	return (
 		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>
-				<div style={titleDivStyle}>
+				<div>
 					<h2 style={titleStyle}>Active Rooms</h2>
 					<div style={delimiterStyle}></div>
 				</div>
-				<div style={arrayDisplayDivStyle}>
+				<div>
 				{
 					rooms.map((item, index) => (
 							<span>

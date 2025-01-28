@@ -17,6 +17,14 @@ export const whiteStyle = {
     padding: 0,
 }
 
+export const smallWhiteStyle = {
+    color: colors.white,
+    ...redOctoberRegular,
+    fontSize: '2rem',
+    margin: 0,
+    padding: 0,
+}
+
 export const logoRedStyle = {
     color: colors.sovietRed,
     ...redOctoberRegular,
@@ -44,10 +52,17 @@ export const welcomeWhiteStyle = {
 export const redContainerStyle = {
     width: '100%',
     display: 'flex',
-    /*justifyContent: 'flex-end',*/
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    margin: 0,
-    marginBottom: '1rem'
+    margin: 0
+}
+
+export const stackedContainerStyle = {
+    width: '100%',
+    display: 'flex-column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 0
 }
 
 export const titleContainerStyle = {
@@ -57,6 +72,16 @@ export const titleContainerStyle = {
     alignItems: 'center',
     flexDirection: 'column',
     margin: 'auto'
+}
+
+export const statsContainerStyle = {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    flexDirection: 'column',
+    margin: 'auto',
+    textAlign: 'center'
 }
 
 export const startButtonContainerStyle = {

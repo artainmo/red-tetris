@@ -1,5 +1,5 @@
 import React from "react";
-import { arrayContainerStyle, arrayDivStyle, titleDivStyle, titleStyle, delimiterStyle, arrayDisplayDivStyle } from "../../style/panelStyle";
+import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "../../style/panelStyle";
 import { useSelector } from "react-redux";
 
 const BestScoresArray = () => {
@@ -9,11 +9,11 @@ const BestScoresArray = () => {
 	return (
 		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>
-				<div style={titleDivStyle}>
+				<div>
 					<h2 style={titleStyle}>Best Scores</h2>
 					<div style={delimiterStyle}></div>
 				</div>
-				<div style={arrayDisplayDivStyle}>
+				<div>
 				{
 					scores.map((item, index) => (
 							<p key={index}>{item}</p>

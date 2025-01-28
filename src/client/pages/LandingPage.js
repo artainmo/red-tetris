@@ -8,7 +8,6 @@ const LandingPage = () => {
 	
 	const navigate = useNavigate();
 
-
 	return (
 		<div style={pageMainContainerStyle}>
 			<RedTetrisTitle/>

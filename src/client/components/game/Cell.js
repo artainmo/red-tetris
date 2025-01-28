@@ -7,7 +7,7 @@ const Cell = ({colorCode}) => {
 		width: '100%',
 		height: '100%',
 		backgroundColor: CELL_COLORS[colorCode],
-		border: '2px solid white',
+		// border: '2px solid white',
 		boxSizing: 'border-box',
 	}
 

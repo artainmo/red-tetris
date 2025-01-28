@@ -1,53 +1,16 @@
 import React from "react";
-import { landingPageStyle, arrayContainerStyle } from "../style/mainStyle";
+import { pageMainContainerStyle } from "../style/pagesStyle";
 import Board from "../components/game/Board";
-import GameActionsPannel from "../components/game/GameActionsPannel";
+import GameStatsPanel from "../components/game/GameStatsPanel";
+import { panelsStyle } from "../style/panelStyle";
 
 const Game = () => {
 	
-	const leftPannelStyle = {
-		height: '100%',
-		width: '50%',
-		backgroundColor: 'green',
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center'
-	}
-	
-	const rightPannelStyle = {
-		height: '100%',
-		width: '50%',
-		backgroundColor: 'blue',
-		display: 'flex',
-		flexDirection: 'column',
-		alignItems: 'center',
-		justifyContent: 'center'
-	}
-
-	const gameElemsStyle = {
-		width: '50%',
-		height: '90%',
-		display: 'flex',
-	}
-
-	const startPannelStyle = {
-
-	}
-	
 	return (
-		<div style={arrayContainerStyle}>			
-			<div style={landingPageStyle}>
-				<div style={startPannelStyle}>
-					<GameActionsPannel />
-				</div>
-				<div style={gameElemsStyle}>
-					<div style={leftPannelStyle}>
-						<Board />
-					</div>
-					<div style={rightPannelStyle}>
-						
-					</div>
-				</div>
+		<div style={pageMainContainerStyle}>			
+			<div style={panelsStyle}>
+				<GameStatsPanel />		{/* Left panel */}
+				<Board />				{/* Center and right panel */}
 			</div>
 		</div>
 	)

@@ -3,21 +3,13 @@ import LeftMenuPanel from "../components/main-menu/LeftMenuPanel";
 import CenterMenuPanel from "../components/main-menu/CenterMenuPanel";
 import RightMenuPanel from "../components/main-menu/RightMenuPanel";
 import { welcomeWhiteStyle, redContainerStyle, pageMainContainerStyle } from "../style/pagesStyle";
+import { panelsStyle } from "../style/panelStyle";
 import RedTetrisLogo from "../components/shared/RedTetrisLogo";
 import { useSelector } from "react-redux";
 
 const MainMenu = () => {
 	
 	const username = useSelector((state) => state.auth.user);
-
-	const panelsStyle = {
-		display: 'flex',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		height: '100%',
-		width: '100%',
-		margin: 0
-	}
 
 	const welcomeContainerStyle = {
 		height: '100%',
