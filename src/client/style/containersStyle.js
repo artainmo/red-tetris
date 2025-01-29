@@ -1,4 +1,4 @@
-import { margin, width } from "@mui/system";
+import { height, margin, width } from "@mui/system";
 import { colors } from "./colors"
 import { redOctoberRegular } from "./fonts";
 
@@ -64,6 +64,15 @@ export const stackedContainerStyle = {
     justifyContent: 'center',
     alignItems: 'center',
     margin: 0
+}
+
+export const cardContainerStyle = {
+    height: '100%',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 'auto'
 }
 
 export const titleContainerStyle = {

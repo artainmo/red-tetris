@@ -6,7 +6,7 @@ import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
 import { middlePanelStyle } from "../../style/panelStyle";
 
-const GameActionsPanel = () => {
+const GameActionsPanel = ({isMultiPlayer}) => {
 
 	const dispatch = useDispatch();
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
@@ -58,6 +58,9 @@ const GameActionsPanel = () => {
 					{/* add logic to add piece */}
 				</div>
 			</div>
+			{
+				isMultiPlayer && <div></div>
+			}
 			<div style={inlineContainerStyle}>
 				<div style={alignSelfEnd}>
 				{

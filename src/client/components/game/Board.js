@@ -4,7 +4,7 @@ import Cell from "./Cell";
 import GameActionsPanel from "./GameActionsPanel";
 import { fullTransparentMenuPanelStyle } from "../../style/panelStyle";
 
-const Board = () => {
+const Board = ({isMultiPlayer}) => {
 	
 	/* dimensions of the board, in numbers of cells */
 	const BOARD_WIDTH = 10;
@@ -52,7 +52,7 @@ const Board = () => {
 				</div>
 			</div>
 			<div style={fullTransparentMenuPanelStyle}>
-				<GameActionsPanel/>
+				<GameActionsPanel isMultiPlayer={isMultiPlayer}/>
 			</div>
 		</>
 		

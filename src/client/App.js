@@ -3,6 +3,7 @@ import LandingPage from './pages/LandingPage';
 import Auth from './pages/Auth';
 import MainMenu from './pages/MainMenu';
 import Game from './pages/Game';
+import MultiGame from './pages/MultiGame';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import AuthGuard from './guards/AuthGuard';
@@ -30,7 +31,14 @@ const App = () => {
                     <Route path='/game/:room_id' element={
                         <AuthGuard>
                             <GameGuard>
-                                < Game/>
+                                <Game/>
+                            </GameGuard>
+                        </AuthGuard>
+                    } />
+                    <Route path='/multiplayer/:room_id' element={
+                        <AuthGuard>
+                            <GameGuard>
+                                <MultiGame/>
                             </GameGuard>
                         </AuthGuard>
                     } />

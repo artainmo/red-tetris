@@ -14,6 +14,7 @@ const CenterMenuPanel = () => {
 	const [isSoloHovered, setIsSoloHovered] = useState(false);
 	const [isMultiHovered, setIsMultiHovered] = useState(false);
 	const [gameCreated, setgameCreated] = useState(false);
+	const [multiplayerGameCreated, setMultiplayerGameCreated] = useState(false);
 
 	const username = useSelector((state) => state.auth.user);
 	const gameId = useSelector((state) => state.currentGame.id);
@@ -34,10 +35,20 @@ const CenterMenuPanel = () => {
 			navigate(`/game/${gameId}`);
 			setgameCreated(false);
 		}	
-	}, [navigate, gameCreated, gameId, username]);
+
+		{/* This logic is added in order to code the multi game css layout */}
+		if (multiplayerGameCreated && gameId && username) {             
+			navigate(`/multiplayer/${gameId}`);
+			setMultiplayerGameCreated(false);
+		}	
+		
+	}, [navigate, multiplayerGameCreated, gameCreated, gameId, username]);
 
 	const handleMatchmakingForMultiplayer = () => {
 		console.log('starting matchmaking process for multiplayer');
+		dispatch(createSoloGameThunk(username)); {/* This logic is added in order to code the multi game css layout */}
+		dispatch(socketConnectThunk());		
+		setMultiplayerGameCreated(true);
 	}
 
 	const buttonColStyle = {
