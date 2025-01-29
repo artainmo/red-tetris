@@ -1,8 +1,10 @@
 import React from "react";
 import useModifyGrid from "../../hooks/useModifyGrid";
 import Cell from "./Cell";
+import GameActionsPanel from "./GameActionsPanel";
+import { fullTransparentMenuPanelStyle } from "../../style/panelStyle";
 
-const Board = () => {
+const Board = ({isMultiPlayer}) => {
 	
 	/* dimensions of the board, in numbers of cells */
 	const BOARD_WIDTH = 10;
@@ -21,7 +23,7 @@ const Board = () => {
 		height: '100%',
 		display: 'flex',
 		justifyContent: 'center',
-		alignItems: 'center',
+		alignItems: 'center'	
 	}
 
 	const boardCellsContainerStyle = {
@@ -31,18 +33,29 @@ const Board = () => {
 		gridTemplateRows: `repeat(${BOARD_HEIGHT}, 1fr)`,
 		gridTemplateColumns: `repeat(${BOARD_WIDTH}, 1fr)`,
 		boxSizing: 'border-box',
+		border: '1rem solid white'
 	}
 	
 	return (
-		<div style={boardContainerStyle}>
-			<div style={boardCellsContainerStyle}>
-				{grid.map((row, rowIndex) =>
-          			row.map((cell, cellIndex) => (
-            			<Cell key={`${rowIndex}-${cellIndex}`} colorCode={cell} />
-          			))
-        		)}
+		<>
+			<div style={fullTransparentMenuPanelStyle}>
+				<div style={boardContainerStyle}>
+					<div style={boardCellsContainerStyle}>
+						{
+							grid.map((row, rowIndex) =>
+								row.map((cell, cellIndex) => (
+									<Cell key={`${rowIndex}-${cellIndex}`} colorCode={cell} />
+								))
+							)
+						}
+					</div>
+				</div>
 			</div>
-		</div>
+			<div style={fullTransparentMenuPanelStyle}>
+				<GameActionsPanel isMultiPlayer={isMultiPlayer}/>
+			</div>
+		</>
+		
 	)
 }
 

@@ -1,26 +1,37 @@
 import React from "react";
-import LeftMenuPannel from "../components/main-menu/LeftMenuPannel";
-import RightMenuPannel from "../components/main-menu/RightMenuPannel";
-import { mainContainerStyle, landingPageStyle } from '../style/mainStyle';
+import LeftMenuPanel from "../components/main-menu/LeftMenuPanel";
+import CenterMenuPanel from "../components/main-menu/CenterMenuPanel";
+import RightMenuPanel from "../components/main-menu/RightMenuPanel";
+import { welcomeContainerStyle, welcomeWhiteStyle, redContainerStyle, pageMainContainerStyle } from "../style/containersStyle";
+import { panelsStyle } from "../style/panelStyle";
+import RedTetrisLogo from "../components/shared/RedTetrisLogo";
+import { useSelector } from "react-redux";
 
 const MainMenu = () => {
 	
-	const pannelsStyle = {
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		height: '100%',
-		width: '100%',
-		margin: 0
-	}
+	const username = useSelector((state) => state.auth.user);
 	
 	return (
-		<div style={mainContainerStyle}>
-			<div style={landingPageStyle}>
-				<div style={pannelsStyle}>
-					<LeftMenuPannel />
-					<RightMenuPannel />
+		<div style={pageMainContainerStyle}>
+			<div style={redContainerStyle}>
+				<RedTetrisLogo firstLine="Red" secondLine="Tetris" />
+				<div style={welcomeContainerStyle}>
+					<div style={redContainerStyle}>
+						<p style={welcomeWhiteStyle}>
+							WELCOME
+						</p>
+					</div>
+					<div style={redContainerStyle}>
+						<p style={welcomeWhiteStyle}>
+							{username}
+						</p>
+					</div>
 				</div>
+			</div>
+			<div style={panelsStyle}>
+				<LeftMenuPanel />
+				<CenterMenuPanel />
+				<RightMenuPanel />
 			</div>
 		</div>
 	)

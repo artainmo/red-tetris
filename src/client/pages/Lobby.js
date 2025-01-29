@@ -5,8 +5,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { landingPageStyle, mainContainerStyle } from "../style/mainStyle";
-
+import { pageMainContainerStyle, titleContainerStyle, redContainerStyle, whiteStyle, buttonContainerStyle } from "../style/containersStyle";
 const Lobby = () => {
 	
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
@@ -33,18 +32,21 @@ const Lobby = () => {
 		// add some API call to remove the player form the match
 		navigate('/main_menu');
 	}
-
-	const cancelButtonStyle = {
-
-	}
 	
 	return (
-		<div style={mainContainerStyle}>
-			<div style={landingPageStyle}>
-				<p>{matchmakingText}</p>
-				<button style={cancelButtonStyle} onClick={handleCancelButton}>
-					Cancel
-				</button>
+		<div style={pageMainContainerStyle}>
+			<div style={titleContainerStyle}>
+				<div style={redContainerStyle}>
+					<p style={whiteStyle}>
+						{matchmakingText}
+					</p>
+				</div>
+			</div>
+			<div style={buttonContainerStyle}>
+				<RedButton
+					textContent='Cancel'
+					onClick={handleCancelButton}
+				/>
 			</div>
 		</div>
 	);

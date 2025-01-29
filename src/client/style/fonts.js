@@ -2,7 +2,7 @@
 	Font for the design of the website
 */
 
-const redOctoberBaseStyle = {
+export const redOctoberBaseStyle = {
 	fontFamily: 'Red October',
     fontStyle: 'normal',
 }

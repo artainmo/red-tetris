@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { userConnect } from '../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
-import { colors } from '../style/colors';
-import Button from '../components/shared/Button';
-import { redOctoberRegular } from '../style/fonts';
+import RedButton from '../components/shared/RedButton';
+import { whiteStyle, redStyle, pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
 
 const Auth = () => {
 	const dispatch = useDispatch();
@@ -37,24 +36,13 @@ const Auth = () => {
 		borderRadius: '20px',
 		fontSize: '16px',
 		padding: '10px 20px',
-		margin: '24px'
+		margin: '24px',
+		width: '25%'
 	}
 
 	const errMsgStyle = {
 		color: 'red',
 		fontSize: '12px',
-	}
-
-	const authMainContainerStyle = {
-		width: '100vw',
-		height: '100vh',
-		backgroundColor: colors.backgroundDarkGrey,
-		margin: 0,
-		padding: '40px',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		flexDirection: 'column',
 	}
 
 	const mainPartContainerStyle = {
@@ -70,14 +58,6 @@ const Auth = () => {
 		boxSizing: 'border-box',
 	}
 
-	const buttonPartContainerStyle = {
-		width: '100%',
-		height: '40px',
-		display: 'flex',
-		justifyContent: 'flex-end',
-		alignItems: 'center',
-	}
-
 	const textsContainerStyle = {
 		width: '100%',
 		height: 'auto',
@@ -85,39 +65,18 @@ const Auth = () => {
 		justifyContent: 'center',
 		alignItems: 'center',
 		flexDirection: 'column',
-
-	}
-
-	const whiteStyle = {
-		...redOctoberRegular,
-		color: colors.white,
-		fontSize: '72px',
-		margin: 0,
-		padding: 0,
-		paddingBottom: '24px',
-	}
-
-	const redStyle = {
-		...redOctoberRegular,
-		color: colors.sovietRed,
-		fontSize: '48px',
-		margin: 0,
-		padding: 0,
-		paddingBottom: '24px',
 	}
 
 	return (
-		<div style={authMainContainerStyle}>
+		<div style={pageMainContainerStyle}>
 			<div style={mainPartContainerStyle}>
 				<div style={textsContainerStyle}>
-					<p style={whiteStyle}>Time to register</p>
-					<p style={redStyle}>Comrade !!!</p>
-				</div>
-				<div>
+					<p style={whiteStyle}>TIME TO REGISTER</p>
+					<p style={redStyle}>COMRADE !!!</p>
 					<input 
 						style={inputStyle}
 						type='text'
-						placeholder='enter your pseudo'
+						placeholder='Enter your pseudo'
 						value={localName}
 						onChange={(e) => {
 							setLocalName(e.target.value);
@@ -127,15 +86,13 @@ const Auth = () => {
 					{nameTooLong && <p style={errMsgStyle}>Please enter a shorter username</p>}
 					{emptyInputErrMsg && <p style={errMsgStyle}>Empty inputs are invalid</p>}
 					{nameInvalidChars && <p style={errMsgStyle}>Invalid characters</p>}
+					<RedButton style={buttonContainerStyle}
+						textContent='Start'
+						onClick={() => {
+							handleAuth();
+						}}
+					/>
 				</div>
-			</div>
-			<div style={buttonPartContainerStyle}>
-				<Button
-					textContent='Start'
-					onClick={() => {
-						handleAuth();
-					}}
-				/>
 			</div>
 		</div>
 	);
