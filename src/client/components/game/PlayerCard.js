@@ -5,9 +5,9 @@ const PlayerCard = ({username}) => {
 	
 	const PlayerCardStyle = {
 		height: '100%',
-		width: '30%',
+		width: '100%',
 		border: '2px solid white',
-		margin: '2rem'
+		margin: '0.5rem'
 	}
 
 	return (

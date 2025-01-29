@@ -94,6 +94,24 @@ export const statsContainerStyle = {
     textAlign: 'center'
 }
 
+export const multiplayerStatsContainerStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    margin: '1rem',
+    textAlign: 'center'
+}
+
+export const wrapFlexContainerStyle = {
+    display: 'flex',
+    height: '50%',
+    width: '100%',
+    flexWrap: 'row wrap',
+    margin: '0.5rem',
+    justifyContent: 'start'
+}
+
 export const inlineContainerStyle = {
     height: '20%',
     width: '100%',
