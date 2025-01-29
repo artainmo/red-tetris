@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import LeftMenuPanel from "../components/main-menu/LeftMenuPanel";
 import CenterMenuPanel from "../components/main-menu/CenterMenuPanel";
 import RightMenuPanel from "../components/main-menu/RightMenuPanel";
-import { welcomeWhiteStyle, redContainerStyle, pageMainContainerStyle } from "../style/containersStyle";
+import { welcomeContainerStyle, welcomeWhiteStyle, redContainerStyle, pageMainContainerStyle } from "../style/containersStyle";
 import { panelsStyle } from "../style/panelStyle";
 import RedTetrisLogo from "../components/shared/RedTetrisLogo";
 import { useSelector } from "react-redux";
@@ -10,15 +10,6 @@ import { useSelector } from "react-redux";
 const MainMenu = () => {
 	
 	const username = useSelector((state) => state.auth.user);
-
-	const welcomeContainerStyle = {
-		height: '100%',
-		display: 'flex-column',
-		justifyContent: 'center',
-		alignItems: 'center',
-		alignSelf: 'center',
-		margin: 'auto'
-	}
 	
 	return (
 		<div style={pageMainContainerStyle}>

@@ -60,10 +60,11 @@ export const redContainerStyle = {
 
 export const stackedContainerStyle = {
     width: '100%',
-    display: 'flex-column',
+    display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    margin: 0
+    margin: '2rem'
 }
 
 export const cardContainerStyle = {
@@ -110,6 +111,15 @@ export const wrapFlexContainerStyle = {
     flexWrap: 'row wrap',
     margin: '0.5rem',
     justifyContent: 'start'
+}
+
+export const welcomeContainerStyle = {
+    height: '100%',
+    display: 'flex-column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    margin: 'auto'
 }
 
 export const inlineContainerStyle = {

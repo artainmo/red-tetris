@@ -26,7 +26,7 @@ export const middlePanelStyle = {
     flexGrow: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'space-evenly'
 }
 
 export const middleArrayContainerStyle = {
