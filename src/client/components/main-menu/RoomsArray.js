@@ -17,8 +17,8 @@ const RoomsArray = () => {
 				<div>
 				{
 					rooms.map((item, index) => (
-							<span>
-								<p key={index}>{item}</p>
+							<span key={index}>
+								<p>{item}</p>
 								<Button>Join</Button>
 							</span>
 					))

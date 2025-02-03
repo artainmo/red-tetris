@@ -11,7 +11,7 @@ const MultiGame = () => {
 		<div style={pageMainContainerStyle}>		
 			<RedTetrisLogo firstLine="Red" secondLine="Tetris"/>	
 			<div style={panelsStyle}>
-				<MultiPlayerPanel />		{/* Left panel */}
+				<MultiPlayerPanel />						{/* Left panel */}
 				<Board isMultiPlayer={true} />				{/* Center and right panel */}
 			</div>
 		</div>

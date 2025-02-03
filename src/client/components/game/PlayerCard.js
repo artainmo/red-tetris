@@ -11,18 +11,16 @@ const PlayerCard = ({username}) => {
 	}
 
 	return (
-		// <Col sm={12} md={6} className="mb-4">
-			<Card style={PlayerCardStyle}>
-				<Card.Body>
-					<Card.Title>
-						{username}
-					</Card.Title>
-					<Card.Text>
-						A picture will go here
-					</Card.Text>
-				</Card.Body>
-			</Card>
-		// </Col>
+		<Card style={PlayerCardStyle}>
+			<Card.Body>
+				<Card.Title>
+					{username}
+				</Card.Title>
+				<Card.Text>
+					A picture will go here
+				</Card.Text>
+			</Card.Body>
+		</Card>
 	)
 	;
 }

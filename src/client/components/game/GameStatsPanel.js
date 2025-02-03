@@ -12,25 +12,15 @@ const GameStatsPanel = () => {
 		<div style={fullTransparentMenuPanelStyle}>
 			<div style={statsContainerStyle}>
 				<div style={stackedContainerStyle}>
-					<p style={smallWhiteStyle}>
-						GAME STATS
-					</p>
+					<p style={smallWhiteStyle}>GAME STATS</p>
 				</div>
 				<div style={stackedContainerStyle}>
-					<p style={smallWhiteStyle}>
-						GAME DURATION
-					</p>
-					<p style={smallWhiteStyle}>
-						{gameTime}
-					</p>
+					<p style={smallWhiteStyle}>GAME DURATION</p>
+					<p style={smallWhiteStyle}>{gameTime}</p>
 				</div>
 				<div style={stackedContainerStyle}>
-					<p style={smallWhiteStyle}>
-						SCORE
-					</p>
-					<p style={smallWhiteStyle}>
-						{gameScore}
-					</p>
+					<p style={smallWhiteStyle}>SCORE</p>
+					<p style={smallWhiteStyle}>{gameScore}</p>
 				</div>
 			</div>
 		</div>
