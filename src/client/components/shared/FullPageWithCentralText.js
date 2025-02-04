@@ -1,16 +1,19 @@
 import React from "react";
-import { titleContainerStyle, redContainerStyle, whiteStyle } from "../../style/containersStyle";
+import { titleContainerStyle, mainPartContainerStyle, textsContainerStyle, redContainerStyle, whiteStyle, redStyle } from "../../style/containersStyle";
 import RedTetrisLogo from "./RedTetrisLogo";
 
-const FullPageWithCentralText = ({centralText}) => {
+const FullPageWithCentralText = ({firstLine, secondLine}) => {
 
 	return (
             <div style={titleContainerStyle}>
                 <div style={redContainerStyle}>
                     <RedTetrisLogo firstLine="Red" secondLine="Tetris" />
-                    <p style={whiteStyle}>
-                        {centralText}
-                    </p>
+                    <div style={mainPartContainerStyle}>
+                        <div style={textsContainerStyle}>
+                            <p style={whiteStyle}>{firstLine}</p>
+                            <p style={redStyle}>{secondLine}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 	)

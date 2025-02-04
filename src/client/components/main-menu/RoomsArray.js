@@ -1,11 +1,11 @@
 import React from "react";
 import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "../../style/panelStyle";
-import { useSelector } from "react-redux";
+//import { useSelector } from "react-redux";
 import Button from "../shared/RedButton";
 
 const RoomsArray = () => {
 	
-	const rooms = useSelector((state) => Object.values(state.currentGame.scores))
+	const rooms = [] // useSelector((state) => Object.values(state.currentGame.players))
 
 	return (
 		<div style={arrayContainerStyle}>

@@ -1,12 +1,12 @@
 import React from "react";
-import { useState } from "react";
+import { useSelector } from "react-redux";
 import { fullTransparentMenuPanelStyle } from "../../style/panelStyle";
 import { statsContainerStyle, stackedContainerStyle, smallWhiteStyle } from "../../style/containersStyle";
 
 const GameStatsPanel = () => {
 
-	const gameTime = useState('0:0') // useSelector((state) => state.gameTimeSlice.updateGameTime);
-	const gameScore = useState('0') // useSelector((state) => state.gameplaySlice.setScore);
+	const gameTime = useSelector((state) => state.gameTime.currentTime);
+	const gameScore = useSelector((state) => state.gameplay.score);
 
 	return (
 		<div style={fullTransparentMenuPanelStyle}>

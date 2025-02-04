@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { setIsGameOver } from "../redux/slices/gameplaySlice";
 import { pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
-import { useSelector } from "react-redux";
+import RedButton from "../components/shared/RedButton";
 
-const GameEnd = ({wonOrLostText}) => {
+const GameEnd = ({firstLine, secondLine}) => {
 	
 	const navigate = useNavigate();
 
 	return (
 		<div style={pageMainContainerStyle}>
-			<FullPageWithCentralText centralText={wonOrLostText}/>
+			<FullPageWithCentralText firstLine={firstLine} secondLine={secondLine}/>
 			<div style={buttonContainerStyle}>
 				<RedButton
 					textContent='Back To Menu'

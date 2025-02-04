@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { userConnect } from '../redux/slices/authSlice';
 import { useNavigate } from 'react-router-dom';
 import RedButton from '../components/shared/RedButton';
-import { whiteStyle, redStyle, pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
+import { whiteStyle, redStyle, pageMainContainerStyle, buttonContainerStyle, mainPartContainerStyle, textsContainerStyle } from "../style/containersStyle";
 
 const Auth = () => {
 	const dispatch = useDispatch();
@@ -43,28 +43,6 @@ const Auth = () => {
 	const errMsgStyle = {
 		color: 'red',
 		fontSize: '12px',
-	}
-
-	const mainPartContainerStyle = {
-		width: '100%',
-		height: 'calc(100vh - 40px)',
-		margin: 0,
-		padding: 0,
-		paddingTop: '40px',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		flexDirection: 'column',
-		boxSizing: 'border-box',
-	}
-
-	const textsContainerStyle = {
-		width: '100%',
-		height: 'auto',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		flexDirection: 'column',
 	}
 
 	return (
