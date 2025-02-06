@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { pageMainContainerStyle, titleContainerStyle, redContainerStyle, whiteStyle, buttonContainerStyle } from "../style/containersStyle";
+import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
 const Lobby = () => {
 	
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
@@ -35,13 +36,7 @@ const Lobby = () => {
 	
 	return (
 		<div style={pageMainContainerStyle}>
-			<div style={titleContainerStyle}>
-				<div style={redContainerStyle}>
-					<p style={whiteStyle}>
-						{matchmakingText}
-					</p>
-				</div>
-			</div>
+			<FullPageWithCentralText centralText={matchmakingText}/>
 			<div style={buttonContainerStyle}>
 				<RedButton
 					textContent='Cancel'

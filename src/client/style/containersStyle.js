@@ -151,3 +151,25 @@ export const pageMainContainerStyle = {
     boxSizing: 'border-box',
     position: 'relative'
 }
+
+export const mainPartContainerStyle = {
+    width: '100%',
+    height: 'calc(100vh - 40px)',
+    margin: 0,
+    padding: 0,
+    paddingTop: '40px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+    boxSizing: 'border-box',
+}
+
+export const textsContainerStyle = {
+    width: '100%',
+    height: 'auto',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+}

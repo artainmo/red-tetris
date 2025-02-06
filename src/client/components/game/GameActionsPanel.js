@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { startGame, endGame, resumeGame, pauseGame } from "../../redux/slices/gameTimeSlice";
+import { nextPiece } from "../../redux/slices/gameplaySlice"
 import { inlineContainerStyle, smallWhiteStyle, statsContainerStyle, stackedContainerStyle, wrapFlexContainerStyle, titleContainerStyle } from "../../style/containersStyle";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
@@ -11,6 +12,7 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const dispatch = useDispatch();
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
 	const isGameStarted = useSelector((state) => state.gameTime > 0);
+	const nextPiece = useSelector((state) => state.gameplay.nextPiece);
 	const gameRank = useState('1st') // useSelector((state) => state.gameTimeSlice.updateGameTime);
 	const gameScore = useState('24') // useSelector((state) => state.gameplaySlice.setScore);
 
@@ -59,7 +61,7 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 		<div style={middlePanelStyle}>
 			<div style={pieceContainerStyle}>
 				<div style={pieceSquare}>
-					{/* add logic to add piece */}
+					{nextPiece}
 				</div>
 			</div>
 				<div style={stackedContainerStyle}>
