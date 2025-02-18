@@ -2,17 +2,21 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateGameTime } from "../redux/slices/gameTimeSlice";
+import { startGame } from "../redux/slices/gameTimeSlice";
 
-const useManageTime = (gameIsActive) => {
+const useManageTime = () => {
 
 	const dispatch = useDispatch();
 
 	const time = useSelector((state) => state.gameTime.currentTime);
+	const gameActive = useSelector((state) => state.gameTime.isGameActive)
 	const [intervalId, setIntervalId] = useState(null);
 
 	useEffect(() => {
-		if (gameIsActive) {
-		const id = setInterval(() => {
+		if (!gameActive)
+			dispatch(startGame())
+		if (gameActive) {
+			const id = setInterval(() => {
 			dispatch(updateGameTime())
 			//setTime((prevTime) => prevTime + 1000); // Increment time by 1 second
 		}, 1000);
@@ -21,7 +25,8 @@ const useManageTime = (gameIsActive) => {
 
 		return () => clearInterval(id); // Clean up on unmount
 		}
-	}, [gameIsActive]);
+	}, [gameActive]);
+
 
 	useEffect(() => {
 		if (time >= 60 * 60 * 1000) { // 60 minutes * 60 seconds * 1000 milliseconds
@@ -29,13 +34,7 @@ const useManageTime = (gameIsActive) => {
 		}
 	}, [time, intervalId]);
 
-	const formatTime = (milliseconds) => {
-		const minutes = Math.floor(milliseconds / (60 * 1000));
-		const seconds = ((milliseconds % (60 * 1000)) / 1000).toFixed(0);
-		return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-	};
-
-	return <div>{formatTime(time)}</div>;
+	return time;
 }
 
 export default useManageTime;

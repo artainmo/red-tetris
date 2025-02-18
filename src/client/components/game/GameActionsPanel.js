@@ -18,7 +18,7 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const gameRank = useSelector((state) => state.gameplay.rank);
 	const gameScore = useSelector((state) => state.gameplay.score);
 
-	useManageTime(!isGamePaused);
+	useManageTime();
 
 	const pieceContainerStyle = {
 		width: '100%',
