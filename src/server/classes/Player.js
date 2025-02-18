@@ -50,7 +50,7 @@ class Player {
 		return games;
 	}
 
-	async searchGame() {
+	async searchOrCreateMultiGame() {				{/* previously : searchGame */}
 		const game = new Game();
 		const db = new database();
 		const openGames = await db.query("SELECT * FROM game WHERE locked = false AND player6_id IS NULL");

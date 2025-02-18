@@ -5,8 +5,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { pageMainContainerStyle, titleContainerStyle, redContainerStyle, whiteStyle, buttonContainerStyle } from "../style/containersStyle";
+import { pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
+
 const Lobby = () => {
 	
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
@@ -31,6 +32,8 @@ const Lobby = () => {
 
 	const handleCancelButton = () => {
 		// add some API call to remove the player form the match
+		console.log('should cancel the game');
+		dispatch(endGame());
 		navigate('/main_menu');
 	}
 	

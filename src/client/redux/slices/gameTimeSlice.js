@@ -23,6 +23,7 @@ const gameTimeSlice = createSlice({
 		endGame(state) {
 			state.endTime = Date.now();
 			state.isGameActive = false;
+			state.currentTime = state.endTime - state.startTime - state.totalBreakTime;
 		},
 		updateGameTime(state) {
 			if (state.isGameActive && !state.isGamePaused) {

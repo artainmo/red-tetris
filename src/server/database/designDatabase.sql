@@ -1,13 +1,14 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE account (
-	username varchar(20) PRIMARY KEY
+	username varchar(20) PRIMARY KEY,
+	scores   INT[] DEFAULT ARRAY[]::INT[]
 );
 
 CREATE TABLE game (
 	id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
 	player1_id varchar(20) REFERENCES account(username) NOT NULL,
-  player2_id varchar(20) REFERENCES account(username) DEFAULT NULL,
+    player2_id varchar(20) REFERENCES account(username) DEFAULT NULL,
 	player3_id varchar(20) REFERENCES account(username) DEFAULT NULL,
 	player4_id varchar(20) REFERENCES account(username) DEFAULT NULL,
 	player5_id varchar(20) REFERENCES account(username) DEFAULT NULL,

@@ -3,6 +3,7 @@ import useManagePiece from "./useManagePiece";
 import useManageLines from "./useManageLines";
 import { useSelector, useDispatch } from 'react-redux';
 import { setActivePiece, setIsGameOver } from "../redux/slices/gameplaySlice";
+import { gameFinalScore } from "../api/http.api";
 
 const useModifyGrid = (width, height) => {
 
@@ -91,6 +92,7 @@ const useModifyGrid = (width, height) => {
 	useEffect(() => {
 		if (isGameOver) {
 			console.log('game over');
+			dispatch(gameFinalScore())
 			setIsGameOver(true)
 			// pause the bloody game and handle the rest
 		}

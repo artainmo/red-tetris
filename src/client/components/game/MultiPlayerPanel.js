@@ -3,16 +3,12 @@ import { useState } from "react";
 import { fullTransparentMenuPanelStyle } from "../../style/panelStyle";
 import { multiplayerStatsContainerStyle, wrapFlexContainerStyle, smallWhiteStyle } from "../../style/containersStyle";
 import PlayerCard from "./PlayerCard";
+import { useSelector } from "react-redux";
 
 const MultiPlayerPanel = () => {
 
-	const gameTime = useState('0:0') // useSelector((state) => state.gameTimeSlice.updateGameTime);
-	// const players = [
-	// 	{ username: "Player 1"},
-	// 	{ username: "Player 2"},
-	// 	{ username: "Player 3"},
-	// 	{ username: "Player 4"},
-	// ]
+	const gameTime = useSelector((state) => state.gameTime.gameTime);
+	const players =  useSelector((state) => state.gameplay.players);
 
 	return (
 		<div style={fullTransparentMenuPanelStyle}>

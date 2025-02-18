@@ -74,7 +74,7 @@ router.get('/game/search/:name', async (req,res,next) => {
   	const player = new Player();
 
   	await player.connect(name);
-  	const game = await player.searchGame();
+  	const game = await player.searchOrCreateMultiGame();
   	res.status(200).json(game);
 });
 

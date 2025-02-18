@@ -18,7 +18,7 @@ const useManageLines = (width, height) => {
 
 		if (clearedLines > 0) {
 			dispatch(setGrid(updatedGrid));
-			dispatch(setScore(score + clearedLines));
+			dispatch(setScore(score + clearedLines * 10));
 		} 
 
 		// send malus to API (do when integrate with full multi game) TODO

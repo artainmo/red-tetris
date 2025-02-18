@@ -1,20 +1,24 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { startGame, endGame, resumeGame, pauseGame } from "../../redux/slices/gameTimeSlice";
-import { nextPiece } from "../../redux/slices/gameplaySlice"
 import { inlineContainerStyle, smallWhiteStyle, statsContainerStyle, stackedContainerStyle, wrapFlexContainerStyle, titleContainerStyle } from "../../style/containersStyle";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
 import { middlePanelStyle } from "../../style/panelStyle";
+import useManageTime from "../../hooks/useManageTime";
 
 const GameActionsPanel = ({isMultiPlayer}) => {
 
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
 	const isGameStarted = useSelector((state) => state.gameTime > 0);
-	const nextPiece = useSelector((state) => state.gameplay.nextPiece);
-	const gameRank = useState('1st') // useSelector((state) => state.gameTimeSlice.updateGameTime);
-	const gameScore = useState('24') // useSelector((state) => state.gameplaySlice.setScore);
+	const nextPiece = useSelector((state) => state.piece.nextPieces[state.currentGame.id]);
+	const gameRank = useSelector((state) => state.gameplay.rank);
+	const gameScore = useSelector((state) => state.gameplay.score);
+
+	useManageTime(!isGamePaused);
 
 	const pieceContainerStyle = {
 		width: '100%',
@@ -55,6 +59,7 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const handleClickCancelButton = () => {
 		console.log('should cancel the game');
 		dispatch(endGame());
+		navigate('/main_menu');
 	}
 
 	return (
