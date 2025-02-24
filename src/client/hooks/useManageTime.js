@@ -18,7 +18,6 @@ const useManageTime = () => {
 		if (gameActive) {
 			const id = setInterval(() => {
 			dispatch(updateGameTime())
-			//setTime((prevTime) => prevTime + 1000); // Increment time by 1 second
 		}, 1000);
 
 		setIntervalId(id);

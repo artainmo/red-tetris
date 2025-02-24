@@ -14,7 +14,7 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const navigate = useNavigate();
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
 	const isGameStarted = useSelector((state) => state.gameTime > 0);
-	const nextPiece = useSelector((state) => state.piece.nextPieces[state.currentGame.id]);
+	const nextPiece = useSelector((state) => state.piece.nextActivePiece);
 	const gameRank = useSelector((state) => state.gameplay.rank);
 	const gameScore = useSelector((state) => state.gameplay.score);
 

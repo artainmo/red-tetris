@@ -68,7 +68,7 @@ export const createSoloGame = async (name) => {
 ** Search a game. If a game exists, join it.
 ** Else create a game and wait for others to join.
 */
-export const SearchOrCreateMultiGame = async (name) => {
+export const searchOrCreateMultiGame = async (name) => {
 	const response = await axios.get("/game/search/" + name);
 	return {status: response.status, game: response.data};
 }
@@ -311,7 +311,7 @@ export const gameWaitStart = async (game) => {
 ** Else returns game object with new scores.
 */
 export const gameFinalScore = async (game, score1, score2=null, score3=null, score4=null, score5=null, score6=null) => {
-	console.log("saving gale final scores")
+	console.log("saving game final scores")
   try {
     if (score2 === null) {
       var response = await axios.post(`/game/score/${score1}`, game);

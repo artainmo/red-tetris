@@ -40,7 +40,6 @@ const CenterMenuPanel = () => {
 			setgameCreated(false);
 		}	
 
-		{/* This logic is added in order to code the multi game css layout */}
 		if (multiplayerGameCreated && gameId && username) {             
 			navigate(`/multiplayer/${gameId}`);
 			setMultiplayerGameCreated(false);

@@ -3,7 +3,7 @@ import useManagePiece from "./useManagePiece";
 import useManageLines from "./useManageLines";
 import { useSelector, useDispatch } from 'react-redux';
 import { setActivePiece, setIsGameOver } from "../redux/slices/gameplaySlice";
-import { gameFinalScore } from "../api/http.api";
+import { handleGameOverThunk } from "../redux/slices/currentGameSlice";
 
 const useModifyGrid = (width, height) => {
 
@@ -11,7 +11,6 @@ const useModifyGrid = (width, height) => {
 	
 	const grid = useSelector((state) => state.gameplay.grid);
 	const activePiece = useSelector((state) => state.gameplay.activePiece);
-	const nextPiece = useSelector((state) => state.gameplay.nextPiece);
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
 	const [isInContact, setIsInContact ] = useState(false);
@@ -88,13 +87,10 @@ const useModifyGrid = (width, height) => {
 		return () => clearInterval(interval);
 	}, []);
 
-	/* game over manager */
 	useEffect(() => {
 		if (isGameOver) {
 			console.log('game over');
-			dispatch(gameFinalScore())
-			setIsGameOver(true)
-			// pause the bloody game and handle the rest
+			dispatch(handleGameOverThunk())
 		}
 	}, [isGameOver]);
 	

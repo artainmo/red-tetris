@@ -8,6 +8,7 @@ import usePieceGenerator from "./usePieceGenerator";
 import { useDispatch, useSelector } from 'react-redux';
 import { setActivePiece, setActivePieceType, setPiecePosition} from '../redux/slices/gameplaySlice';
 import { setIsGameOver, setOrientation, setGrid } from "../redux/slices/gameplaySlice";
+import { handleGameOverThunk, setPlayerScore } from "../redux/slices/currentGameSlice";
 
 const useManagePiece = (width, height) => {
 	
@@ -19,6 +20,7 @@ const useManagePiece = (width, height) => {
 	const piecePosition = useSelector((state) => state.gameplay.piecePosition);
 	const orientation = useSelector((state) => state.gameplay.orientation);
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
+	const gameScore = useSelector((state) => state.gameplay.score);
 
 	const { canMoveDown, canMoveRight, canMoveLeft, canRotate } = useCollisionDetection(width, height, grid);
 	const getNextPiece = usePieceGenerator();
@@ -33,7 +35,9 @@ const useManagePiece = (width, height) => {
 		});
 
 		if (gameOver && !isGameOver) {
+			console.log("dispatching game over")
 			dispatch(setIsGameOver(true));
+			dispatch(handleGameOverThunk())
 			return false;
 		}
 		return true;
@@ -41,8 +45,9 @@ const useManagePiece = (width, height) => {
 
 	/* spawn an new piece */
 	const spawnNewPiece = () => {
-		const pieceLetterCode = getNextPiece();
+		const { pieceLetterCode, nextPieceLetterCode } = getNextPiece();
 		const piece = TETROMINOS[pieceLetterCode];
+		const nextPiece = TETROMINOS[nextPieceLetterCode];
 
 		if (!piece) {
 			console.error('Unknown piece type: ', pieceLetterCode);
@@ -59,6 +64,8 @@ const useManagePiece = (width, height) => {
 		dispatch(setPiecePosition({x: initialX, y: initialY}));
 		dispatch(setActivePiece(piece));
 		dispatch(setActivePieceType(pieceLetterCode));
+		dispatch(setNextActivePiece(nextPiece));
+		dispatch(setNextActivePieceType(nextPieceLetterCode));
 		dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
 	}
 

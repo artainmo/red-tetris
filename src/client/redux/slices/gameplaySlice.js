@@ -6,6 +6,8 @@ const gameplaySlice = createSlice({
 		grid: Array.from({ length: 20 }, () => Array(10).fill(0)),
 		activePiece: null, /* js object containing pieces coords for every orientation */
 		activePieceType: null, /* letter of the piece */
+		nextActivePiece: null, /* js object containing pieces coords for every orientation */
+		nextActivePieceType: null, /* letter of the piece */
 		piecePosition: { x: 0, y: 0 },
 		orientation: 0,
 		isInContact: false,
@@ -25,6 +27,12 @@ const gameplaySlice = createSlice({
 		},
 		setActivePieceType: (state, action) => {			
 			state.activePieceType = action.payload;
+		},
+		setNextActivePiece: (state, action) => {
+			state.nextActivePiece = action.payload;
+		},
+		setNaxtActivePieceType: (state, action) => {			
+			state.nextActivePieceType = action.payload;
 		},
 		setPiecePosition: (state, action) => {
 			state.piecePosition = action.payload;
