@@ -34,7 +34,7 @@ export const searchOrCreateMultiGameThunk = createAsyncThunk(
 
 export const handleGameOverThunk = createAsyncThunk(
 	'currentGame/handleGameOverThunk',
-	async (name, { rejectWithValue }) => {
+	async (game, { rejectWithValue }) => {
 		try {
 			console.log("currentGamescores")
 			console.log(state.scores._player1_score)

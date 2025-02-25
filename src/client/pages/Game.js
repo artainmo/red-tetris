@@ -14,7 +14,7 @@ const Game = () => {
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver)
 	const score = useSelector((state) => state.gameplay.score)
 
-	dispatch(setIsGameOver(false));
+	//dispatch(setIsGameOver(false));
 
 	return (
 			isGameOver ?

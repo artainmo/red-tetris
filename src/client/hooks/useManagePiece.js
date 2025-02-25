@@ -6,8 +6,8 @@ import { WALL_KICK_OFFSETS } from "../utils/wallKickOffsets";
 import useCollisionDetection from "./useCollisionDetection";
 import usePieceGenerator from "./usePieceGenerator";
 import { useDispatch, useSelector } from 'react-redux';
-import { setActivePiece, setActivePieceType, setPiecePosition} from '../redux/slices/gameplaySlice';
-import { setIsGameOver, setOrientation, setGrid } from "../redux/slices/gameplaySlice";
+import { setActivePiece, setActivePieceType, setNextActivePiece, setNextActivePieceType, setPiecePosition } from '../redux/slices/gameplaySlice';
+import { setIsGameOver, setOrientation, setGrid, setBox } from "../redux/slices/gameplaySlice";
 import { handleGameOverThunk, setPlayerScore } from "../redux/slices/currentGameSlice";
 
 const useManagePiece = (width, height) => {
@@ -15,12 +15,16 @@ const useManagePiece = (width, height) => {
 	const dispatch = useDispatch();
 
 	const grid = useSelector((state) => state.gameplay.grid);
+	const box = useSelector((state) => state.gameplay.box);
 	const activePiece = useSelector((state) => state.gameplay.activePiece);
 	const activePieceType = useSelector((state) => state.gameplay.activePieceType);
+	const nextActivePiece = useSelector((state) => state.gameplay.nextActivePiece);
+	const nextActivePieceType = useSelector((state) => state.gameplay.nextActivePieceType);
 	const piecePosition = useSelector((state) => state.gameplay.piecePosition);
 	const orientation = useSelector((state) => state.gameplay.orientation);
+	const nextPiecePosition = 3;
+	const nextOrientation = 1;
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
-	const gameScore = useSelector((state) => state.gameplay.score);
 
 	const { canMoveDown, canMoveRight, canMoveLeft, canRotate } = useCollisionDetection(width, height, grid);
 	const getNextPiece = usePieceGenerator();
@@ -37,7 +41,6 @@ const useManagePiece = (width, height) => {
 		if (gameOver && !isGameOver) {
 			console.log("dispatching game over")
 			dispatch(setIsGameOver(true));
-			dispatch(handleGameOverThunk())
 			return false;
 		}
 		return true;
@@ -45,7 +48,9 @@ const useManagePiece = (width, height) => {
 
 	/* spawn an new piece */
 	const spawnNewPiece = () => {
-		const { pieceLetterCode, nextPieceLetterCode } = getNextPiece();
+		if (isGameOver)
+			return ;
+		const { piece: pieceLetterCode, nextPiece: nextPieceLetterCode } = getNextPiece();
 		const piece = TETROMINOS[pieceLetterCode];
 		const nextPiece = TETROMINOS[nextPieceLetterCode];
 
@@ -83,6 +88,21 @@ const useManagePiece = (width, height) => {
 		});
 
 		dispatch(setGrid(newGrid));
+	};
+
+	const updateUpcomingPieceBox = (boxCoords, x, y, colorCode) => {
+		
+		if (!boxCoords) return;
+
+		const newBox = box.map((row) => [...row]);
+
+		boxCoords.forEach(([relY, relX]) => {
+			const newY = y + relY;
+			const newX = x + relX;
+			newBox[newY][newX] = colorCode;
+		});
+
+		dispatch(setBox(newBox));
 	};
 
 	/* used to removed the piece when producing a move, to later display the piece in new position */
@@ -159,6 +179,9 @@ const useManagePiece = (width, height) => {
 
 	/* update grid when a parameter changes */
 	useEffect(() => {
+		console.log("active")
+		console.log(activePiece)
+		console.log(activePieceType)
 		if (activePiece && activePieceType && piecePosition && orientation !== null) {
 			updateGridWithPiece(
 				activePiece[orientation],
@@ -169,7 +192,23 @@ const useManagePiece = (width, height) => {
 		}		
 	}, [activePiece, activePieceType, piecePosition, orientation]);
 
-	return {spawnNewPiece, rotatePiece, movePieceRight, movePieceLeft, movePieceDown};
+	useEffect(() => {
+		console.log("next")
+		console.log(nextActivePiece)
+		console.log(nextActivePieceType)
+		console.log(nextPiecePosition)
+		console.log(nextOrientation)
+		if (nextActivePiece && nextActivePieceType) {
+			updateUpcomingPieceBox(
+				nextActivePiece[nextOrientation],
+				nextPiecePosition.x,
+				nextPiecePosition.y,
+				PIECES_COLOR_CODES[nextActivePieceType]
+			);
+		}		
+	}, [nextActivePiece, nextActivePieceType, nextPiecePosition, nextOrientation]);
+
+	return { spawnNewPiece, rotatePiece, movePieceRight, movePieceLeft, movePieceDown };
 }
 
 export default useManagePiece;

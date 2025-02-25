@@ -4,6 +4,7 @@ const gameplaySlice = createSlice({
 	name: 'gameplay',
 	initialState: {
 		grid: Array.from({ length: 20 }, () => Array(10).fill(0)),
+		box: Array.from({ length: 5 }, () => Array(5).fill(0)),				// upcoming piece display box
 		activePiece: null, /* js object containing pieces coords for every orientation */
 		activePieceType: null, /* letter of the piece */
 		nextActivePiece: null, /* js object containing pieces coords for every orientation */
@@ -22,6 +23,12 @@ const gameplaySlice = createSlice({
 		resetGrid: (state) => {
 			state.grid = Array.from({ length: 20 }, () => Array(10).fill(0));
 		},
+		setBox: (state, action) => {
+			state.box = action.payload;
+		},
+		resetBox: (state) => {
+			state.box = Array.from({ length: 5 }, () => Array(5).fill(0));
+		},
 		setActivePiece: (state, action) => {
 			state.activePiece = action.payload;
 		},
@@ -31,7 +38,7 @@ const gameplaySlice = createSlice({
 		setNextActivePiece: (state, action) => {
 			state.nextActivePiece = action.payload;
 		},
-		setNaxtActivePieceType: (state, action) => {			
+		setNextActivePieceType: (state, action) => {			
 			state.nextActivePieceType = action.payload;
 		},
 		setPiecePosition: (state, action) => {
@@ -58,8 +65,12 @@ const gameplaySlice = createSlice({
 export const { 
 	setGrid,
 	resetGrid,
+	setBox,
+	resetBox,
 	setActivePiece, 
 	setActivePieceType,
+	setNextActivePiece, 
+	setNextActivePieceType,
 	setPiecePosition, 
 	setOrientation,
 	setIsInContact,

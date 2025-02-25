@@ -5,7 +5,8 @@ import { useSelector } from "react-redux";
 const BestScoresArray = () => {
 	
 	const scores = useSelector((state) => Object.values(state.currentGame.scores))
-
+	console.log("scores here")
+	console.log(scores)
 	return (
 		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>
