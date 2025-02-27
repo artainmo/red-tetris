@@ -22,8 +22,8 @@ const useManagePiece = (width, height) => {
 	const nextActivePieceType = useSelector((state) => state.gameplay.nextActivePieceType);
 	const piecePosition = useSelector((state) => state.gameplay.piecePosition);
 	const orientation = useSelector((state) => state.gameplay.orientation);
-	const nextPiecePosition = 3;
-	const nextOrientation = 1;
+	const nextPiecePosition = { x: 0, y: 0 };
+	const nextOrientation = [[0,0],[1,0],[1,1],[2,0]];
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
 	const { canMoveDown, canMoveRight, canMoveLeft, canRotate } = useCollisionDetection(width, height, grid);
@@ -47,7 +47,7 @@ const useManagePiece = (width, height) => {
 	}
 
 	/* spawn an new piece */
-	const spawnNewPiece = () => {
+	const spawnNewPiece = (both) => {
 		if (isGameOver)
 			return ;
 		const { piece: pieceLetterCode, nextPiece: nextPieceLetterCode } = getNextPiece();
@@ -66,19 +66,30 @@ const useManagePiece = (width, height) => {
 			return; 
 		}
 		
-		dispatch(setPiecePosition({x: initialX, y: initialY}));
-		dispatch(setActivePiece(piece));
-		dispatch(setActivePieceType(pieceLetterCode));
-		dispatch(setNextActivePiece(nextPiece));
-		dispatch(setNextActivePieceType(nextPieceLetterCode));
-		dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
+		if (both) {
+			dispatch(setPiecePosition({x: initialX, y: initialY}));
+			dispatch(setActivePiece(piece));
+			dispatch(setActivePieceType(pieceLetterCode));
+			dispatch(setNextActivePiece(nextPiece));
+			dispatch(setNextActivePieceType(nextPieceLetterCode));
+			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
+		}
+		else {
+			dispatch(setPiecePosition({x: initialX, y: initialY}));
+			dispatch(setActivePiece(nextActivePiece));
+			dispatch(setActivePieceType(nextActivePieceType));
+			dispatch(setNextActivePiece(piece));
+			dispatch(setNextActivePieceType(pieceLetterCode));
+			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
+		}
 	}
 
 	/* general updater for the grid when there is a move */
 	const updateGridWithPiece = (shapeCoords, x, y, colorCode) => {
 		
 		if (!shapeCoords) return;
-
+		console.log("shape coords")
+		console.log(shapeCoords)
 		const newGrid = grid.map((row) => [...row]);
 
 		shapeCoords.forEach(([relY, relX]) => {
@@ -93,7 +104,8 @@ const useManagePiece = (width, height) => {
 	const updateUpcomingPieceBox = (boxCoords, x, y, colorCode) => {
 		
 		if (!boxCoords) return;
-
+		console.log("box coords")
+		console.log(boxCoords)
 		const newBox = box.map((row) => [...row]);
 
 		boxCoords.forEach(([relY, relX]) => {
@@ -179,9 +191,8 @@ const useManagePiece = (width, height) => {
 
 	/* update grid when a parameter changes */
 	useEffect(() => {
-		console.log("active")
-		console.log(activePiece)
-		console.log(activePieceType)
+		// console.log("active")
+		// console.log(activePieceType)
 		if (activePiece && activePieceType && piecePosition && orientation !== null) {
 			updateGridWithPiece(
 				activePiece[orientation],
@@ -194,11 +205,9 @@ const useManagePiece = (width, height) => {
 
 	useEffect(() => {
 		console.log("next")
-		console.log(nextActivePiece)
 		console.log(nextActivePieceType)
-		console.log(nextPiecePosition)
-		console.log(nextOrientation)
 		if (nextActivePiece && nextActivePieceType) {
+			console.log("updating box")
 			updateUpcomingPieceBox(
 				nextActivePiece[nextOrientation],
 				nextPiecePosition.x,
@@ -206,7 +215,7 @@ const useManagePiece = (width, height) => {
 				PIECES_COLOR_CODES[nextActivePieceType]
 			);
 		}		
-	}, [nextActivePiece, nextActivePieceType, nextPiecePosition, nextOrientation]);
+	}, [nextActivePiece, nextActivePieceType]);
 
 	return { spawnNewPiece, rotatePiece, movePieceRight, movePieceLeft, movePieceDown };
 }

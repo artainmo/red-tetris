@@ -3,7 +3,7 @@
 //!This code has also been put in the backend!
 
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const usePieceGenerator = () => {
 	
@@ -19,18 +19,21 @@ const usePieceGenerator = () => {
 			// swap i index to the randomly chosen j index
 			[arr[i], arr[j]] = [arr[j], arr[i]] ;
 		}
-		setBag(arr);
+		setBag([...arr]);
+		const piece = bag.pop();
+		const nextPiece = bag.pop();
+		return {piece, nextPiece}
 	}
 
-
 	const getNextPiece = () => {
-		if (bag.length < 2)
-			shuffleArrayWithFisherYatesPermutationAlgo(PIECES_TYPE);
-		setPiece(bag[0]);
-		setNextPiece(bag[1]);
-		setBag((prevBag) => prevBag.slice(2));
-		return {piece, nextPiece};
-	};
+		return shuffleArrayWithFisherYatesPermutationAlgo(PIECES_TYPE);
+	}
+
+	// useEffect(() => {
+	// 	if (piece == undefined || nextPiece == undefined)
+	// 		getNextPiece;
+	// }, [piece, nextPiece]);
+
 
 	return getNextPiece;
 };

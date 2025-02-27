@@ -11,6 +11,7 @@ const useModifyGrid = (width, height) => {
 	
 	const grid = useSelector((state) => state.gameplay.grid);
 	const activePiece = useSelector((state) => state.gameplay.activePiece);
+	const nextActivePiece = useSelector((state) => state.gameplay.nextActivePiece);
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
 	const [isInContact, setIsInContact ] = useState(false);
@@ -24,10 +25,14 @@ const useModifyGrid = (width, height) => {
 
 	/* spawn the pieces, at launch and everytime activePiece is resetted to null */
 	useEffect(() => {
-		if (!activePiece && !isGameOver) {
+		if (!activePiece && !nextActivePiece && !isGameOver) {
 			spawnNewPiece();
 		}
-	}, [activePiece, spawnNewPiece, isGameOver]);
+		else if (!activePiece && nextActivePiece) {
+			//activePiece = nextActivePiece
+			spawnNewPiece();
+		}
+	}, [activePiece, nextActivePiece, isGameOver]);
 
 	/* player inputs manager */
 	useEffect(() => {

@@ -4,7 +4,7 @@ import { createSoloGame, getGames, searchOrCreateMultiGame } from '../../api/htt
 const initialState = {
 	id: null,
 	players: [],
-	scores: {},
+	scores: [],
 	error: null
 }
 
@@ -58,7 +58,11 @@ const currentGameSlice = createSlice({
 			console.log(action.payload)
 			const { username, score } = action.payload;
 			console.log("setting score for player " + username + " who got " + score)
-			state.scores[username] = score;
+			state.scores.push(
+				{
+					"username" : username,
+					"score" : score
+				});
 		}
 	},
 	extraReducers: (builder) => {

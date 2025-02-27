@@ -4,7 +4,7 @@ const gameplaySlice = createSlice({
 	name: 'gameplay',
 	initialState: {
 		grid: Array.from({ length: 20 }, () => Array(10).fill(0)),
-		box: Array.from({ length: 5 }, () => Array(5).fill(0)),				// upcoming piece display box
+		box: Array.from({ length: 10 }, () => Array(10).fill(0)),				// upcoming piece display box
 		activePiece: null, /* js object containing pieces coords for every orientation */
 		activePieceType: null, /* letter of the piece */
 		nextActivePiece: null, /* js object containing pieces coords for every orientation */
