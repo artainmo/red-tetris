@@ -27,7 +27,7 @@ const gameplaySlice = createSlice({
 			state.box = action.payload;
 		},
 		resetBox: (state) => {
-			state.box = Array.from({ length: 5 }, () => Array(5).fill(0));
+			state.box = Array.from({ length: 10 }, () => Array(10).fill(0));
 		},
 		setActivePiece: (state, action) => {
 			state.activePiece = action.payload;

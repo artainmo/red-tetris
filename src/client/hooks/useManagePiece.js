@@ -22,8 +22,8 @@ const useManagePiece = (width, height) => {
 	const nextActivePieceType = useSelector((state) => state.gameplay.nextActivePieceType);
 	const piecePosition = useSelector((state) => state.gameplay.piecePosition);
 	const orientation = useSelector((state) => state.gameplay.orientation);
-	const nextPiecePosition = { x: 0, y: 0 };
-	const nextOrientation = [[0,0],[1,0],[1,1],[2,0]];
+	const nextPiecePosition = { x: 3, y: 3 };
+	const nextOrientation = 0;
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
 	const { canMoveDown, canMoveRight, canMoveLeft, canRotate } = useCollisionDetection(width, height, grid);
@@ -102,7 +102,7 @@ const useManagePiece = (width, height) => {
 	};
 
 	const updateUpcomingPieceBox = (boxCoords, x, y, colorCode) => {
-		
+		console.log(boxCoords)
 		if (!boxCoords) return;
 		console.log("box coords")
 		console.log(boxCoords)
@@ -191,8 +191,8 @@ const useManagePiece = (width, height) => {
 
 	/* update grid when a parameter changes */
 	useEffect(() => {
-		// console.log("active")
-		// console.log(activePieceType)
+		console.log("active " + activePiece)
+		console.log("orientation " + orientation)
 		if (activePiece && activePieceType && piecePosition && orientation !== null) {
 			updateGridWithPiece(
 				activePiece[orientation],
@@ -205,7 +205,7 @@ const useManagePiece = (width, height) => {
 
 	useEffect(() => {
 		console.log("next")
-		console.log(nextActivePieceType)
+		console.log(nextActivePiece)
 		if (nextActivePiece && nextActivePieceType) {
 			console.log("updating box")
 			updateUpcomingPieceBox(
