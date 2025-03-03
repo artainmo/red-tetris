@@ -26,11 +26,10 @@ const useModifyGrid = (width, height) => {
 	/* spawn the pieces, at launch and everytime activePiece is resetted to null */
 	useEffect(() => {
 		if (!activePiece && !nextActivePiece && !isGameOver) {
-			spawnNewPiece();
+			spawnNewPiece(true);
 		}
 		else if (!activePiece && nextActivePiece) {
-			//activePiece = nextActivePiece
-			spawnNewPiece();
+			spawnNewPiece(false);
 		}
 	}, [activePiece, nextActivePiece, isGameOver]);
 

@@ -22,7 +22,7 @@ const useManagePiece = (width, height) => {
 	const nextActivePieceType = useSelector((state) => state.gameplay.nextActivePieceType);
 	const piecePosition = useSelector((state) => state.gameplay.piecePosition);
 	const orientation = useSelector((state) => state.gameplay.orientation);
-	const nextPiecePosition = { x: 3, y: 3 };
+	const nextPiecePosition = { x: 4, y: 4 };
 	const nextOrientation = 0;
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
@@ -38,7 +38,7 @@ const useManagePiece = (width, height) => {
 			return grid[newY] && grid[newY][newX] !== 0;
 		});
 
-		if (gameOver && !isGameOver) {
+		if (gameOver && isGameOver) {
 			console.log("dispatching game over")
 			dispatch(setIsGameOver(true));
 			return false;
@@ -80,7 +80,7 @@ const useManagePiece = (width, height) => {
 			dispatch(setActivePieceType(nextActivePieceType));
 			dispatch(setNextActivePiece(piece));
 			dispatch(setNextActivePieceType(pieceLetterCode));
-			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
+			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[nextPieceLetterCode]));
 		}
 	}
 
@@ -88,8 +88,7 @@ const useManagePiece = (width, height) => {
 	const updateGridWithPiece = (shapeCoords, x, y, colorCode) => {
 		
 		if (!shapeCoords) return;
-		console.log("shape coords")
-		console.log(shapeCoords)
+
 		const newGrid = grid.map((row) => [...row]);
 
 		shapeCoords.forEach(([relY, relX]) => {
@@ -102,11 +101,18 @@ const useManagePiece = (width, height) => {
 	};
 
 	const updateUpcomingPieceBox = (boxCoords, x, y, colorCode) => {
-		console.log(boxCoords)
+
 		if (!boxCoords) return;
-		console.log("box coords")
-		console.log(boxCoords)
-		const newBox = box.map((row) => [...row]);
+
+		const newBox = Array.from({ length: 10 }, () => Array(10).fill(0));
+
+		// if (nextActivePiece) {
+		// 	nextActivePiece[nextOrientation].forEach(([relY, relX]) => {
+		// 		const oldY = piecePosition.y + relY;
+		// 		const oldX = piecePosition.x + relX;
+		// 		newBox[oldY][oldX] = 0;
+		// 	})	
+		// }
 
 		boxCoords.forEach(([relY, relX]) => {
 			const newY = y + relY;
@@ -191,8 +197,7 @@ const useManagePiece = (width, height) => {
 
 	/* update grid when a parameter changes */
 	useEffect(() => {
-		console.log("active " + activePiece)
-		console.log("orientation " + orientation)
+
 		if (activePiece && activePieceType && piecePosition && orientation !== null) {
 			updateGridWithPiece(
 				activePiece[orientation],
@@ -204,10 +209,8 @@ const useManagePiece = (width, height) => {
 	}, [activePiece, activePieceType, piecePosition, orientation]);
 
 	useEffect(() => {
-		console.log("next")
-		console.log(nextActivePiece)
+
 		if (nextActivePiece && nextActivePieceType) {
-			console.log("updating box")
 			updateUpcomingPieceBox(
 				nextActivePiece[nextOrientation],
 				nextPiecePosition.x,
