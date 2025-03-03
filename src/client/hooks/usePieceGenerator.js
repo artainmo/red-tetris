@@ -3,16 +3,14 @@
 //!This code has also been put in the backend!
 
 
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const usePieceGenerator = () => {
-	
-	const [ bag, setBag ] = useState([]);
-	const [ piece, setPiece ] = useState("")
-	const [ nextPiece, setNextPiece ] = useState("")
+	  
+	const [bag,setBag] = useState([])
 
 	const PIECES_TYPE = ["I", "O", "T", "L", "J", "S", "Z"];
-	const shuffleArrayWithFisherYatesPermutationAlgo = (arr) => {
+	const shuffleArrayWithFisherYatesPermutationAlgo = ([...arr]) => {
 		for (let i = arr.length - 1; i > 0; i--) {
 			// random number from 0 to i (included)
 			let j = Math.floor(Math.random() * (i + 1));
@@ -21,8 +19,9 @@ const usePieceGenerator = () => {
 		}
 		setBag([...arr]);
 		const piece = bag.pop();
-		const nextPiece = bag.pop();
-		return {piece, nextPiece}
+		return piece ;
+
+
 	}
 
 	const getNextPiece = () => {

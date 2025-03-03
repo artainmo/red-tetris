@@ -58,7 +58,7 @@ const currentGameSlice = createSlice({
 			console.log(action.payload)
 			const { username, score } = action.payload;
 			console.log("setting score for player " + username + " who got " + score)
-			state.scores.push(
+			state.scores.add(
 				{
 					"username" : username,
 					"score" : score

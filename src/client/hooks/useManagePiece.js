@@ -7,8 +7,7 @@ import useCollisionDetection from "./useCollisionDetection";
 import usePieceGenerator from "./usePieceGenerator";
 import { useDispatch, useSelector } from 'react-redux';
 import { setActivePiece, setActivePieceType, setNextActivePiece, setNextActivePieceType, setPiecePosition } from '../redux/slices/gameplaySlice';
-import { setIsGameOver, setOrientation, setGrid, setBox } from "../redux/slices/gameplaySlice";
-import { handleGameOverThunk, setPlayerScore } from "../redux/slices/currentGameSlice";
+import { setIsGameOver, setOrientation, setNextOrientation, setGrid, setBox } from "../redux/slices/gameplaySlice";
 
 const useManagePiece = (width, height) => {
 	
@@ -23,7 +22,7 @@ const useManagePiece = (width, height) => {
 	const piecePosition = useSelector((state) => state.gameplay.piecePosition);
 	const orientation = useSelector((state) => state.gameplay.orientation);
 	const nextPiecePosition = { x: 4, y: 4 };
-	const nextOrientation = 0;
+	const nextOrientation = useSelector((state) => state.gameplay.nextOrientation);;
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
 	const { canMoveDown, canMoveRight, canMoveLeft, canRotate } = useCollisionDetection(width, height, grid);
@@ -50,37 +49,51 @@ const useManagePiece = (width, height) => {
 	const spawnNewPiece = (both) => {
 		if (isGameOver)
 			return ;
-		const { piece: pieceLetterCode, nextPiece: nextPieceLetterCode } = getNextPiece();
-		const piece = TETROMINOS[pieceLetterCode];
-		const nextPiece = TETROMINOS[nextPieceLetterCode];
-
-		if (!piece) {
-			console.error('Unknown piece type: ', pieceLetterCode);
-			return;
-		}
-
-		const initialX = Math.floor(width / 2) - Math.floor(TETROMINOS[pieceLetterCode][0].length / 2);
-		const initialY = 0;
-
-		if (!isPieceInsertable(piece, initialX,initialY, PIECE_STARTING_ORIENTATIONS[pieceLetterCode])) {
-			return; 
-		}
-		
 		if (both) {
+			const pieceLetterCode = getNextPiece();
+			const nextPieceLetterCode = getNextPiece();
+			const piece = TETROMINOS[pieceLetterCode];
+			const nextPiece = TETROMINOS[nextPieceLetterCode];
+	
+			if (!piece) {
+				console.error('Unknown piece type: ', pieceLetterCode);
+				return;
+			}
+	
+			const initialX = Math.floor(width / 2) - Math.floor(TETROMINOS[pieceLetterCode][0].length / 2);
+			const initialY = 0;
+	
+			if (!isPieceInsertable(piece, initialX,initialY, PIECE_STARTING_ORIENTATIONS[pieceLetterCode])) {
+				return; 
+			}
+
 			dispatch(setPiecePosition({x: initialX, y: initialY}));
 			dispatch(setActivePiece(piece));
 			dispatch(setActivePieceType(pieceLetterCode));
 			dispatch(setNextActivePiece(nextPiece));
 			dispatch(setNextActivePieceType(nextPieceLetterCode));
 			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
+			dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[nextPieceLetterCode]));
 		}
 		else {
+			const pieceLetterCode = getNextPiece();
+			const piece = TETROMINOS[pieceLetterCode];
+	
+			if (!piece) {
+				console.error('Unknown piece type: ', pieceLetterCode);
+				return;
+			}
+	
+			const initialX = Math.floor(width / 2) - Math.floor(TETROMINOS[pieceLetterCode][0].length / 2);
+			const initialY = 0;
+
 			dispatch(setPiecePosition({x: initialX, y: initialY}));
 			dispatch(setActivePiece(nextActivePiece));
 			dispatch(setActivePieceType(nextActivePieceType));
 			dispatch(setNextActivePiece(piece));
 			dispatch(setNextActivePieceType(pieceLetterCode));
-			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[nextPieceLetterCode]));
+			dispatch(setOrientation(nextOrientation));
+			dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
 		}
 	}
 
@@ -105,14 +118,6 @@ const useManagePiece = (width, height) => {
 		if (!boxCoords) return;
 
 		const newBox = Array.from({ length: 10 }, () => Array(10).fill(0));
-
-		// if (nextActivePiece) {
-		// 	nextActivePiece[nextOrientation].forEach(([relY, relX]) => {
-		// 		const oldY = piecePosition.y + relY;
-		// 		const oldX = piecePosition.x + relX;
-		// 		newBox[oldY][oldX] = 0;
-		// 	})	
-		// }
 
 		boxCoords.forEach(([relY, relX]) => {
 			const newY = y + relY;

@@ -11,6 +11,7 @@ const gameplaySlice = createSlice({
 		nextActivePieceType: null, /* letter of the piece */
 		piecePosition: { x: 0, y: 0 },
 		orientation: 0,
+		nextOrientation: 0,
 		isInContact: false,
 		isGameOver: false,
 		rank: 0,
@@ -47,6 +48,9 @@ const gameplaySlice = createSlice({
 		setOrientation: (state, action) => {
 			state.orientation = action.payload;
 		},
+		setNextOrientation: (state, action) => {
+			state.nextOrientation = action.payload;
+		},
 		setIsInContact: (state, action) => {
 			state.isInContact = action.payload;
 		},
@@ -73,6 +77,7 @@ export const {
 	setNextActivePieceType,
 	setPiecePosition, 
 	setOrientation,
+	setNextOrientation,
 	setIsInContact,
 	setIsGameOver,
 	setRank,
