@@ -8,6 +8,7 @@ import usePieceGenerator from "./usePieceGenerator";
 import { useDispatch, useSelector } from 'react-redux';
 import { setActivePiece, setActivePieceType, setNextActivePiece, setNextActivePieceType, setPiecePosition } from '../redux/slices/gameplaySlice';
 import { setIsGameOver, setOrientation, setNextOrientation, setGrid, setBox } from "../redux/slices/gameplaySlice";
+import { handleGameOverThunk } from "../redux/slices/currentGameSlice";
 
 const useManagePiece = (width, height) => {
 	
@@ -29,7 +30,7 @@ const useManagePiece = (width, height) => {
 	const getNextPiece = usePieceGenerator();
 
 	/* check whether the piece can indeed be inserted */
-	const isPieceInsertable = (piece, x, y, orientation) => {
+	const isPieceInsertable = async(piece, x, y, orientation) => {
 		const shapeCoords = piece[orientation];
 		const gameOver =  shapeCoords.some(([relY, relX]) => {
 			const newY = y + relY;
@@ -37,9 +38,15 @@ const useManagePiece = (width, height) => {
 			return grid[newY] && grid[newY][newX] !== 0;
 		});
 
-		if (gameOver && isGameOver) {
+		if (gameOver && !isGameOver) {
 			console.log("dispatching game over")
-			dispatch(setIsGameOver(true));
+			dispatch(handleGameOverThunk())
+			.then((response) => {
+				dispatch(setIsGameOver(true));
+			})
+			.catch((error) => {
+				console.error(error);
+			});
 			return false;
 		}
 		return true;
@@ -86,6 +93,10 @@ const useManagePiece = (width, height) => {
 	
 			const initialX = Math.floor(width / 2) - Math.floor(TETROMINOS[pieceLetterCode][0].length / 2);
 			const initialY = 0;
+
+			if (!isPieceInsertable(piece, initialX,initialY, PIECE_STARTING_ORIENTATIONS[pieceLetterCode])) {
+				return; 
+			}
 
 			dispatch(setPiecePosition({x: initialX, y: initialY}));
 			dispatch(setActivePiece(nextActivePiece));

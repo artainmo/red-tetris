@@ -10,11 +10,8 @@ import GameEnd from "./GameEnd";
 
 const Game = () => {
 	
-	const dispatch = useDispatch();
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver)
 	const score = useSelector((state) => state.gameplay.score)
-
-	//dispatch(setIsGameOver(false));
 
 	return (
 			isGameOver ?

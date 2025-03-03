@@ -2,8 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import useManagePiece from "./useManagePiece";
 import useManageLines from "./useManageLines";
 import { useSelector, useDispatch } from 'react-redux';
-import { setActivePiece, setIsGameOver } from "../redux/slices/gameplaySlice";
-import { handleGameOverThunk } from "../redux/slices/currentGameSlice";
+import { setActivePiece } from "../redux/slices/gameplaySlice";
 
 const useModifyGrid = (width, height) => {
 
@@ -90,13 +89,6 @@ const useModifyGrid = (width, height) => {
 
 		return () => clearInterval(interval);
 	}, []);
-
-	useEffect(() => {
-		if (isGameOver) {
-			console.log('game over');
-			dispatch(handleGameOverThunk())
-		}
-	}, [isGameOver]);
 	
 	return grid;
 }

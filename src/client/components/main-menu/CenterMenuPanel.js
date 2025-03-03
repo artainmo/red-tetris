@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import RoomsArray from "./RoomsArray";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createSoloGameThunk, searchOrCreateMultiGameThunk } from "../../redux/slices/currentGameSlice";
+import { createSoloGameThunk, searchOrCreateMultiGameThunk, setGame } from "../../redux/slices/currentGameSlice";
 import { socketConnectThunk } from "../../redux/slices/socketSlice";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
@@ -20,7 +20,7 @@ const CenterMenuPanel = () => {
 	const gameId = useSelector((state) => state.currentGame.id);
 
 	/* create a solo game and store it to the currentGame slice, then connect to socket to exhange data with server */
-	const handleSoloGameCreation = () => {
+	const handleSoloGameCreation = async() => {
 		dispatch(createSoloGameThunk(username));
 		dispatch(socketConnectThunk());
 		setgameCreated(true);

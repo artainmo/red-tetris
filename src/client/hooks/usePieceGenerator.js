@@ -20,19 +20,11 @@ const usePieceGenerator = () => {
 		setBag([...arr]);
 		const piece = bag.pop();
 		return piece ;
-
-
 	}
 
 	const getNextPiece = () => {
 		return shuffleArrayWithFisherYatesPermutationAlgo(PIECES_TYPE);
 	}
-
-	// useEffect(() => {
-	// 	if (piece == undefined || nextPiece == undefined)
-	// 		getNextPiece;
-	// }, [piece, nextPiece]);
-
 
 	return getNextPiece;
 };
