@@ -10,7 +10,7 @@ class PieceBasket {
 		this.PIECES_TYPE = ["I", "O", "T", "L", "J", "S", "Z"];
 	}
 
-	#shuffleArrayWithFisherYatesPermutationAlgo = (arr) => {
+	shuffleArrayWithFisherYatesPermutationAlgo = (arr) => {
 		for (let i = arr.length - 1; i > 0; i--) {
 			/* random number from 0 to i (included) */
 			let j = Math.floor(Math.random() * (i + 1));
@@ -22,7 +22,7 @@ class PieceBasket {
 
 	getNextPiece = () => {
 		if (this.bag.length === 0) {
-			const newBag = this.#shuffleArrayWithFisherYatesPermutationAlgo([...this.PIECES_TYPE]);
+			const newBag = this.shuffleArrayWithFisherYatesPermutationAlgo([...this.PIECES_TYPE]);
 			this.bag = newBag.slice(1); 
 			// console.log(newBag[0]);
 			return newBag[0]; 

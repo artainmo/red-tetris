@@ -4,6 +4,7 @@ import { connect } from "../../api/http.api";
 const initialState = {
 	isAuthenticated: false,
 	user: null,
+	id: null,
 	nameTooLong: false,
 	nameInvalidChars: false
 }

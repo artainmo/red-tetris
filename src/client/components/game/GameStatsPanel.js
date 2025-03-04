@@ -8,6 +8,12 @@ const GameStatsPanel = () => {
 	const gameTime = useSelector((state) => state.gameTime.currentTime);
 	const gameScore = useSelector((state) => state.gameplay.score);
 
+	const formatTime = (milliseconds) => {
+		const minutes = Math.floor(milliseconds / (60 * 1000));
+		const seconds = ((milliseconds % (60 * 1000)) / 1000).toFixed(0);
+		return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+	};
+
 	return (
 		<div style={fullTransparentMenuPanelStyle}>
 			<div style={statsContainerStyle}>
@@ -16,7 +22,7 @@ const GameStatsPanel = () => {
 				</div>
 				<div style={stackedContainerStyle}>
 					<p style={smallWhiteStyle}>GAME DURATION</p>
-					<p style={smallWhiteStyle}>{gameTime}</p>
+					<p style={smallWhiteStyle}>{formatTime(gameTime)}</p>
 				</div>
 				<div style={stackedContainerStyle}>
 					<p style={smallWhiteStyle}>SCORE</p>

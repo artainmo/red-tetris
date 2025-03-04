@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import useManagePiece from "./useManagePiece";
 import useManageLines from "./useManageLines";
 import { useSelector, useDispatch } from 'react-redux';
-import { setActivePiece, setIsGameOver } from "../redux/slices/gameplaySlice";
+import { setActivePiece } from "../redux/slices/gameplaySlice";
 
 const useModifyGrid = (width, height) => {
 
@@ -10,7 +10,7 @@ const useModifyGrid = (width, height) => {
 	
 	const grid = useSelector((state) => state.gameplay.grid);
 	const activePiece = useSelector((state) => state.gameplay.activePiece);
-	const nextPiece = useSelector((state) => state.gameplay.nextPiece);
+	const nextActivePiece = useSelector((state) => state.gameplay.nextActivePiece);
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
 	const [isInContact, setIsInContact ] = useState(false);
@@ -24,10 +24,13 @@ const useModifyGrid = (width, height) => {
 
 	/* spawn the pieces, at launch and everytime activePiece is resetted to null */
 	useEffect(() => {
-		if (!activePiece && !isGameOver) {
-			spawnNewPiece();
+		if (!activePiece && !nextActivePiece && !isGameOver) {
+			spawnNewPiece(true);
 		}
-	}, [activePiece, spawnNewPiece, isGameOver]);
+		else if (!activePiece && nextActivePiece) {
+			spawnNewPiece(false);
+		}
+	}, [activePiece, nextActivePiece, isGameOver]);
 
 	/* player inputs manager */
 	useEffect(() => {
@@ -86,15 +89,6 @@ const useModifyGrid = (width, height) => {
 
 		return () => clearInterval(interval);
 	}, []);
-
-	/* game over manager */
-	useEffect(() => {
-		if (isGameOver) {
-			console.log('game over');
-			setIsGameOver(true)
-			// pause the bloody game and handle the rest
-		}
-	}, [isGameOver]);
 	
 	return grid;
 }

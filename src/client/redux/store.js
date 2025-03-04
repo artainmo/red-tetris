@@ -5,6 +5,7 @@ import gameSessionsSlice from "./slices/gameSessionsSlice";
 import gameTimeSlice from "./slices/gameTimeSlice";
 import socketSlice from "./slices/socketSlice";
 import gameplaySlice from "./slices/gameplaySlice";
+import pieceSlice from "./slices/pieceSlice"
 
 const store = configureStore({
 	reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
 		socket: socketSlice.reducer,
 		gameTime: gameTimeSlice.reducer,
 		gameSessions: gameSessionsSlice.reducer,
+		piece: pieceSlice.reducer,
 	},
 	middleware: (getDefaultMiddleware) => getDefaultMiddleware({ 
 		serializableCheck: false,		/* this is to fix "A non serializable object was detected in socket.socket error" */		

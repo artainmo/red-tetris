@@ -68,7 +68,7 @@ export const createSoloGame = async (name) => {
 ** Search a game. If a game exists, join it.
 ** Else create a game and wait for others to join.
 */
-export const searchGame = async (name) => {
+export const searchOrCreateMultiGame = async (name) => {
 	const response = await axios.get("/game/search/" + name);
 	return {status: response.status, game: response.data};
 }
@@ -310,23 +310,16 @@ export const gameWaitStart = async (game) => {
 ** If unable to add game score, returns same game object with status code 400.
 ** Else returns game object with new scores.
 */
-export const gameFinalScore = async (game, score1, score2=null, score3=null, score4=null, score5=null, score6=null) => {
-	try {
-    if (score2 === null) {
-      var response = await axios.post(`/game/score/${score1}`, game);
-    } else if (score3 === null) {
-      var response = await axios.post(`/game/score/${score1}/${score2}`, game);
-    } else if (score4 === null) {
-      var response = await axios.post(`/game/score/${score1}/${score2}/${score3}`, game);
-    } else if (score5 === null) {
-      var response = await axios.post(`/game/score/${score1}/${score2}/${score3}/${score4}`, game);
-    } else if (score6 === null) {
-      var response = await axios.post(`/game/score/${score1}/${score2}/${score3}/${score4}/${score5}`, game);
-    } else {
-      var response = await axios.post(`/game/score/${score1}/${score2}/${score3}/${score4}/${score5}/${score6}`, game);
-    }
+export const gameFinalScore = async(gameId, playerId, score) => {
+
+  try {
+    var response = await axios.post("/game/" + gameId + "/score/", {
+      playerId,
+      score,
+    });
 		return {status: response.status, game: response.data};
 	} catch (e) {
+    console.log(e)
 		return {status: e.response.status, game: e.response.data};
 	}
 }
@@ -391,6 +384,14 @@ export const gameNext = async (game) => {
   data: "This game is not finished. Can't go to next game."
 }
 */
+
+/*
+** Get a list of all the games 
+*/
+export const getAllGames = async (name) => {
+	var response = await axios.get("/games/");
+	return {status: response.status, games: response.data};
+}
 
 /*
 ** Get a list of all the games someone has participated in.

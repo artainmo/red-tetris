@@ -1,20 +1,37 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { startGame, endGame, resumeGame, pauseGame } from "../../redux/slices/gameTimeSlice";
-import { nextPiece } from "../../redux/slices/gameplaySlice"
+import { resetGame } from "../../redux/slices/currentGameSlice";
+import { resetGameplay } from "../../redux/slices/gameplaySlice";
 import { inlineContainerStyle, smallWhiteStyle, statsContainerStyle, stackedContainerStyle, wrapFlexContainerStyle, titleContainerStyle } from "../../style/containersStyle";
+import Cell from "./Cell";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
 import { middlePanelStyle } from "../../style/panelStyle";
+import useManageTime from "../../hooks/useManageTime";
 
 const GameActionsPanel = ({isMultiPlayer}) => {
 
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
-	const isGameStarted = useSelector((state) => state.gameTime > 0);
-	const nextPiece = useSelector((state) => state.gameplay.nextPiece);
-	const gameRank = useState('1st') // useSelector((state) => state.gameTimeSlice.updateGameTime);
-	const gameScore = useState('24') // useSelector((state) => state.gameplaySlice.setScore);
+	const isGameStarted = useSelector((state) => state.gameTime.isGameActive);
+	const box = useSelector((state) => state.gameplay.box)
+	const gameRank = useSelector((state) => state.gameplay.rank);
+	const gameScore = useSelector((state) => state.gameplay.score);
+
+	useManageTime();
+
+	/* dimensions of the board, in numbers of cells */
+	const BOX_WIDTH = 10;
+	const BOX_HEIGHT = 10;
+	/* dimensions of an individual cell */
+	const CELL_WIDTH = 30;
+	const CELL_HEIGHT = 30;
+	/* dimensions of the BOX, in pixels */
+	const BOX_WIDTH_PIXELS = BOX_WIDTH * CELL_WIDTH;
+	const BOX_HEIGHT_PIXELS = BOX_HEIGHT * CELL_HEIGHT;
 
 	const pieceContainerStyle = {
 		width: '100%',
@@ -26,11 +43,13 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	}
 
 	const pieceSquare = {
-		width: '200px',
-		height: '200px',
-		border: '1rem solid white',
-		marginTop: 0,
-		margin: '3rem'
+		width: BOX_WIDTH_PIXELS,
+		height: BOX_HEIGHT_PIXELS,
+		display: 'grid',
+		gridTemplateRows: `repeat(${BOX_HEIGHT}, 1fr)`,
+		gridTemplateColumns: `repeat(${BOX_WIDTH}, 1fr)`,
+		boxSizing: 'border-box',
+		border: '1rem solid white'
 	}
 
 	const alignSelfEnd = {
@@ -55,13 +74,22 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const handleClickCancelButton = () => {
 		console.log('should cancel the game');
 		dispatch(endGame());
+		dispatch(resetGame());
+		dispatch(resetGameplay());
+		navigate('/main_menu');
 	}
 
 	return (
 		<div style={middlePanelStyle}>
 			<div style={pieceContainerStyle}>
 				<div style={pieceSquare}>
-					{nextPiece}
+					{
+						box.map((row, rowIndex) =>
+							row.map((cell, cellIndex) => (
+								<Cell key={`${rowIndex}-${cellIndex}`} colorCode={cell} />
+							))
+						)
+					}
 				</div>
 			</div>
 				<div style={stackedContainerStyle}>

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "../../style/panelStyle";
 import { useSelector } from "react-redux";
+import { getGames } from "../../api/http.api";
 
-const ScoresArray = () => {
-	
-	const scores = useSelector((state) => Object.values(state.currentGame.scores))
+const ScoresArray = ({user, scores}) => {
+
+	console.log('array')
+	console.log(scores)
 
 	return (
 		<div style={arrayContainerStyle}>
@@ -15,8 +17,8 @@ const ScoresArray = () => {
 				</div>
 				<div>
 				{
-					scores.map((item, index) => (
-							<p key={index}>{item}</p>
+					scores.map((score, index) => (
+							<p key={index}>{user} got {score} points</p>
 					))
 				}
 				</div>	

@@ -37,11 +37,11 @@ async function test() {
 	catch(e) { console.log(e.message); }
 
   console.log("---------- Matchmaking ----------")
-  let gamePlayer1 = await player.searchGame();
+  let gamePlayer1 = await player.SearchOrCreateMultiGame();
   await gamePlayer1.waitForSomeoneToJoin();
   await gamePlayer1.waitForSomeoneToJoin();
   //sleep(4000);
-  let gamePlayer2 = await player2.searchGame();
+  let gamePlayer2 = await player2.SearchOrCreateMultiGame();
   await gamePlayer1.waitForSomeoneToJoin();
   //sleep(4000);
   await gamePlayer2.waitGameStart()
@@ -50,19 +50,19 @@ async function test() {
   console.log("")
 
   let soloGamePlayer1 = await player.createSoloGame();
-  let soloGamePlayer2 = await player2.searchGame();
+  let soloGamePlayer2 = await player2.SearchOrCreateMultiGame();
   await soloGamePlayer2.quit(player2.name)
   await soloGamePlayer1.finalScore(1);
   console.log("")
 
-  let game2Player2 = await player2.searchGame();
+  let game2Player2 = await player2.SearchOrCreateMultiGame();
   await game2Player2.start_play();
   await game2Player2.finalScore(44);
   //sleep(4000);
-  let game2Player1 = await player.searchGame();
-  game2Player2 = await player2.searchGame();
+  let game2Player1 = await player.SearchOrCreateMultiGame();
+  game2Player2 = await player2.SearchOrCreateMultiGame();
   await game2Player1.waitForSomeoneToJoin();
-  let game2Player3 = await player3.searchGame();
+  let game2Player3 = await player3.SearchOrCreateMultiGame();
   await game2Player1.waitForSomeoneToJoin();
   await game2Player2.waitForSomeoneToJoin();
   //sleep(2000);	
@@ -71,7 +71,7 @@ async function test() {
   console.log("")
 
   let game3Player2 = await game2Player2.next_game();
-  let game3Player4 = await player4.searchGame()
+  let game3Player4 = await player4.SearchOrCreateMultiGame()
   await game3Player2.waitForSomeoneToJoin();
   await game3Player2.start_play();
   await game3Player4.waitForSomeoneToQuit();

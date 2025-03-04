@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setGrid, setScore } from "../redux/slices/gameplaySlice";
+import { setPlayerScore } from "../redux/slices/currentGameSlice"
 
 const useManageLines = (width, height) => {
 
@@ -8,6 +9,7 @@ const useManageLines = (width, height) => {
 
 	const grid = useSelector((state) => state.gameplay.grid);
 	const score = useSelector((state) => state.gameplay.score);
+	const username = useSelector((state) => state.auth.user)
 	
 	const clearFullLines = useCallback(() => { 
 		const newGrid = grid.filter(row => row.some(cell => cell === 0));
@@ -18,7 +20,9 @@ const useManageLines = (width, height) => {
 
 		if (clearedLines > 0) {
 			dispatch(setGrid(updatedGrid));
-			dispatch(setScore(score + clearedLines));
+			const currScore = score + clearedLines * 10;
+			dispatch(setScore(currScore));
+			dispatch(setPlayerScore({username: username, score: currScore }))
 		} 
 
 		// send malus to API (do when integrate with full multi game) TODO
