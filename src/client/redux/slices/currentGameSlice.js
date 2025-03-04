@@ -39,7 +39,9 @@ export const handleGameOverThunk = createAsyncThunk(
 		try {
 			console.log("handleGameOverThunk")
 			const game = getState().currentGame;
-			const response = await gameFinalScore(game);
+			console.log(game)
+			//console.log(game._player1_scorescore[player.username])
+			const response = await gameFinalScore(game.id, "qq", 30);
 			return response;
 		} catch (err) {
 			console.error('Error in handleGameOverThunk:', err);

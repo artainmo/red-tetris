@@ -41,12 +41,7 @@ const useManagePiece = (width, height) => {
 		if (gameOver && !isGameOver) {
 			console.log("dispatching game over")
 			dispatch(handleGameOverThunk())
-			.then((response) => {
-				dispatch(setIsGameOver(true));
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+			dispatch(setIsGameOver(true))
 			return false;
 		}
 		return true;

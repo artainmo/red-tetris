@@ -14,7 +14,7 @@ CREATE TABLE game (
 	player5_id varchar(20) REFERENCES account(username) DEFAULT NULL,
 	player6_id varchar(20) REFERENCES account(username) DEFAULT NULL,
 	-- player2_id varchar(20) REFERENCES account(username) DEFAULT NULL, -- To automatically create multiplayer games for testing, remove prior line and set this one
-	player1_score INT DEFAULT NULL,
+	player1_score INT DEFAULT 0,
 	player2_score INT DEFAULT NULL,
 	player3_score INT DEFAULT NULL,
 	player4_score INT DEFAULT NULL,

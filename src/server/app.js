@@ -3,11 +3,13 @@ const socketio = require('socket.io');
 const { Player } = require(__dirname + '/classes/Player.js');
 const { Game } = require(__dirname + '/classes/Game.js');
 const { PieceBasket } = require(__dirname + '/classes/PieceBasket.js');
+const { database } = require(__dirname + '/database/manageDatabase.js');
 
 const app = express();
 
 // /* only for dev purpose (remove after !)
 const cors = require('cors');
+const { Utils } = require('./classes/Utils');
 app.use(cors());
 
 const corsOptions = {
@@ -126,23 +128,37 @@ router.post('/game/wait/start', async (req,res,next) => {
   	}
 });
 
-router.post('/game/score/:score1?/:score2?/:score3?/:score4?/:score5?/:score6?', async (req,res,next) => {
-  	const score1 = req.params.score1 || null;
-  	const score2 = req.params.score2 || null;
-    const score3 = req.params.score3 || null;
-    const score4 = req.params.score4 || null;
-    const score5 = req.params.score5 || null;
-    const score6 = req.params.score6 || null;
-  	const body = req.body;
-    const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
-          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
+router.post('/game/:gameId/score/', async (req,res) => {
+	console.log("router part")
+	const utils = new Utils();
+	const gameId = req.params.gameId;
+	console.log(gameId)
+	const { playerId, score } = req.body;
+	try {
+		await utils.UpdateGame(gameId, playerId, score)
+		res.status(200).send("Game updated successfully");
+	}
+	catch (error) {
+		res.status(400).send("This game could not be updated with error " + error);
+	}
 
-  	const newGame = await game.finalScore(score1, score2, score3, score4, score5, score6);
-  	if (newGame === false) {
-    	res.status(400).json(game);
-  	} else {
-    	res.status(200).json(newGame);
-  	}
+
+  	// const score1 = req.params.score1 || null;
+  	// const score2 = req.params.score2 || null;
+    // const score3 = req.params.score3 || null;
+    // const score4 = req.params.score4 || null;
+    // const score5 = req.params.score5 || null;
+    // const score6 = req.params.score6 || null;
+  	// const body = req.body;
+    // const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
+    //       body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
+
+  	// const newGame = await game.finalScore(score1, score2, score3, score4, score5, score6);
+  	// if (newGame === false) {
+    // 	
+  	// } else {
+    // 	res.status(200).json(newGame);
+  	// }
 });
 
 router.patch('/game/quit/:name', async (req,res,next) => {

@@ -310,12 +310,16 @@ export const gameWaitStart = async (game) => {
 ** If unable to add game score, returns same game object with status code 400.
 ** Else returns game object with new scores.
 */
-export const gameFinalScore = async(game) => {
-	console.log("saving game final scores")
+export const gameFinalScore = async(gameId, playerId, score) => {
+
   try {
-    var response = await axios.put(`/game/${game.id}`, game);
+    var response = await axios.post("/game/" + gameId + "/score/", {
+      playerId,
+      score,
+    });
 		return {status: response.status, game: response.data};
 	} catch (e) {
+    console.log(e)
 		return {status: e.response.status, game: e.response.data};
 	}
 }
