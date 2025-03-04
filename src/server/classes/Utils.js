@@ -55,10 +55,15 @@ class Utils {
           } catch (error) {
             console.log(error)
             console.log("The game could not be updated");
-          }
-      
-          
+          }          
 	}
+
+  async GetAllGames() {
+		const db = new database();
+		const games = await db.query("SELECT * FROM game");
+		db.close_connection();
+		return games.rows;
+  }
 
 }
 

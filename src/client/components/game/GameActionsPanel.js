@@ -2,6 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { startGame, endGame, resumeGame, pauseGame } from "../../redux/slices/gameTimeSlice";
+import { resetGame } from "../../redux/slices/currentGameSlice";
+import { resetGameplay } from "../../redux/slices/gameplaySlice";
 import { inlineContainerStyle, smallWhiteStyle, statsContainerStyle, stackedContainerStyle, wrapFlexContainerStyle, titleContainerStyle } from "../../style/containersStyle";
 import Cell from "./Cell";
 import RedButton from "../shared/RedButton";

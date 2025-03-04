@@ -1,12 +1,8 @@
 import React from "react";
 import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "../../style/panelStyle";
-import { useSelector } from "react-redux";
 
-const BestScoresArray = () => {
-	
-	const scores = useSelector((state) => Object.values(state.currentGame.scores))
-	console.log("scores here")
-	console.log(scores)
+const BestScoresArray = ({scores}) => {
+
 	return (
 		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>
@@ -16,8 +12,8 @@ const BestScoresArray = () => {
 				</div>
 				<div>
 				{
-					scores.map((item, index) => (
-							<p key={index}>{item}</p>
+					Object.keys(scores).map((key, index) => (
+							<p key={index}>{key} best scores is <mark>{scores[key]}</mark> points</p>
 					))
 				}
 				</div>	

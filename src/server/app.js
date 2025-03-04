@@ -62,6 +62,12 @@ router.get('/connect/:name', async (req, res, next) => {
   	}
 });
 
+router.get('/games/', async (req,res) => {
+	const utils = new Utils();
+	const games = await utils.GetAllGames();
+	res.status(200).json(games);
+});
+
 router.get('/games/:name', async (req,res,next) => {
   	const name = req.params.name;
   	const player = new Player();

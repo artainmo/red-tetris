@@ -386,6 +386,14 @@ export const gameNext = async (game) => {
 */
 
 /*
+** Get a list of all the games 
+*/
+export const getAllGames = async (name) => {
+	var response = await axios.get("/games/");
+	return {status: response.status, games: response.data};
+}
+
+/*
 ** Get a list of all the games someone has participated in.
 */
 export const getGames = async (name) => {
