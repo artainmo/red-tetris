@@ -14,8 +14,9 @@ const useManagePiece = (width, height) => {
 	
 	const dispatch = useDispatch();
 
+	const username = useSelector((state) => state.auth.user)
+	const scores = useSelector((state) => state.currentGame.scores)
 	const grid = useSelector((state) => state.gameplay.grid);
-	const box = useSelector((state) => state.gameplay.box);
 	const activePiece = useSelector((state) => state.gameplay.activePiece);
 	const activePieceType = useSelector((state) => state.gameplay.activePieceType);
 	const nextActivePiece = useSelector((state) => state.gameplay.nextActivePiece);
@@ -40,7 +41,9 @@ const useManagePiece = (width, height) => {
 
 		if (gameOver && !isGameOver) {
 			console.log("dispatching game over")
-			dispatch(handleGameOverThunk())
+			const score = scores[username];
+			console.log(score)
+			dispatch(handleGameOverThunk({user: username, score: score}))
 			dispatch(setIsGameOver(true))
 			return false;
 		}

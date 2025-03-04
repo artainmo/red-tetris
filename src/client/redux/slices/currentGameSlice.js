@@ -35,24 +35,18 @@ export const searchOrCreateMultiGameThunk = createAsyncThunk(
 
 export const handleGameOverThunk = createAsyncThunk(
 	'currentGame/handleGameOverThunk',
-	async (arg, { getState, rejectWithValue }) => {
+	async ({user, score}, { getState, rejectWithValue }) => {
 		try {
 			console.log("handleGameOverThunk")
+			console.log(user)
+			console.log(score)
 			const game = getState().currentGame;
-			console.log(game)
-			//console.log(game._player1_scorescore[player.username])
-			const response = await gameFinalScore(game.id, "qq", 30);
+			const response = await gameFinalScore(game.id, user, score);
 			return response;
 		} catch (err) {
 			console.error('Error in handleGameOverThunk:', err);
-		// Check if the error has a response property
-		if (err.response && err.response.data) {
 			return rejectWithValue(err.response.data);
-		} else {
-			// If not, use the error message as the payload
-			return rejectWithValue({ message: err.message });
 		}
-	}
 	}
 );
 
@@ -66,8 +60,6 @@ const currentGameSlice = createSlice({
 			state.players.push(game._player);
 		},
 		setPlayerScore: (state, action) => {
-			console.log(state.id)
-			console.log(action.payload)
 			const { username, score } = action.payload;
 			console.log("setting score for player " + username + " who got " + score)
 			state.scores[username] = score;

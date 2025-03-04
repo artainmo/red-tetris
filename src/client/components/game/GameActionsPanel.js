@@ -14,7 +14,7 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
-	const isGameStarted = useSelector((state) => state.gameTime > 0);
+	const isGameStarted = useSelector((state) => state.gameTime.isGameActive);
 	const box = useSelector((state) => state.gameplay.box)
 	const gameRank = useSelector((state) => state.gameplay.rank);
 	const gameScore = useSelector((state) => state.gameplay.score);
@@ -72,6 +72,8 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const handleClickCancelButton = () => {
 		console.log('should cancel the game');
 		dispatch(endGame());
+		dispatch(resetGame());
+		dispatch(resetGameplay());
 		navigate('/main_menu');
 	}
 
