@@ -5,18 +5,26 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
+import RedButton from "../components/shared/RedButton";
+import { endGame } from "../redux/slices/gameTimeSlice";
+import { resetGame } from "../redux/slices/currentGameSlice";
+import { resetGameplay } from "../redux/slices/gameplaySlice";
 
 const Lobby = () => {
 	
+	const dispatch = useDispatch();
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
 
 	const navigate = useNavigate();
-
+	let dotCount = 0;
+	
 	/* used to add the "..." dynamically in the matchmaking text */
 	useEffect(() => {
-		let dotCount = 0;
+		console.log("useEffect matchmaking")
+		
 		const interval = setInterval(() => {
 			if (dotCount < 3) {
 				setMatchmakingText(matchmakingText => matchmakingText + '.');
@@ -28,18 +36,20 @@ const Lobby = () => {
 		}, 500);
 		
 		return () => clearInterval(interval);
-	}, []);
+	}, [matchmakingText]);
 
 	const handleCancelButton = () => {
 		// add some API call to remove the player form the match
 		console.log('should cancel the game');
 		dispatch(endGame());
+		dispatch(resetGame());
+		dispatch(resetGameplay());
 		navigate('/main_menu');
 	}
 	
 	return (
 		<div style={pageMainContainerStyle}>
-			<FullPageWithCentralText centralText={matchmakingText}/>
+			<FullPageWithCentralText firstLine={matchmakingText} secondLine={""}/>
 			<div style={buttonContainerStyle}>
 				<RedButton
 					textContent='Cancel'

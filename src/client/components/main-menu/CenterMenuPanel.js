@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import RoomsArray from "./RoomsArray";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createSoloGameThunk, searchOrCreateMultiGameThunk, setGame } from "../../redux/slices/currentGameSlice";
+import { createSoloGameThunk, searchOrCreateMultiGameThunk, setWaitingForPlayersToJoin } from "../../redux/slices/currentGameSlice";
 import { socketConnectThunk } from "../../redux/slices/socketSlice";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
@@ -31,6 +31,7 @@ const CenterMenuPanel = () => {
 		dispatch(searchOrCreateMultiGameThunk(username));
 		dispatch(socketConnectThunk());		
 		setMultiplayerGameCreated(true);
+		dispatch(setWaitingForPlayersToJoin(true));
 	}
 
 	/* redirect to game when game has been created */

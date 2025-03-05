@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 const MultiPlayerPanel = () => {
 
 	const gameTime = useSelector((state) => state.gameTime.gameTime);
-	const players =  useSelector((state) => state.gameplay.players);
+	const players =  useSelector((state) => state.currentGame.players);
 
 	return (
 		<div style={fullTransparentMenuPanelStyle}>
@@ -21,12 +21,16 @@ const MultiPlayerPanel = () => {
 					</p>
 				</div>
 				<div style={wrapFlexContainerStyle}>
-					<PlayerCard username="Player 1"/>
-					<PlayerCard username="Player 2"/>
+					<PlayerCard username={players[0].username}/>
+					<PlayerCard username={players[1].username}/>
 				</div>
 				<div style={wrapFlexContainerStyle}>
-					<PlayerCard username="Player 3"/>
-					<PlayerCard username="Player 4"/>
+				{
+					players[2] != null && <PlayerCard username={players[2].username}/>
+				}
+				{
+					players[3] != null && <PlayerCard username={players[3].username}/>
+				}
 				</div>
 		</div>
 	);

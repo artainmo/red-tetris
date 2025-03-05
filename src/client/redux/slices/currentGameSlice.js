@@ -5,7 +5,9 @@ const initialState = {
 	id: null,
 	players: [],
 	scores: {},
-	error: null
+	error: null,
+	multi: false,
+	waitingForPlayersToJoin: false
 }
 
 export const createSoloGameThunk = createAsyncThunk(
@@ -23,7 +25,7 @@ export const createSoloGameThunk = createAsyncThunk(
 
 export const searchOrCreateMultiGameThunk = createAsyncThunk(
 	'currentGame/createMultiGameThunk',
-	async (name, { rejectWithValue }) => {
+	async ({ name}, { rejectWithValue }) => {
 		try {
 			const response = await searchOrCreateMultiGame(name);
 			return response;
@@ -59,6 +61,9 @@ const currentGameSlice = createSlice({
 			state.id = game._id;
 			state.players.push(game._player);
 		},
+		setWaitingForPlayersToJoin: (state,action) => {
+			state.waitingForPlayersToJoin = action.payload ;
+		},
 		setPlayerScore: (state, action) => {
 			const { username, score } = action.payload;
 			console.log("setting score for player " + username + " who got " + score)
@@ -68,7 +73,8 @@ const currentGameSlice = createSlice({
 			state.id = null;		// resetting to initial state
 			state.players = []
 			state.scores = {}
-			state.error = null;		
+			state.error = null		
+			state.multi = false
 		}
 	},
 	extraReducers: (builder) => {
@@ -87,13 +93,9 @@ const currentGameSlice = createSlice({
 		.addCase(searchOrCreateMultiGameThunk.fulfilled, (state, action) => {
 			const gameData = action.payload.game;
 			state.id = gameData._id;
-			state.players = [gameData._player1, gameData._player2, gameData._player3, gameData._player4];
-			state.scores = {
-				[gameData._player1]: gameData._player1_score,
-				[gameData._player2]: gameData._player2_score,
-				[gameData._player3]: gameData._player3_score,
-				[gameData._player4]: gameData._player4_score
-			}
+			state.multi = true;
+			state.waitingForPlayersToJoin = true;
+			// players are pushed in players[] in the component 
 			state.error = null;
 		})
 		.addCase(searchOrCreateMultiGameThunk.rejected, (state, action) => {
@@ -112,6 +114,7 @@ const currentGameSlice = createSlice({
 
 export const { 
 	setGame,
+	setWaitingForPlayersToJoin,
 	setPlayerScore,
 	resetGame
 } = currentGameSlice.actions;
