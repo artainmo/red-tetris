@@ -1,4 +1,5 @@
 import { API_ENDPOINT } from "./api_endpoint"
+
 const axios = require('axios');
 axios.defaults.baseURL = API_ENDPOINT + "/rest";
 
@@ -68,8 +69,19 @@ export const createSoloGame = async (name) => {
 ** Search a game. If a game exists, join it.
 ** Else create a game and wait for others to join.
 */
-export const searchOrCreateMultiGame = async (name) => {
-	const response = await axios.get("/game/search/" + name);
+export const createMultiGame = async (name) => {
+  console.log("searching multi: " + name)
+	const response = await axios.get("/game/multi/" + name);
+	return {status: response.status, game: response.data};
+}
+
+export const joinMultiGame = async (id, username) => {
+  console.log("searching multi: " + username)
+  const params = {
+    id: id,
+    username: username
+  }
+	const response = await axios.get("/game/join/", params);
 	return {status: response.status, game: response.data};
 }
 /*
@@ -388,7 +400,7 @@ export const gameNext = async (game) => {
 /*
 ** Get a list of all the games 
 */
-export const getAllGames = async (name) => {
+export const getAllGames = async () => {
 	var response = await axios.get("/games/");
 	return {status: response.status, games: response.data};
 }

@@ -17,9 +17,9 @@ const Lobby = () => {
 	
 	const dispatch = useDispatch();
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
+	const [dotCount, setDotCount] = useState(0);
 
 	const navigate = useNavigate();
-	let dotCount = 0;
 	
 	/* used to add the "..." dynamically in the matchmaking text */
 	useEffect(() => {
@@ -28,15 +28,15 @@ const Lobby = () => {
 		const interval = setInterval(() => {
 			if (dotCount < 3) {
 				setMatchmakingText(matchmakingText => matchmakingText + '.');
-				dotCount += 1;
+				setDotCount(dotCount + 1);
 			} else {
 				setMatchmakingText('Matchmaking In Progress');
-				dotCount = 0;
+				setDotCount(0);
 			}
 		}, 500);
 		
 		return () => clearInterval(interval);
-	}, [matchmakingText]);
+	}, [setMatchmakingText,dotCount]);
 
 	const handleCancelButton = () => {
 		// add some API call to remove the player form the match

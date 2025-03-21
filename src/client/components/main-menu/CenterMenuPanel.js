@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import RoomsArray from "./RoomsArray";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createSoloGameThunk, searchOrCreateMultiGameThunk, setWaitingForPlayersToJoin } from "../../redux/slices/currentGameSlice";
+import { createSoloGameThunk, createMultiGameThunk, setWaitingForPlayersToJoin } from "../../redux/slices/currentGameSlice";
 import { socketConnectThunk } from "../../redux/slices/socketSlice";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
@@ -26,13 +26,15 @@ const CenterMenuPanel = () => {
 		setgameCreated(true);
 	}
 
-	const handleMatchmakingForMultiplayer = () => {
+	const handleMultiplayerGameCreation = () => {
 		console.log('starting matchmaking process for multiplayer');
-		dispatch(searchOrCreateMultiGameThunk(username));
+		dispatch(createMultiGameThunk(username));
 		dispatch(socketConnectThunk());		
 		setMultiplayerGameCreated(true);
 		dispatch(setWaitingForPlayersToJoin(true));
 	}
+
+
 
 	/* redirect to game when game has been created */
 	useEffect(() => {
@@ -74,8 +76,8 @@ const CenterMenuPanel = () => {
 					</div>
 					<div style={buttonDivStyle}>
 						<YellowButton 
-							textContent='Join Multi'
-							onClick={handleMatchmakingForMultiplayer} 
+							textContent='Multi'
+							onClick={handleMultiplayerGameCreation} 
 						/>
 					</div>
 				</div>

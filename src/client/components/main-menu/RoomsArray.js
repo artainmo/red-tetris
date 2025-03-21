@@ -5,6 +5,13 @@ import Button from "../shared/RedButton";
 
 const RoomsArray = () => {
 	
+
+	const handleMatchmakingForMultiplayer = () => {
+		console.log('starting matchmaking process for multiplayer');
+		dispatch(joinMultiGameThunk(username));
+		dispatch(socketConnectThunk());
+	}
+
 	const rooms = [] // useSelector((state) => Object.values(state.currentGame.players))
 
 	return (
@@ -18,8 +25,11 @@ const RoomsArray = () => {
 				{
 					rooms.map((item, index) => (
 						<span key={index}>
-							<p>{item}</p>
-							<Button>Join</Button>
+							<p>#{index} {item.player1_id} room</p>
+							<YellowButton 
+								textContent='Join'
+								onClick={handleMatchmakingForMultiplayer} 
+							/>
 						</span>
 					))
 				}

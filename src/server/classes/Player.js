@@ -50,49 +50,41 @@ class Player {
 		return games;
 	}
 
-	async searchOrCreateMultiGame() {				{/* previously : searchGame */}
-		const game = new Game();
+	async searchOrCreateMultiGame(username) {				{/* previously : searchGame */}
 		const db = new database();
 		const openGames = await db.query("SELECT * FROM game WHERE locked = false AND player6_id IS NULL");
 		if (openGames.rows.length !== 0) { //Join existing game
-			game.id = openGames.rows[0].id
-			game.player1 = openGames.rows[0].player1_id;
-			if (!openGames.rows[0].player2_id) {
-				await db.query("UPDATE game SET player2_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
-				game.player2 = this._username;
-			} else if (!openGames.rows[0].player3_id) {
-				game.player2 = openGames.rows[0].player2_id;
-				await db.query("UPDATE game SET player3_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
-				game.player3 = this._username;
-			} else if (!openGames.rows[0].player4_id) {
-				game.player2 = openGames.rows[0].player2_id;
-				game.player3 = openGames.rows[0].player3_id;
-				await db.query("UPDATE game SET player4_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
-				game.player4 = this._username;
-			} else if (!openGames.rows[0].player5_id) {
-				game.player2 = openGames.rows[0].player2_id;
-				game.player3 = openGames.rows[0].player3_id;
-				game.player4 = openGames.rows[0].player4_id;
-				await db.query("UPDATE game SET player5_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
-				game.player5 = this._username;
+			const game = openGames.rows[0]
+			if (!game.player2_id) {
+				await db.query("UPDATE game SET player2_id = $1 WHERE id = $2", [username, game.id]);
+				game.player2 = username;
+			} else if (!game.player3_id) {
+				await db.query("UPDATE game SET player3_id = $1 WHERE id = $2", [username, game.id]);
+				game.player3 = username;
+			} else if (!game.player4_id) {
+				await db.query("UPDATE game SET player4_id = $1 WHERE id = $2", [username, game.id]);
+			} else if (!game.player5_id) {
+				await db.query("UPDATE game SET player5_id = $1 WHERE id = $2", [username, game.id]);
 			} else {
-				game.player2 = openGames.rows[0].player2_id;
-				game.player3 = openGames.rows[0].player3_id;
-				game.player4 = openGames.rows[0].player4_id;
-				game.player5 = openGames.rows[0].player5_id;
-				await db.query("UPDATE game SET player6_id = $1 WHERE id = $2", [this._username, openGames.rows[0].id]);
-				game.player6 = this._username;
+				await db.query("UPDATE game SET player6_id = $1 WHERE id = $2", [username, game.id]);
 			}
-			console.log(`${this._username}: ${this._username} joined ${game.player1}'s game`)
+			console.log(`${username}: ${username} joined ${game.player1_id}'s game`)
 		} else { //Create joinable game
-			await db.query("INSERT INTO game (player1_id) VALUES ($1);", [this._username]);
+			await db.query("INSERT INTO game (player1_id) VALUES ($1);", [username]);
 			const newGame = await db.query("SELECT id FROM game WHERE locked = false AND player1_id = $1 AND player2_id IS NULL;", [this._username]);
 			game.id = newGame.rows[0].id
-			game.player1 = this._username;
-			console.log(`${this._username}: ${this._username} created a joinable game`)
+			game.player1 = username;
+			console.log(`${username}: ${username} created a joinable game`)
 		}
 		db.close_connection();
 		return game;
+	}
+
+	async showJoinableGames() {				{/* this is for the Rooms in the front */}
+		const db = new database();
+		const openGames = await db.query("SELECT * FROM game WHERE locked = false AND player6_id IS NULL");
+		db.close_connection();
+		return openGames.rows;
 	}
 
 	async createSoloGame() {

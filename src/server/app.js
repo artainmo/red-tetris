@@ -9,8 +9,9 @@ const app = express();
 
 // /* only for dev purpose (remove after !)
 const cors = require('cors');
-const { Utils } = require('./classes/Utils');
 app.use(cors());
+const { Utils } = require('./classes/Utils');
+
 
 const corsOptions = {
   	origin: true,
@@ -68,7 +69,7 @@ router.get('/games/', async (req,res) => {
 	res.status(200).json(games);
 });
 
-router.get('/games/:name', async (req,res,next) => {
+router.get('/games/:name', async (req,res) => {
   	const name = req.params.name;
   	const player = new Player();
 
@@ -77,16 +78,29 @@ router.get('/games/:name', async (req,res,next) => {
   	res.status(200).json(games);
 });
 
-router.get('/game/search/:name', async (req,res,next) => {
-  	const name = req.params.name;
-  	const player = new Player();
-
-  	await player.connect(name);
-  	const game = await player.searchOrCreateMultiGame();
+router.get('/game/search/:name', async (req,res) => {
+  	const username = req.params.name;
+	const utils = new Utils();
+  	const game = await utils.createMultiGame(username);
   	res.status(200).json(game);
 });
 
-router.get('/game/solo/:name', async (req,res,next) => {
+router.get('/game/multi/:name', async (req,res) => {
+	const username = req.params.name;
+  	const utils = new Utils();
+	const game = await utils.createMultiGame(username);
+	res.status(200).json(game);
+});
+
+router.get('/game/join/:id', async (req,res) => {
+	const gameId = req.params.id
+	const username = res.username;
+  	const utils = new Utils();
+	const game = await utils.joinMultiGame(gameId, username);
+	res.status(200).json(game);
+});
+
+router.get('/game/solo/:name', async (req,res) => {
   	const name = req.params.name;
   	const player = new Player();
 
@@ -95,17 +109,13 @@ router.get('/game/solo/:name', async (req,res,next) => {
     res.status(200).json(game);
 });
 
-router.post('/game/wait/join', async (req,res,next) => {
-  	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
-          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
-
-  	const newGame = await game.waitForSomeoneToJoin();
-  	if (newGame === false) {
-    	res.status(400).json(game);
-  	} else {
-    	res.status(200).json(newGame);
-  	}
+router.post('/game/wait/join', async () => {
+	const utils = new Utils();
+  	const game = await utils.GetJoinableGames();
+	if (game != null)
+  		res.status(200).json(game);
+	else
+		res.status(400).send("No joinable rooms");
 });
 
 router.patch('/game/start', async (req,res,next) => {

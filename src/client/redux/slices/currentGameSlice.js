@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { createSoloGame, getGames, searchOrCreateMultiGame, gameFinalScore } from '../../api/http.api';
+import { createSoloGame, createMultiGame, joinMultiGame, gameFinalScore } from '../../api/http.api';
 
 const initialState = {
 	id: null,
@@ -23,11 +23,24 @@ export const createSoloGameThunk = createAsyncThunk(
 	}
 );
 
-export const searchOrCreateMultiGameThunk = createAsyncThunk(
+export const createMultiGameThunk = createAsyncThunk(
 	'currentGame/createMultiGameThunk',
-	async ({ name}, { rejectWithValue }) => {
+	async (name, { rejectWithValue }) => {
 		try {
-			const response = await searchOrCreateMultiGame(name);
+			console.log('in the thunk')
+			const response = await createMultiGame(name);
+			return response;
+		} catch (err) {
+			return rejectWithValue(err.response.data);
+		}
+	}
+);
+
+export const joinMultiGameThunk = createAsyncThunk(
+	'currentGame/joinMultiGameThunk',
+	async (name, { rejectWithValue }) => {
+		try {
+			const response = await joinMultiGame(name);
 			return response;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
@@ -90,16 +103,31 @@ const currentGameSlice = createSlice({
 			console.log('problem creating solo game');
 			state.error = action.payload; // check this
 		})
-		.addCase(searchOrCreateMultiGameThunk.fulfilled, (state, action) => {
+		.addCase(createMultiGameThunk.fulfilled, (state, action) => {
 			const gameData = action.payload.game;
+			console.log("createMultiThunk")
+			console.log("gameData")
+			console.log(gameData)
 			state.id = gameData._id;
 			state.multi = true;
 			state.waitingForPlayersToJoin = true;
 			// players are pushed in players[] in the component 
 			state.error = null;
 		})
-		.addCase(searchOrCreateMultiGameThunk.rejected, (state, action) => {
+		.addCase(createMultiGameThunk.rejected, (state, action) => {
 			console.log('problem creating multi game');
+			state.error = action.payload; // check this
+		})
+		.addCase(joinMultiGameThunk.fulfilled, (state, action) => {
+			const gameData = action.payload.game;
+			state.id = gameData._id;
+			state.multi = true;
+			state.waitingForPlayersToJoin = false;
+			// players are pushed in players[] in the component 
+			state.error = null;
+		})
+		.addCase(joinMultiGameThunk.rejected, (state, action) => {
+			console.log('problem joining multi game');
 			state.error = action.payload; // check this
 		})
 		.addCase(handleGameOverThunk.fulfilled, (state, action) => {
