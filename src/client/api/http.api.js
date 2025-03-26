@@ -455,3 +455,8 @@ export const getGames = async (name) => {
         ]
 }
 */
+
+export const getJoinableGames = async () => {
+	var response = await axios.get("/joinablegames/");
+	return {status: response.status, games: response.data};
+}
