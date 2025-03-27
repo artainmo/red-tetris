@@ -117,7 +117,6 @@ class Utils {
     //const db = new database();
     const game = await this.FindGameById(id);
     if (game != null) { //Join existing game
-      game = openGames.rows[0]
       if (!game.player2_id) {
         await pool.query("UPDATE game SET player2_id = $1 WHERE id = $2", [username, game.id]);
         game.player2 = username;

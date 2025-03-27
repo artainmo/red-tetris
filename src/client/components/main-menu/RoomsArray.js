@@ -2,14 +2,20 @@ import React, { useEffect, useState } from "react";
 import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "../../style/panelStyle";
 import SmallButton from "../shared/SmallButton";
 import { getJoinableGames } from "../../api/http.api";
+import { useDispatch, useSelector } from "react-redux";
+import { joinMultiGameThunk } from "../../redux/slices/currentGameSlice";
+import { socketConnectThunk } from "../../redux/slices/socketSlice";
 
 const RoomsArray = () => {
 	
-	const [rooms,setRooms] = useState([])
+	const dispatch = useDispatch();
 
-	const handleMatchmakingForMultiplayer = () => {
+	const [rooms,setRooms] = useState([])
+	const username = useSelector((state) => state.auth.user)
+
+	const handleMatchmakingForMultiplayer = (id) => {
 		console.log('starting matchmaking process for multiplayer');
-		dispatch(joinMultiGameThunk(username));
+		dispatch(joinMultiGameThunk({id: id, username: username}));
 		dispatch(socketConnectThunk());
 	}
 
@@ -17,6 +23,8 @@ const RoomsArray = () => {
 		const fetchRooms = async () => {
 		  try {
 			const data = await getJoinableGames();
+			console.log("rooms")
+			console.log(data.games)
 			setRooms(data.games);
 		  } catch (error) {
 			console.error('Error fetching joinable games:', error);
@@ -24,7 +32,7 @@ const RoomsArray = () => {
 		};
 	  
 		fetchRooms();
-		console.log(rooms)
+
 	  }, []);
 
 	return (
@@ -34,17 +42,17 @@ const RoomsArray = () => {
 					<h2 style={titleStyle}>Active Rooms</h2>
 					<div style={delimiterStyle}></div>
 				</div>
-				<div className="d-flex flex-wrap justify-content-between align-items-center">
+				<div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
 				{
 					rooms.length === 0 ?
 					<p>No rooms to join right now</p>
 					:
-					rooms.map((item, index) => (
-						<div style={{display:"flex"}} key={index}>
-							<p style={{margin: "auto"}}>#{index} {item.player1_id} room</p>
+					rooms.map((r, index) => (
+						<div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }} key={index}>
+							<p style={{ margin: 'auto', marginLeft: '0' }}>#{index} {r.player1_id} room</p>
 							<SmallButton
 								textContent={"Join"}
-								onClick={handleMatchmakingForMultiplayer} 
+								onClick={() => handleMatchmakingForMultiplayer(r.id)} 
 							/>
 						</div>
 					))

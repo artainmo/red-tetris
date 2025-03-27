@@ -77,11 +77,11 @@ export const createMultiGame = async (name) => {
 
 export const joinMultiGame = async (id, username) => {
   console.log("searching multi: " + username)
-  const params = {
-    id: id,
-    username: username
-  }
-	const response = await axios.get("/game/join/", params);
+  // const params = {
+  //   id: id,
+  //   username: username
+  // }
+	const response = await axios.get("/game/join/" + id, username);
 	return {status: response.status, game: response.data};
 }
 /*

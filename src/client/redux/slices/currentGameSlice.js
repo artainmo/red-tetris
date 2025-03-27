@@ -38,9 +38,12 @@ export const createMultiGameThunk = createAsyncThunk(
 
 export const joinMultiGameThunk = createAsyncThunk(
 	'currentGame/joinMultiGameThunk',
-	async (name, { rejectWithValue }) => {
+	async ({id, username}, { rejectWithValue }) => {
 		try {
-			const response = await joinMultiGame(name);
+			console.log("joinMultiGameOverThunk")
+			console.log(id)
+			console.log(username)
+			const response = await joinMultiGame(id, username);
 			return response;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
@@ -125,6 +128,7 @@ const currentGameSlice = createSlice({
 			state.waitingForPlayersToJoin = false;
 			// players are pushed in players[] in the component 
 			state.error = null;
+			console.log('succesfully joined multi game!');
 		})
 		.addCase(joinMultiGameThunk.rejected, (state, action) => {
 			console.log('problem joining multi game');
