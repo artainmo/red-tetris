@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
 import RedButton from "../components/shared/RedButton";
@@ -17,7 +17,9 @@ const Lobby = () => {
 	
 	const dispatch = useDispatch();
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
+	const [gameStartingSoonText, setGameStartingSoonText] = useState('New players joined the game');
 	const [dotCount, setDotCount] = useState(0);
+	const playersJoinedTheGame = useSelector((state) => state.currentGame.playersJoinedTheGame)
 
 	const navigate = useNavigate();
 	
@@ -49,7 +51,13 @@ const Lobby = () => {
 	
 	return (
 		<div style={pageMainContainerStyle}>
-			<FullPageWithCentralText firstLine={matchmakingText} secondLine={""}/>
+			{
+				/* ca serait cool de faire un countdown de 10 seconds si on a le temps */
+				playersJoinedTheGame ? 
+				<FullPageWithCentralText firstLine={gameStartingSoonText} secondLine={"Game will start soon."}/>
+				:
+				<FullPageWithCentralText firstLine={matchmakingText} secondLine={""}/>
+			}
 			<div style={buttonContainerStyle}>
 				<RedButton
 					textContent='Cancel'

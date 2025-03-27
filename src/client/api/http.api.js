@@ -70,17 +70,13 @@ export const createSoloGame = async (name) => {
 ** Else create a game and wait for others to join.
 */
 export const createMultiGame = async (name) => {
-  console.log("searching multi: " + name)
+  console.log("creating multi: " + name)
 	const response = await axios.get("/game/multi/" + name);
 	return {status: response.status, game: response.data};
 }
 
 export const joinMultiGame = async (id, username) => {
   console.log("searching multi: " + username)
-  // const params = {
-  //   id: id,
-  //   username: username
-  // }
 	const response = await axios.get("/game/join/" + id, username);
 	return {status: response.status, game: response.data};
 }

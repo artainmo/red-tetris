@@ -81,42 +81,15 @@ class Utils {
   }
 
   async createMultiGame(username) {				{/* previously : searchGame */}
-    //const db = new database();
-    // const openGames = await pool.query("SELECT * FROM game WHERE locked = false AND player6_id IS NULL");
-    // if (openGames.rows.length !== 0) { //Join existing game
-    //   game = openGames.rows[0]
-    //   if (!game.player2_id) {
-    //     await pool.query("UPDATE game SET player2_id = $1 WHERE id = $2", [username, game.id]);
-    //     game.player2 = username;
-    //   } else if (!game.player3_id) {
-    //     await pool.query("UPDATE game SET player3_id = $1 WHERE id = $2", [username, game.id]);
-    //     game.player3 = username;
-    //   } else if (!game.player4_id) {
-    //     await pool.query("UPDATE game SET player4_id = $1 WHERE id = $2", [username, game.id]);
-    //     game.player4 = username;
-    //   } else if (!game.player5_id) {
-    //     await pool.query("UPDATE game SET player5_id = $1 WHERE id = $2", [username, game.id]);
-    //     game.player5 = username;
-    //   } else {
-    //     await pool.query("UPDATE game SET player6_id = $1 WHERE id = $2", [username, game.id]);
-    //     game.player6 = username;
-    //   }
-    //   console.log(`${username}: ${username} joined ${game.player1_id}'s game`)
-    // } else { //Create joinable game
-    const game = await pool.query("INSERT INTO game (player1_id) VALUES ($1);", [username]);
-      // = await pool.query("SELECT id FROM game WHERE locked = false AND player1_id = $1 AND player2_id IS NULL;", [this._username]);
-      // game.id = newGame.rows[0].id
-      // game.player1 = username;
-      console.log(`${username}: ${username} created a joinable game`)
-    //db.close_connection();
-    return game;
+    const game = await pool.query("INSERT INTO game (player1_id) VALUES ($1) RETURNING *;", [username]);
+    console.log(`${username}: ${username} created a joinable game`)
+    return game.rows[0];
   }
 
   
-  async joinMultiGame(id, username) {				{/* previously : searchGame */}
-    //const db = new database();
+  async joinMultiGame(id, username) {				{/* join existing game */}
     const game = await this.FindGameById(id);
-    if (game != null) { //Join existing game
+    if (game != null) { 
       if (!game.player2_id) {
         await pool.query("UPDATE game SET player2_id = $1 WHERE id = $2", [username, game.id]);
         game.player2 = username;
