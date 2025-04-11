@@ -153,6 +153,7 @@ export const {
 	setGame,
 	setWaitingForPlayersToJoin,
 	setPlayerScore,
+	setPlayersJoinedTheGame,
 	resetGame
 } = currentGameSlice.actions;
 

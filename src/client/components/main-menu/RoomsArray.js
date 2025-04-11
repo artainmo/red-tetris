@@ -3,7 +3,7 @@ import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "
 import SmallButton from "../shared/SmallButton";
 import { getJoinableGames } from "../../api/http.api";
 import { useDispatch, useSelector } from "react-redux";
-import { joinMultiGameThunk } from "../../redux/slices/currentGameSlice";
+import { joinMultiGameThunk, setPlayersJoinedTheGame } from "../../redux/slices/currentGameSlice";
 import { socketConnectThunk } from "../../redux/slices/socketSlice";
 
 const RoomsArray = () => {
@@ -17,6 +17,7 @@ const RoomsArray = () => {
 		console.log('starting matchmaking process for multiplayer');
 		dispatch(joinMultiGameThunk({id: id, username: username}));
 		dispatch(socketConnectThunk());
+		dispatch(setPlayersJoinedTheGame(true));
 	}
 
 	useEffect(() => {

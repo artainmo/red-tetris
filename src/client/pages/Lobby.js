@@ -10,7 +10,7 @@ import { pageMainContainerStyle, buttonContainerStyle } from "../style/container
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
 import RedButton from "../components/shared/RedButton";
 import { endGame } from "../redux/slices/gameTimeSlice";
-import { resetGame } from "../redux/slices/currentGameSlice";
+import { handleGameOverThunk, resetGame, setIsGameOver } from "../redux/slices/currentGameSlice";
 import { resetGameplay } from "../redux/slices/gameplaySlice";
 
 const Lobby = () => {
@@ -20,6 +20,7 @@ const Lobby = () => {
 	const [gameStartingSoonText, setGameStartingSoonText] = useState('New players joined the game');
 	const [dotCount, setDotCount] = useState(0);
 	const playersJoinedTheGame = useSelector((state) => state.currentGame.playersJoinedTheGame)
+	const username = useSelector((state) => state.auth.user)
 
 	const navigate = useNavigate();
 	
@@ -36,19 +37,28 @@ const Lobby = () => {
 				setDotCount(0);
 			}
 		}, 500);
+
+		if (playersJoinedTheGame)
+			console.log("joined multi")
 		
 		return () => clearInterval(interval);
-	}, [setMatchmakingText,dotCount]);
+
+
+
+	}, [setMatchmakingText,dotCount,playersJoinedTheGame]);
 
 	const handleCancelButton = () => {
 		// add some API call to remove the player form the match
 		console.log('should cancel the game');
+		dispatch(handleGameOverThunk({user: username, score: 0}))
+		dispatch(setIsGameOver(true))
 		dispatch(endGame());
 		dispatch(resetGame());
 		dispatch(resetGameplay());
 		navigate('/main_menu');
 	}
 	
+	console.log("player joined " + playersJoinedTheGame)
 	return (
 		<div style={pageMainContainerStyle}>
 			{
