@@ -98,9 +98,10 @@ router.get('/game/multi/:name', async (req,res) => {
 	res.status(200).json(game);
 });
 
-router.get('/game/join/:id', async (req,res) => {
-	const gameId = req.params.id
-	const username = res.username;
+router.post('/game/join/:id', async (req,res) => {
+	console.log(res.params)
+	const gameId = req.params.id;
+	const username = req.body.username;
   	const utils = new Utils();
 	const game = await utils.joinMultiGame(gameId, username);
 	res.status(200).json(game);

@@ -10,8 +10,8 @@ import { pageMainContainerStyle, buttonContainerStyle } from "../style/container
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
 import RedButton from "../components/shared/RedButton";
 import { endGame } from "../redux/slices/gameTimeSlice";
-import { handleGameOverThunk, resetGame, setIsGameOver } from "../redux/slices/currentGameSlice";
-import { resetGameplay } from "../redux/slices/gameplaySlice";
+import { handleGameOverThunk, resetGame } from "../redux/slices/currentGameSlice";
+import { resetGameplay, setIsGameOver } from "../redux/slices/gameplaySlice";
 
 const Lobby = () => {
 	
