@@ -37,15 +37,24 @@ const Lobby = () => {
 				setDotCount(0);
 			}
 		}, 500);
-
-		if (playersJoinedTheGame)
-			console.log("joined multi")
 		
 		return () => clearInterval(interval);
 
 
 
 	}, [setMatchmakingText,dotCount,playersJoinedTheGame]);
+
+	useEffect(()=>{
+		try {
+		  socket.on("newPlayerJoined", (data) => {
+			console.log(data.message);
+			dispatch(playersJoinedTheGame(true));
+		  });
+		} catch (error) {
+		  console.log(error)
+		}
+		
+	  },[])
 
 	const handleCancelButton = () => {
 		// add some API call to remove the player form the match
@@ -58,7 +67,6 @@ const Lobby = () => {
 		navigate('/main_menu');
 	}
 	
-	console.log("player joined " + playersJoinedTheGame)
 	return (
 		<div style={pageMainContainerStyle}>
 			{

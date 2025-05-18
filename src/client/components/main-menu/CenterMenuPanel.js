@@ -25,7 +25,6 @@ const CenterMenuPanel = () => {
 		dispatch(socketConnectThunk());
 		setgameCreated(true);
 	}
-
 	const handleMultiplayerGameCreation = () => {
 		console.log('starting matchmaking process for multiplayer');
 		dispatch(createMultiGameThunk(username));
@@ -33,6 +32,7 @@ const CenterMenuPanel = () => {
 		setMultiplayerGameCreated(true);
 		dispatch(setWaitingForPlayersToJoin(true));
 	}
+
 
 
 

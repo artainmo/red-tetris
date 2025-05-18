@@ -13,7 +13,7 @@ const RoomsArray = () => {
 	const [rooms,setRooms] = useState([])
 	const username = useSelector((state) => state.auth.user)
 
-	const handleMatchmakingForMultiplayer = (id) => {
+	const joinMultiplayer = (id) => {
 		console.log('starting matchmaking process for multiplayer');
 		dispatch(joinMultiGameThunk({id: id, username: username}));
 		dispatch(socketConnectThunk());
@@ -53,7 +53,7 @@ const RoomsArray = () => {
 							<p style={{ margin: 'auto', marginLeft: '0' }}>#{index} {r.player1_id} room</p>
 							<SmallButton
 								textContent={"Join"}
-								onClick={() => handleMatchmakingForMultiplayer(r.id)} 
+								onClick={() => joinMultiplayer(r.id)} 
 							/>
 						</div>
 					))

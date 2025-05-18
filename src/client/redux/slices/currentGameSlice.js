@@ -8,7 +8,8 @@ const initialState = {
 	error: null,
 	multi: false,
 	waitingForPlayersToJoin: false,
-	playersJoinedTheGame: false
+	playersJoinedTheGame: false,
+	socket: null
 }
 
 export const createSoloGameThunk = createAsyncThunk(
@@ -28,7 +29,6 @@ export const createMultiGameThunk = createAsyncThunk(
 	'currentGame/createMultiGameThunk',
 	async (name, { rejectWithValue }) => {
 		try {
-			console.log('in the thunk')
 			const response = await createMultiGame(name);
 			return response;
 		} catch (err) {
@@ -110,7 +110,7 @@ const currentGameSlice = createSlice({
 			console.log('problem creating solo game');
 			state.error = action.payload; // check this
 		})
-		.addCase(createMultiGameThunk.fulfilled, (state, action) => {
+		.addCase(createMultiGameThunk.fulfilled, async(state, action) => {
 			const game = action.payload.game;
 			console.log("succesfully created multi game!")
 			console.log("gameData")

@@ -164,24 +164,6 @@ router.post('/game/:gameId/score/', async (req,res) => {
 	catch (error) {
 		res.status(400).send("This game could not be updated with error " + error);
 	}
-
-
-  	// const score1 = req.params.score1 || null;
-  	// const score2 = req.params.score2 || null;
-    // const score3 = req.params.score3 || null;
-    // const score4 = req.params.score4 || null;
-    // const score5 = req.params.score5 || null;
-    // const score6 = req.params.score6 || null;
-  	// const body = req.body;
-    // const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
-    //       body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
-
-  	// const newGame = await game.finalScore(score1, score2, score3, score4, score5, score6);
-  	// if (newGame === false) {
-    // 	
-  	// } else {
-    // 	res.status(200).json(newGame);
-  	// }
 });
 
 router.patch('/game/quit/:name', async (req,res,next) => {
@@ -225,7 +207,66 @@ router.patch('/game/wait/quit', async (req,res,next) => {
   	}
 });
 
+/***********************************************/
+/***********		SOCKETS		 ***************/
+/***********************************************/
 
+const joinRoom = (socket, room) => {
+	room.sockets.push(socket);
+	socket.join(room.id, () => {
+	  // store the room id in the socket for future use
+	  socket.roomId = room.id;
+	  console.log(socket.id, "Joined", room.id);
+	});
+  };
+  
+  const leaveRooms = (socket) => {
+	const roomsToDelete = [];
+	for (const id in rooms) {
+	  const room = rooms[id];
+	  if (room.sockets.includes(socket)) {
+		socket.leave(id);
+		room.sockets = room.sockets.filter((item) => item !== socket);
+	  }
+	  if (room.sockets.length == 0) {
+		roomsToDelete.push(room);
+	  }
+	}
+  
+	for (const room of roomsToDelete) {
+	  delete rooms[room.id];
+	}
+  };
+  
+  const checkScore = (room, sendMessage = false) => {
+	let winner = null;
+	for (const client of room.sockets) {
+	  if (client.score >= NUM_ROUNDS) {
+		winner = client;
+		break;
+	  }
+	}
+  
+	if (winner) {
+	  if (sendMessage) {
+		for (const client of room.sockets) {
+		  client.emit('gameOver', client.id === winner.id ? "You won the game!" : "You lost the game :(");
+		}
+	  }
+  
+	  return true;
+	}
+  
+	return false;
+  };
+  
+  
+const room = rooms[socket.roomId];
+if (!room) {
+	return;
+}
+
+const rooms = {};
 //Setting up the websockets with socket.io
 const io = socketio(server, {
   	cors: {
@@ -259,6 +300,7 @@ io.on('connection', async (socket) => {
         io.to(roomId).emit('newPiece', piece); //Broadcast to all room members the same new piece
     });
 
+
     socket.on('sendPersonalGameStructure', (data) => {
         socket.broadcast.to(data.roomId).emit('otherPlayerGameStructure',
             data.gameStructure); //Broadcast to all room members the game structures of all players
@@ -268,4 +310,48 @@ io.on('connection', async (socket) => {
     		console.log("Sending next game");
         socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame); //Broadcast to all room members the next game, whereby last winner will become host
     });
+  
+	socket.on('ready', () => {
+	  console.log(socket.id, "is ready!");
+	  const room = rooms[socket.roomId];
+	  // when we have two players... START THE GAME!
+	  if (room.sockets.length > 1) {
+		// tell each player to start the game.
+		for (const client of room.sockets) {
+		  client.emit('initGame');
+		}
+	  }
+	});
+  
+	socket.on('startGame', (data, callback) => {
+	  const room = rooms[socket.roomId];
+	  if (!room) {
+		return;
+	  }
+	});
+  
+	socket.on('createRoom', (game, callback) => {
+	  const room = {
+		id: game.id, 
+		name: game._player1,
+		sockets: []
+	  };
+	  rooms[room.id] = room;
+	  joinRoom(socket, room);
+	  callback();
+	});
+  
+	socket.on('joinRoom', (roomId, callback) => {
+		console.log("sockets join Room")
+		const room = rooms[roomId];
+		joinRoom(socket, room);
+		if (room.sockets.length > 1)
+			socket.to(room.name).emit('newPlayerJoined', room);
+		//  callback();
+	});
+  
+	socket.on('leaveRoom', () => {
+	  leaveRooms(socket);
+	});
+  
 });
