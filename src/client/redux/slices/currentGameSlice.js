@@ -9,7 +9,7 @@ const initialState = {
 	multi: false,
 	waitingForPlayersToJoin: false,
 	playersJoinedTheGame: false,
-	socket: null
+	roomName: ""
 }
 
 export const createSoloGameThunk = createAsyncThunk(
@@ -39,12 +39,12 @@ export const createMultiGameThunk = createAsyncThunk(
 
 export const joinMultiGameThunk = createAsyncThunk(
 	'currentGame/joinMultiGameThunk',
-	async ({id, username}, { rejectWithValue }) => {
+	async ({id, username, socket}, { rejectWithValue }) => {
 		try {
-			console.log("joinMultiGameOverThunk")
+			console.log("joinMultiGameThunk")
 			console.log(id)
 			console.log(username)
-			const response = await joinMultiGame(id, username);
+			const response = await joinMultiGame(id, username, socket);
 			return response;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
@@ -95,6 +95,7 @@ const currentGameSlice = createSlice({
 			state.scores = {}
 			state.error = null		
 			state.multi = false
+			state.roomName = ""
 		}
 	},
 	extraReducers: (builder) => {
@@ -105,12 +106,13 @@ const currentGameSlice = createSlice({
 			state.id = gameData._id;
 			state.players.push(gameData._player1);
 			state.error = null;
+			state.roomName = gameData._id;
 		})
 		.addCase(createSoloGameThunk.rejected, (state, action) => {
 			console.log('problem creating solo game');
 			state.error = action.payload; // check this
 		})
-		.addCase(createMultiGameThunk.fulfilled, async(state, action) => {
+		.addCase(createMultiGameThunk.fulfilled, (state, action) => {
 			const game = action.payload.game;
 			console.log("succesfully created multi game!")
 			console.log("gameData")
@@ -120,6 +122,7 @@ const currentGameSlice = createSlice({
 			state.waitingForPlayersToJoin = true;
 			state.players.push(game.player1)
 			state.error = null;
+			state.roomName = game.id;
 		})
 		.addCase(createMultiGameThunk.rejected, (state, action) => {
 			console.log('problem creating multi game');

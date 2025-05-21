@@ -4,7 +4,7 @@ import SmallButton from "../shared/SmallButton";
 import { getJoinableGames } from "../../api/http.api";
 import { useDispatch, useSelector } from "react-redux";
 import { joinMultiGameThunk, setPlayersJoinedTheGame } from "../../redux/slices/currentGameSlice";
-import { socketConnectThunk } from "../../redux/slices/socketSlice";
+import { socketConnectThunk, joinRoomThunk } from "../../redux/slices/socketSlice";
 
 const RoomsArray = () => {
 	
@@ -15,8 +15,10 @@ const RoomsArray = () => {
 
 	const joinMultiplayer = (id) => {
 		console.log('starting matchmaking process for multiplayer');
-		dispatch(joinMultiGameThunk({id: id, username: username}));
-		dispatch(socketConnectThunk());
+		const socket = dispatch(socketConnectThunk());
+		console.log(socket)
+		dispatch(joinMultiGameThunk({id: id, username: username, socket: socket}));
+		dispatch(joinRoomThunk({roomName: id, userSocket: socket}));
 		dispatch(setPlayersJoinedTheGame(true));
 	}
 

@@ -47,6 +47,7 @@ const Lobby = () => {
 	useEffect(()=>{
 		try {
 		  socket.on("newPlayerJoined", (data) => {
+			console.log("on newPlayerJoined")
 			console.log(data.message);
 			dispatch(playersJoinedTheGame(true));
 		  });
