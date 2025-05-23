@@ -211,61 +211,6 @@ router.patch('/game/wait/quit', async (req,res,next) => {
 /***********		SOCKETS		 ***************/
 /***********************************************/
 
-// const joinRoom = (socket, room) => {
-// 	room.sockets.push(socket);
-// 	socket.join(room.id, () => {
-// 	  // store the room id in the socket for future use
-// 	  socket.roomId = room.id;
-// 	  console.log(socket.id, "Joined", room.id);
-// 	});
-//   };
-  
-// const leaveRooms = (socket) => {
-// const roomsToDelete = [];
-// for (const id in rooms) {
-// 	const room = rooms[id];
-// 	if (room.sockets.includes(socket)) {
-// 	socket.leave(id);
-// 	room.sockets = room.sockets.filter((item) => item !== socket);
-// 	}
-// 	if (room.sockets.length == 0) {
-// 	roomsToDelete.push(room);
-// 	}
-// }
-
-// for (const room of roomsToDelete) {
-// 		delete rooms[room.id];
-// 	}
-// };
-
-// const checkScore = (room, sendMessage = false) => {
-// let winner = null;
-// for (const client of room.sockets) {
-// 	if (client.score >= NUM_ROUNDS) {
-// 	winner = client;
-// 	break;
-// 	}
-// }
-
-// if (winner) {
-// 	if (sendMessage) {
-// 		for (const client of room.sockets) {
-// 			client.emit('gameOver', client.id === winner.id ? "You won the game!" : "You lost the game :(");
-// 		}
-// 		}
-// 		return true;
-// 	}
-// 	return false;
-// };
-
-  
-// // const room = rooms[socket.roomId];
-// // if (!room) {
-// // 	return;
-// // }
-
-// const rooms = {};
-//Setting up the websockets with socket.io
 const io = socketio(server, {
   	cors: {
     	origin: true,

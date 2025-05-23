@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import RoomsArray from "./RoomsArray";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createSoloGameThunk, createMultiGameThunk, setWaitingForPlayersToJoin } from "../../redux/slices/currentGameSlice";
-import { socketConnectThunk } from "../../redux/slices/socketSlice";
+import { createSoloGameThunk, createMultiGameThunk, setWaitingForPlayersToJoin, joinMultiGameThunk } from "../../redux/slices/currentGameSlice";
+import { socketConnectThunk, joinRoomThunk } from "../../redux/slices/socketSlice";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
 import { fullWhiteMenuPanelStyle, middlePanelStyle, middleArrayContainerStyle } from "../../style/panelStyle";
@@ -13,7 +13,7 @@ const CenterMenuPanel = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const [gameCreated, setgameCreated] = useState(false);
+	const [gameCreated, setGameCreated] = useState(false);
 	const [multiplayerGameCreated, setMultiplayerGameCreated] = useState(false);
 
 	const username = useSelector((state) => state.auth.user);
@@ -23,24 +23,23 @@ const CenterMenuPanel = () => {
 	const handleSoloGameCreation = async() => {
 		dispatch(createSoloGameThunk(username));
 		dispatch(socketConnectThunk());
-		setgameCreated(true);
+		setGameCreated(true);
 	}
-	const handleMultiplayerGameCreation = () => {
+	const handleMultiplayerGameCreation = async() => {
 		console.log('starting matchmaking process for multiplayer');
-		dispatch(createMultiGameThunk(username));
-		dispatch(socketConnectThunk());		
+		const game = dispatch(createMultiGameThunk(username));
+		const socket = await dispatch(socketConnectThunk());
+		dispatch(joinMultiGameThunk({id: game.id, username: username, socket: socket}));		
+		dispatch(joinRoomThunk({roomName: game.id, userSocket: socket}));		
 		setMultiplayerGameCreated(true);
 		dispatch(setWaitingForPlayersToJoin(true));
 	}
-
-
-
 
 	/* redirect to game when game has been created */
 	useEffect(() => {
 		if (gameCreated && gameId && username) {
 			navigate(`/game/${gameId}`);
-			setgameCreated(false);
+			setGameCreated(false);
 		}	
 
 		if (multiplayerGameCreated && gameId && username) {             

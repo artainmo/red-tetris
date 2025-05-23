@@ -11,11 +11,8 @@ export const socketConnectThunk = createAsyncThunk(
 	'socket/socketConnect',
 	async (_, {rejectWithValue}) => {
 		try {
+
 			const socket = await connect();
-			const response = await new Promise((resolve, reject) => {
-				console.log("promise")
-				console.log(resolve(data))
-				});
 			return socket;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
