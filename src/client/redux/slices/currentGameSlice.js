@@ -129,9 +129,7 @@ const currentGameSlice = createSlice({
 			state.error = action.payload; // check this
 		})
 		.addCase(joinMultiGameThunk.fulfilled, (state, action) => {
-			const game = action.payload.game;
-			state.id = game._id;
-			state.multi = true;
+			const game = state.payload // <-- to check
 			state.playersJoinedTheGame = true;
 			state.waitingForPlayersToJoin = false;
 			state.players = [game._player1, game._player2, game._player3, game._player4].filter((p) => p != undefined && p != null);

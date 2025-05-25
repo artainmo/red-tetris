@@ -8,23 +8,6 @@ export const connect = () => {
   	return io(API_ENDPOINT);
 }
 
-/**
- * const connect = () => {
-  return new Promise((resolve, reject) => {
-    const socket = io('http://localhost:3001');
-    socket.on('connect', () => {
-      resolve(socket);
-    });
-    socket.on('error', (err) => {
-      reject(err);
-    });
-  });
-};
- */
-/*
-** Returns a socket object that can be used later on for other socket manipulations.
-*/
-
 /*
 ** Disconnects from socket and thus leaves associated room.
 */
@@ -44,7 +27,7 @@ export const disconnect = (socket) => {
 export const joinRoom = (socket, roomId) => {
 	console.log("joining room with roomId");
 	console.log(roomId);
-  	socket.emit('joinRoom', roomId);
+  socket.emit('joinRoom', roomId);
 }
 /*
 ** Does not return.

@@ -15,6 +15,7 @@ const CenterMenuPanel = () => {
 
 	const [gameCreated, setGameCreated] = useState(false);
 	const [multiplayerGameCreated, setMultiplayerGameCreated] = useState(false);
+	const socket = useSelector((state) => state.socket.socket)
 
 	const username = useSelector((state) => state.auth.user);
 	const gameId = useSelector((state) => state.currentGame.id);
@@ -22,15 +23,16 @@ const CenterMenuPanel = () => {
 	/* create a solo game and store it to the currentGame slice, then connect to socket to exhange data with server */
 	const handleSoloGameCreation = async() => {
 		dispatch(createSoloGameThunk(username));
-		dispatch(socketConnectThunk());
+		//dispatch(socketConnectThunk());
 		setGameCreated(true);
 	}
 	const handleMultiplayerGameCreation = async() => {
 		console.log('starting matchmaking process for multiplayer');
-		const game = dispatch(createMultiGameThunk(username));
-		const socket = await dispatch(socketConnectThunk());
-		dispatch(joinMultiGameThunk({id: game.id, username: username, socket: socket}));		
-		dispatch(joinRoomThunk({roomName: game.id, userSocket: socket}));		
+		const res = await dispatch(createMultiGameThunk(username));
+		const id = res.payload.game.id
+		console.log("gameId")
+		console.log(res.payload.game.id)
+		dispatch(joinRoomThunk({roomName: id, userSocket: socket}));		
 		setMultiplayerGameCreated(true);
 		dispatch(setWaitingForPlayersToJoin(true));
 	}

@@ -233,9 +233,12 @@ io.on('connection', async (socket) => {
     socket.on('joinRoom', (roomId) => {
         console.log('A user joined the room named ' + roomId);
         socket.join(roomId);
+		if (!rooms[roomId]) {
+			rooms[roomId] = [];
+		}
 		rooms[roomId].push(socket.id)
 		var players = rooms[roomId]
-		if (players.length > 1)
+		if (players.length > 2)
 			socket.to(roomId).emit('newPlayerJoined', room);
     });
 

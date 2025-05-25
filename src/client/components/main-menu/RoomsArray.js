@@ -12,12 +12,12 @@ const RoomsArray = () => {
 
 	const [rooms,setRooms] = useState([])
 	const username = useSelector((state) => state.auth.user)
+	const socket = useSelector((state) => state.socket.socket)
+	const gameId = useSelector((state) => state.currentGame.id)
 
 	const joinMultiplayer = (id) => {
-		console.log('starting matchmaking process for multiplayer');
-		const socket = dispatch(socketConnectThunk());
-		console.log(socket)
-		dispatch(joinMultiGameThunk({id: id, username: username, socket: socket}));
+		console.log('joining multiplayer room');
+		dispatch(joinMultiGameThunk({id: id, username: username, socket: socket}));		
 		dispatch(joinRoomThunk({roomName: id, userSocket: socket}));
 		dispatch(setPlayersJoinedTheGame(true));
 	}
@@ -26,8 +26,6 @@ const RoomsArray = () => {
 		const fetchRooms = async () => {
 		  try {
 			const data = await getJoinableGames();
-			console.log("rooms")
-			console.log(data.games)
 			setRooms(data.games);
 		  } catch (error) {
 			console.error('Error fetching joinable games:', error);

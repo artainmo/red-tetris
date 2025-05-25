@@ -11,8 +11,10 @@ export const socketConnectThunk = createAsyncThunk(
 	'socket/socketConnect',
 	async (_, {rejectWithValue}) => {
 		try {
-
+			console.log("socketConnectThunk")
 			const socket = await connect();
+			console.log("socket")
+			console.log(socket)
 			return socket;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
@@ -29,12 +31,12 @@ export const joinRoomThunk = createAsyncThunk(
 			console.log(roomName)
 			console.log(userSocket)
 			joinRoom(userSocket, roomName)
-			const response = await new Promise((resolve, reject) => {
-				console.log("promise")
-				socket.on("newPlayerJoined", (data) => {
-					console.log(data)
-				});
-			});
+			// const response = await new Promise((resolve, reject) => {
+			// 	console.log("promise")
+			// 	socket.on("newPlayerJoined", (data) => {
+			// 		console.log(data)
+			// 	});
+			// });
 			return response;
 		} catch (err) {
 			return rejectWithValue(err.response.data);

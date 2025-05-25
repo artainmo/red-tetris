@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { userConnect } from '../redux/slices/authSlice';
+import { socketConnectThunk } from '../redux/slices/socketSlice';
 import { useNavigate } from 'react-router-dom';
 import RedButton from '../components/shared/RedButton';
 import { whiteStyle, redStyle, pageMainContainerStyle, buttonContainerStyle, mainPartContainerStyle, textsContainerStyle } from "../style/containersStyle";
@@ -16,12 +17,15 @@ const Auth = () => {
 	const [connectionAttempt, setConnectionAttempt] = useState(false);
 
 	const handleAuth = () => {
+		console.log("handle Auth!")
 		if (!localName) {
 			setEmptyInputErrMsg(true);
 			return;
 		}
+		console.log("handle Auth!")
 		setConnectionAttempt(true);
 		dispatch(userConnect(localName));
+		dispatch(socketConnectThunk())
 	}
 
 	useEffect(() => {
