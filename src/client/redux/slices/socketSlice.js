@@ -23,7 +23,7 @@ export const socketConnectThunk = createAsyncThunk(
 );
 
 export const joinRoomThunk = createAsyncThunk(
-	'currentGame/joinMultiGameThunk',
+	'socket/joinRoomThunk',
 	async ({roomName, userSocket}, { rejectWithValue }) => {
 		try {
 			
@@ -37,7 +37,7 @@ export const joinRoomThunk = createAsyncThunk(
 			// 		console.log(data)
 			// 	});
 			// });
-			return response;
+			//return response;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
 		}

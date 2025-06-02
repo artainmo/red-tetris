@@ -5,9 +5,6 @@ import { getGames } from "../../api/http.api";
 
 const ScoresArray = ({user, scores}) => {
 
-	console.log('array')
-	console.log(scores)
-
 	return (
 		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>

@@ -30,8 +30,6 @@ class Utils {
         console.log("updating game")
         try {
             let game = await this.FindGameById(gameId);
-            console.log("game")
-            console.log(game)
             //const db = new database();
             let column;
             switch (playerId) {

@@ -236,9 +236,12 @@ io.on('connection', async (socket) => {
 		if (!rooms[roomId]) {
 			rooms[roomId] = [];
 		}
+		const room = rooms[roomId];
 		rooms[roomId].push(socket.id)
 		var players = rooms[roomId]
-		if (players.length > 2)
+		console.log("players len")
+		console.log(players.length)
+		if (players.length > 1)
 			socket.to(roomId).emit('newPlayerJoined', room);
     });
 

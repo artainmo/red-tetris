@@ -45,6 +45,8 @@ export const joinMultiGameThunk = createAsyncThunk(
 			console.log(id)
 			console.log(username)
 			const response = await joinMultiGame(id, username, socket);
+			console.log("response")
+			console.log(response)
 			return response;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
@@ -124,12 +126,12 @@ const currentGameSlice = createSlice({
 			state.error = null;
 			state.roomName = game.id;
 		})
-		.addCase(createMultiGameThunk.rejected, (state, action) => {
-			console.log('problem creating multi game');
+		.addCase(createMultiGameThunk.rejected, (state, action) => {S
+			console.log('problem creating multi game');S
 			state.error = action.payload; // check this
 		})
 		.addCase(joinMultiGameThunk.fulfilled, (state, action) => {
-			const game = state.payload // <-- to check
+			const game = action.payload // <-- to check
 			state.playersJoinedTheGame = true;
 			state.waitingForPlayersToJoin = false;
 			state.players = [game._player1, game._player2, game._player3, game._player4].filter((p) => p != undefined && p != null);

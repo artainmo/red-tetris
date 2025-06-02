@@ -4,11 +4,13 @@ import SmallButton from "../shared/SmallButton";
 import { getJoinableGames } from "../../api/http.api";
 import { useDispatch, useSelector } from "react-redux";
 import { joinMultiGameThunk, setPlayersJoinedTheGame } from "../../redux/slices/currentGameSlice";
-import { socketConnectThunk, joinRoomThunk } from "../../redux/slices/socketSlice";
+import { joinRoomThunk } from "../../redux/slices/socketSlice";
+import { useNavigate } from "react-router-dom";
 
 const RoomsArray = () => {
 	
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	const [rooms,setRooms] = useState([])
 	const username = useSelector((state) => state.auth.user)
@@ -20,6 +22,7 @@ const RoomsArray = () => {
 		dispatch(joinMultiGameThunk({id: id, username: username, socket: socket}));		
 		dispatch(joinRoomThunk({roomName: id, userSocket: socket}));
 		dispatch(setPlayersJoinedTheGame(true));
+		navigate(`/multiplayer/${gameId}`);
 	}
 
 	useEffect(() => {
