@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import RoomsArray from "./RoomsArray";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createSoloGameThunk, searchOrCreateMultiGameThunk, setGame } from "../../redux/slices/currentGameSlice";
-import { socketConnectThunk } from "../../redux/slices/socketSlice";
+import { createSoloGameThunk, createMultiGameThunk, setWaitingForPlayersToJoin } from "../../redux/slices/currentGameSlice";
+import { joinRoomThunk } from "../../redux/slices/socketSlice";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
 import { fullWhiteMenuPanelStyle, middlePanelStyle, middleArrayContainerStyle } from "../../style/panelStyle";
@@ -13,8 +13,9 @@ const CenterMenuPanel = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const [gameCreated, setgameCreated] = useState(false);
+	const [gameCreated, setGameCreated] = useState(false);
 	const [multiplayerGameCreated, setMultiplayerGameCreated] = useState(false);
+	const socket = useSelector((state) => state.socket.socket)
 
 	const username = useSelector((state) => state.auth.user);
 	const gameId = useSelector((state) => state.currentGame.id);
@@ -22,27 +23,26 @@ const CenterMenuPanel = () => {
 	/* create a solo game and store it to the currentGame slice, then connect to socket to exhange data with server */
 	const handleSoloGameCreation = async() => {
 		dispatch(createSoloGameThunk(username));
-		dispatch(socketConnectThunk());
-		setgameCreated(true);
+		setGameCreated(true);
 	}
-
-	const handleMatchmakingForMultiplayer = () => {
+	const handleMultiplayerGameCreation = async() => {
 		console.log('starting matchmaking process for multiplayer');
-		dispatch(searchOrCreateMultiGameThunk(username));
-		dispatch(socketConnectThunk());		
+		dispatch(createMultiGameThunk(username));
+		dispatch(joinRoomThunk({roomName: id, userSocket: socket}));		
 		setMultiplayerGameCreated(true);
+		dispatch(setWaitingForPlayersToJoin(true));
 	}
 
 	/* redirect to game when game has been created */
 	useEffect(() => {
 		if (gameCreated && gameId && username) {
+			setGameCreated(false);
 			navigate(`/game/${gameId}`);
-			setgameCreated(false);
 		}	
 
-		if (multiplayerGameCreated && gameId && username) {             
+		if (multiplayerGameCreated && gameId && username) {   
+			setMultiplayerGameCreated(false);          
 			navigate(`/multiplayer/${gameId}`);
-			setMultiplayerGameCreated(false);
 		}	
 		
 	}, [navigate, multiplayerGameCreated, gameCreated, gameId, username]);
@@ -73,8 +73,8 @@ const CenterMenuPanel = () => {
 					</div>
 					<div style={buttonDivStyle}>
 						<YellowButton 
-							textContent='Join Multi'
-							onClick={handleMatchmakingForMultiplayer} 
+							textContent='Multi'
+							onClick={handleMultiplayerGameCreation} 
 						/>
 					</div>
 				</div>

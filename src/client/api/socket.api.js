@@ -7,9 +7,6 @@ import { io } from "socket.io-client";
 export const connect = () => {
   	return io(API_ENDPOINT);
 }
-/*
-** Returns a socket object that can be used later on for other socket manipulations.
-*/
 
 /*
 ** Disconnects from socket and thus leaves associated room.
@@ -28,7 +25,8 @@ export const disconnect = (socket) => {
 ** This roomId will be used later on for other socket manipulations within the room.
 */
 export const joinRoom = (socket, roomId) => {
-  	socket.emit("joinRoom", roomId);
+	console.log("joining room with roomId " + roomId);
+  	socket.emit('joinRoom', roomId);
 }
 /*
 ** Does not return.
@@ -71,9 +69,9 @@ export const listenNewPiece = (socket, setNewPiece) => {
 
 /*
 ** Each player should be able to see other players' games.
-** Thus each player needs to send his game to other players.
-** This function allows a player to send his game to the other players of the room/game.
-** The gameStructure paramater should look like this for example:
+** Thus each player needs to send their game to other players.
+** This function allows a player to send their game to the other players of the room/game.
+** The gameStructure parameter should look like this for example:
 {
   player: 'Philip',
   structure: [ [ 'I', 'BG', 'BG' ], [ 'BG', 'BG', 'BG' ], [ 'BG', 'T', 'BG' ] ]
@@ -149,25 +147,4 @@ export const listenNextGame = (socket, setGame) => {
 		setGame(nextGame);
 	});
 }
-/*
-** Does not explicitly return.
-** However, takes 'setGame' which is supposed to come from:
-** 'const [game, setGame] = useState(null);'.
-** Thus the new game send by socket should be found in 'game'.
-** The game object looks like this for example:
-{
-  _id: '69c2c703-ad74-456a-9856-7ec767b2b0df',
-  _player1: 'Alfred',
-  _player2: 'Conrad',
-  _player3: 'Philip',
-  _player4: null,
-  _player5: null,
-  _player6: null,
-  _player1_score: null,
-  _player2_score: null,
-  _player3_score: null,
-  _player4_score: null,
-  _player5_score: null,
-  _player6_score: null
-}
-*/
+

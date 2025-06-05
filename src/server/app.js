@@ -9,8 +9,9 @@ const app = express();
 
 // /* only for dev purpose (remove after !)
 const cors = require('cors');
-const { Utils } = require('./classes/Utils');
 app.use(cors());
+const { Utils } = require('./classes/Utils');
+
 
 const corsOptions = {
   	origin: true,
@@ -68,7 +69,13 @@ router.get('/games/', async (req,res) => {
 	res.status(200).json(games);
 });
 
-router.get('/games/:name', async (req,res,next) => {
+router.get('/joinablegames/', async (req,res) => {
+	const utils = new Utils();
+	const games = await utils.GetJoinableGames();
+	res.status(200).json(games);
+});
+
+router.get('/games/:name', async (req,res) => {
   	const name = req.params.name;
   	const player = new Player();
 
@@ -77,16 +84,30 @@ router.get('/games/:name', async (req,res,next) => {
   	res.status(200).json(games);
 });
 
-router.get('/game/search/:name', async (req,res,next) => {
-  	const name = req.params.name;
-  	const player = new Player();
-
-  	await player.connect(name);
-  	const game = await player.searchOrCreateMultiGame();
+router.get('/game/search/:name', async (req,res) => {
+  	const username = req.params.name;
+	const utils = new Utils();
+  	const game = await utils.createMultiGame(username);
   	res.status(200).json(game);
 });
 
-router.get('/game/solo/:name', async (req,res,next) => {
+router.get('/game/multi/:name', async (req,res) => {
+	const username = req.params.name;
+  	const utils = new Utils();
+	const game = await utils.createMultiGame(username);
+	res.status(200).json(game);
+});
+
+router.post('/game/join/:id', async (req,res) => {
+	console.log(res.params)
+	const gameId = req.params.id;
+	const username = req.body.username;
+  	const utils = new Utils();
+	const game = await utils.joinMultiGame(gameId, username);
+	res.status(200).json(game);
+});
+
+router.get('/game/solo/:name', async (req,res) => {
   	const name = req.params.name;
   	const player = new Player();
 
@@ -95,17 +116,13 @@ router.get('/game/solo/:name', async (req,res,next) => {
     res.status(200).json(game);
 });
 
-router.post('/game/wait/join', async (req,res,next) => {
-  	const body = req.body;
-  	const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
-          body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
-
-  	const newGame = await game.waitForSomeoneToJoin();
-  	if (newGame === false) {
-    	res.status(400).json(game);
-  	} else {
-    	res.status(200).json(newGame);
-  	}
+router.post('/game/wait/join', async () => {
+	const utils = new Utils();
+  	const game = await utils.GetJoinableGames();
+	if (game != null)
+  		res.status(200).json(game);
+	else
+		res.status(400).send("No joinable rooms");
 });
 
 router.patch('/game/start', async (req,res,next) => {
@@ -147,24 +164,6 @@ router.post('/game/:gameId/score/', async (req,res) => {
 	catch (error) {
 		res.status(400).send("This game could not be updated with error " + error);
 	}
-
-
-  	// const score1 = req.params.score1 || null;
-  	// const score2 = req.params.score2 || null;
-    // const score3 = req.params.score3 || null;
-    // const score4 = req.params.score4 || null;
-    // const score5 = req.params.score5 || null;
-    // const score6 = req.params.score6 || null;
-  	// const body = req.body;
-    // const game = new Game(body._id, body._player1, body._player2, body._player3, body._player4, body._player5, body._player6,
-    //       body._player1_score, body._player2_score, body._player3_score, body._player4_score, body._player5_score, body._player6_score);
-
-  	// const newGame = await game.finalScore(score1, score2, score3, score4, score5, score6);
-  	// if (newGame === false) {
-    // 	
-  	// } else {
-    // 	res.status(200).json(newGame);
-  	// }
 });
 
 router.patch('/game/quit/:name', async (req,res,next) => {
@@ -208,8 +207,10 @@ router.patch('/game/wait/quit', async (req,res,next) => {
   	}
 });
 
+/***********************************************/
+/***********		SOCKETS		 ***************/
+/***********************************************/
 
-//Setting up the websockets with socket.io
 const io = socketio(server, {
   	cors: {
     	origin: true,
@@ -218,6 +219,7 @@ const io = socketio(server, {
 });
 
 var pieceBaskets = {};
+var rooms = {}
 
 io.on('connection', async (socket) => {
   	console.log('A user connected to websocket');
@@ -231,7 +233,18 @@ io.on('connection', async (socket) => {
     socket.on('joinRoom', (roomId) => {
         console.log('A user joined the room named ' + roomId);
         socket.join(roomId);
+		if (!rooms[roomId]) {
+			rooms[roomId] = [];
+		}
+		const room = rooms[roomId];
+		rooms[roomId].push(socket.id)
+		var players = rooms[roomId]
+		console.log("players len")
+		console.log(players.length)
+		if (players.length > 1)
+			socket.to(roomId).emit('newPlayerJoined', room);
     });
+
 
     socket.on('askNewPiece', (roomId) => {
         console.log("Sending new piece to " + roomId);
@@ -242,6 +255,7 @@ io.on('connection', async (socket) => {
         io.to(roomId).emit('newPiece', piece); //Broadcast to all room members the same new piece
     });
 
+
     socket.on('sendPersonalGameStructure', (data) => {
         socket.broadcast.to(data.roomId).emit('otherPlayerGameStructure',
             data.gameStructure); //Broadcast to all room members the game structures of all players
@@ -251,4 +265,39 @@ io.on('connection', async (socket) => {
     		console.log("Sending next game");
         socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame); //Broadcast to all room members the next game, whereby last winner will become host
     });
+  
+	socket.on('ready', () => {
+	  console.log(socket.id, "is ready!");
+	  const room = rooms[socket.roomId];
+	  // when we have two players... START THE GAME!
+	  if (room.sockets.length > 1) {
+		// tell each player to start the game.
+		for (const client of room.sockets) {
+		  client.emit('initGame');
+		}
+	  }
+	});
+  
+	socket.on('startGame', (data, callback) => {
+	  const room = rooms[socket.roomId];
+	  if (!room) {
+		return;
+	  }
+	});
+  
+	// socket.on('createRoom', (game, callback) => {
+	//   const room = {
+	// 	id: game.id, 
+	// 	name: game._player1,
+	// 	sockets: []
+	//   };
+	//   rooms[room.id] = room;
+	//   joinRoom(socket, room);
+	//   callback();
+	// });
+  
+	// socket.on('leaveRoom', () => {
+	//   leaveRooms(socket);
+	// });
+  
 });

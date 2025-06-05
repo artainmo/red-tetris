@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { connect, disconnect } from "../../api/socket.api";
+import { connect, disconnect, joinRoom } from "../../api/socket.api";
 
 const initialState = {
 	socket: null,
@@ -11,8 +11,33 @@ export const socketConnectThunk = createAsyncThunk(
 	'socket/socketConnect',
 	async (_, {rejectWithValue}) => {
 		try {
+			console.log("socketConnectThunk")
 			const socket = await connect();
+			console.log("socket")
+			console.log(socket)
 			return socket;
+		} catch (err) {
+			return rejectWithValue(err.response.data);
+		}
+	}
+);
+
+export const joinRoomThunk = createAsyncThunk(
+	'socket/joinRoomThunk',
+	async ({roomName, userSocket}, { rejectWithValue }) => {
+		try {
+			
+			console.log("joinRoomSocketThunk")
+			console.log(roomName)
+			console.log(userSocket)
+			joinRoom(userSocket, roomName)
+			// const response = await new Promise((resolve, reject) => {
+			// 	console.log("promise")
+			// 	socket.on("newPlayerJoined", (data) => {
+			// 		console.log(data)
+			// 	});
+			// });
+			//return response;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
 		}
@@ -51,6 +76,14 @@ const socketSlice = createSlice({
 		.addCase(socketConnectThunk.rejected, (state, action) => {
 			state.socket = null;
 			state.status = 'disconnected';
+			state.error = action.payload;
+		})
+		.addCase(joinRoomThunk.fulfilled, (state, action) => {
+			console.log("player joined the room")
+			state.error = null;
+		})
+		.addCase(joinRoomThunk.rejected, (state, action) => {
+			console.log("error: player could not join the room")
 			state.error = action.payload;
 		})
 	}

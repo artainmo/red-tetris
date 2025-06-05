@@ -5,41 +5,78 @@
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
+import RedButton from "../components/shared/RedButton";
+import { endGame } from "../redux/slices/gameTimeSlice";
+import { handleGameOverThunk, resetGame, setPlayersJoinedTheGame } from "../redux/slices/currentGameSlice";
+import { resetGameplay, setIsGameOver } from "../redux/slices/gameplaySlice";
 
 const Lobby = () => {
 	
+	const dispatch = useDispatch();
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
+	const [gameStartingSoonText, setGameStartingSoonText] = useState('New players joined the game');
+	const [dotCount, setDotCount] = useState(0);
+	const gameId = useSelector((state) => state.currentGame.id)
+	const playersJoinedTheGame = useSelector((state) => state.currentGame.playersJoinedTheGame)
+	const username = useSelector((state) => state.auth.user)
+	const socket = useSelector((state) => state.socket.socket)
 
 	const navigate = useNavigate();
-
+	
 	/* used to add the "..." dynamically in the matchmaking text */
 	useEffect(() => {
-		let dotCount = 0;
+		console.log("useEffect matchmaking")
+		
 		const interval = setInterval(() => {
 			if (dotCount < 3) {
 				setMatchmakingText(matchmakingText => matchmakingText + '.');
-				dotCount += 1;
+				setDotCount(dotCount + 1);
 			} else {
 				setMatchmakingText('Matchmaking In Progress');
-				dotCount = 0;
+				setDotCount(0);
 			}
 		}, 500);
 		
 		return () => clearInterval(interval);
-	}, []);
+
+
+
+	}, [setMatchmakingText,dotCount,playersJoinedTheGame]);
+
+	useEffect(()=>{
+		try {
+		  socket.on("newPlayerJoined", (data) => {
+			dispatch(setPlayersJoinedTheGame(true));
+		  });
+		} catch (error) {
+		  console.log(error)
+		}
+		
+	  },[socket])
 
 	const handleCancelButton = () => {
 		// add some API call to remove the player form the match
 		console.log('should cancel the game');
+		dispatch(handleGameOverThunk({user: username, score: 0}))
+		dispatch(setIsGameOver(true))
 		dispatch(endGame());
+		dispatch(resetGame());
+		dispatch(resetGameplay());
 		navigate('/main_menu');
 	}
 	
 	return (
 		<div style={pageMainContainerStyle}>
-			<FullPageWithCentralText centralText={matchmakingText}/>
+			{
+				/* ca serait cool de faire un countdown de 10 seconds si on a le temps */
+				playersJoinedTheGame ? 
+				<FullPageWithCentralText firstLine={gameStartingSoonText} secondLine={"Game will start soon."}/>
+				:
+				<FullPageWithCentralText firstLine={matchmakingText} secondLine={""}/>
+			}
 			<div style={buttonContainerStyle}>
 				<RedButton
 					textContent='Cancel'

@@ -4,7 +4,6 @@ import { pageMainContainerStyle } from "../style/containersStyle";
 import Board from "../components/game/Board";
 import GameStatsPanel from "../components/game/GameStatsPanel";
 import { panelsStyle } from "../style/panelStyle";
-import { setIsGameOver } from "../redux/slices/gameplaySlice";
 import RedTetrisLogo from "../components/shared/RedTetrisLogo";
 import GameEnd from "./GameEnd";
 
