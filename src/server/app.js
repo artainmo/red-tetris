@@ -99,7 +99,8 @@ router.get('/game/multi/:name', async (req,res) => {
 });
 
 router.post('/game/join/:id', async (req,res) => {
-	console.log(res.params)
+	console.log("game join")
+	console.log(req.body.username)
 	const gameId = req.params.id;
 	const username = req.body.username;
   	const utils = new Utils();
@@ -220,6 +221,7 @@ const io = socketio(server, {
 
 var pieceBaskets = {};
 var rooms = {}
+var users = {}
 
 io.on('connection', async (socket) => {
   	console.log('A user connected to websocket');
@@ -236,15 +238,21 @@ io.on('connection', async (socket) => {
 		if (!rooms[roomId]) {
 			rooms[roomId] = [];
 		}
-		const room = rooms[roomId];
-		rooms[roomId].push(socket.id)
-		var players = rooms[roomId]
+		const players = rooms[roomId];
+		players.push(socket.id)
+		console.log(players)
 		console.log("players len")
 		console.log(players.length)
 		if (players.length > 1)
-			socket.to(roomId).emit('newPlayerJoined', room);
+			socket.to(roomId).emit('newPlayerJoined', roomId);
+		
     });
 
+	socket.on('startGame', (roomId) => {
+		console.log('starting game to room id' + roomId);
+		io.to(roomId).emit('startGame')
+
+	});
 
     socket.on('askNewPiece', (roomId) => {
         console.log("Sending new piece to " + roomId);
@@ -266,17 +274,17 @@ io.on('connection', async (socket) => {
         socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame); //Broadcast to all room members the next game, whereby last winner will become host
     });
   
-	socket.on('ready', () => {
-	  console.log(socket.id, "is ready!");
-	  const room = rooms[socket.roomId];
-	  // when we have two players... START THE GAME!
-	  if (room.sockets.length > 1) {
-		// tell each player to start the game.
-		for (const client of room.sockets) {
-		  client.emit('initGame');
-		}
-	  }
-	});
+	// socket.on('ready', () => {
+	//   console.log(socket.id, "is ready!");
+	//   const room = rooms[socket.roomId];
+	//   // when we have two players... START THE GAME!
+	//   if (room.sockets.length > 1) {
+	// 	// tell each player to start the game.
+	// 	for (const client of room.sockets) {
+	// 	  client.emit('initGame');
+	// 	}
+	//   }
+	// });
   
 	socket.on('startGame', (data, callback) => {
 	  const room = rooms[socket.roomId];
@@ -284,20 +292,5 @@ io.on('connection', async (socket) => {
 		return;
 	  }
 	});
-  
-	// socket.on('createRoom', (game, callback) => {
-	//   const room = {
-	// 	id: game.id, 
-	// 	name: game._player1,
-	// 	sockets: []
-	//   };
-	//   rooms[room.id] = room;
-	//   joinRoom(socket, room);
-	//   callback();
-	// });
-  
-	// socket.on('leaveRoom', () => {
-	//   leaveRooms(socket);
-	// });
   
 });

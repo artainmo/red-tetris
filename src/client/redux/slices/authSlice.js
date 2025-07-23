@@ -34,7 +34,6 @@ const authSlice = createSlice({
 	name: 'auth',
 	initialState,
 	reducers: {
-		// no need for reducers there, all is handled asynchronously by extraReducers
 	},
 	extraReducers: (builder) => {
 		builder
@@ -44,7 +43,7 @@ const authSlice = createSlice({
 			state.nameTooLong = false;
 			state.isAuthenticated = true;
 		})
-		.addCase(userConnect.rejected, (state, action) => { // debug
+		.addCase(userConnect.rejected, (state, action) => {
 			console.log(action.payload);
 			if (action.payload === "Player's username is too long") {
 				state.nameTooLong = true;

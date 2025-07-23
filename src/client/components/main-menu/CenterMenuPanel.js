@@ -27,8 +27,9 @@ const CenterMenuPanel = () => {
 	}
 	const handleMultiplayerGameCreation = async() => {
 		console.log('starting matchmaking process for multiplayer');
-		dispatch(createMultiGameThunk(username));
-		dispatch(joinRoomThunk({roomName: id, userSocket: socket}));		
+		const res = await dispatch(createMultiGameThunk(username));
+		const gameId = res.payload.game.id
+		dispatch(joinRoomThunk({roomName: gameId, userSocket: socket}));		
 		setMultiplayerGameCreated(true);
 		dispatch(setWaitingForPlayersToJoin(true));
 	}
@@ -42,7 +43,7 @@ const CenterMenuPanel = () => {
 
 		if (multiplayerGameCreated && gameId && username) {   
 			setMultiplayerGameCreated(false);          
-			navigate(`/multiplayer/${gameId}`);
+			navigate(`/lobby`);
 		}	
 		
 	}, [navigate, multiplayerGameCreated, gameCreated, gameId, username]);

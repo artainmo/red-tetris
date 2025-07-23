@@ -12,6 +12,7 @@ import RedButton from "../components/shared/RedButton";
 import { endGame } from "../redux/slices/gameTimeSlice";
 import { handleGameOverThunk, resetGame, setPlayersJoinedTheGame } from "../redux/slices/currentGameSlice";
 import { resetGameplay, setIsGameOver } from "../redux/slices/gameplaySlice";
+import { startGame } from "../api/socket.api";
 
 const Lobby = () => {
 	
@@ -19,7 +20,7 @@ const Lobby = () => {
 	const [matchmakingText, setMatchmakingText] = useState('Matchmaking In Progress');
 	const [gameStartingSoonText, setGameStartingSoonText] = useState('New players joined the game');
 	const [dotCount, setDotCount] = useState(0);
-	const gameId = useSelector((state) => state.currentGame.id)
+	const roomId = useSelector((state) => state.currentGame.id)
 	const playersJoinedTheGame = useSelector((state) => state.currentGame.playersJoinedTheGame)
 	const username = useSelector((state) => state.auth.user)
 	const socket = useSelector((state) => state.socket.socket)
@@ -44,18 +45,23 @@ const Lobby = () => {
 
 
 
-	}, [setMatchmakingText,dotCount,playersJoinedTheGame]);
+	}, [setMatchmakingText,dotCount]);
 
-	useEffect(()=>{
-		try {
-		  socket.on("newPlayerJoined", (data) => {
-			dispatch(setPlayersJoinedTheGame(true));
-		  });
-		} catch (error) {
-		  console.log(error)
-		}
+		useEffect(() => {
+
 		
-	  },[socket])
+		socket.on("newPlayerJoined", (data) => {
+			dispatch(setPlayersJoinedTheGame(true));
+			startGame(socket, roomId);
+		  });
+
+		socket.on("startGame", (data) => {
+			console.log("startgame in first player")
+			console.log("startGame")
+			navigate(`/multiplayer/${roomId}`)
+		  })
+
+	}, [socket]);
 
 	const handleCancelButton = () => {
 		// add some API call to remove the player form the match

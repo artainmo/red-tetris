@@ -28,6 +28,11 @@ export const joinRoom = (socket, roomId) => {
 	console.log("joining room with roomId " + roomId);
   	socket.emit('joinRoom', roomId);
 }
+
+export const startGame = (socket, roomId) => {
+	console.log("starting game with roomId " + roomId);
+  	socket.emit('startGame', roomId);
+}
 /*
 ** Does not return.
 */

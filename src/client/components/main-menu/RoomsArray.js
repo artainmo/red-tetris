@@ -16,13 +16,13 @@ const RoomsArray = () => {
 	const username = useSelector((state) => state.auth.user)
 	const socket = useSelector((state) => state.socket.socket)
 	const gameId = useSelector((state) => state.currentGame.id)
+	const playersJoinedTheGame = useSelector((state) => state.currentGame.playersJoinedTheGame)
 
-	const joinMultiplayer = (id) => {
+	const joinMultiplayer = async(id) => {
 		console.log('joining multiplayer room');
-		dispatch(joinMultiGameThunk({id: id, username: username, socket: socket}));		
+		await dispatch(joinMultiGameThunk({id: id, username: username, socket: socket}));		
 		dispatch(joinRoomThunk({roomName: id, userSocket: socket}));
 		dispatch(setPlayersJoinedTheGame(true));
-		navigate(`/multiplayer/${gameId}`);
 	}
 
 	useEffect(() => {
@@ -37,7 +37,14 @@ const RoomsArray = () => {
 	  
 		fetchRooms();
 
-	  }, []);
+		if (playersJoinedTheGame)
+		{
+			console.log("navigate multiplayer");
+			navigate(`/multiplayer/${gameId}`);
+		}
+
+
+	  }, [playersJoinedTheGame]);
 
 	return (
 		<div style={arrayContainerStyle}>
