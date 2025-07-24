@@ -29,7 +29,7 @@ const CenterMenuPanel = () => {
 		console.log('starting matchmaking process for multiplayer');
 		const res = await dispatch(createMultiGameThunk(username));
 		const gameId = res.payload.game.id
-		dispatch(joinRoomThunk({roomName: gameId, userSocket: socket}));		
+		dispatch(joinRoomThunk({username: username, userSocket: socket, roomName: gameId}));		
 		setMultiplayerGameCreated(true);
 		dispatch(setWaitingForPlayersToJoin(true));
 	}

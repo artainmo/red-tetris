@@ -10,9 +10,10 @@ import { pageMainContainerStyle, buttonContainerStyle } from "../style/container
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
 import RedButton from "../components/shared/RedButton";
 import { endGame } from "../redux/slices/gameTimeSlice";
-import { handleGameOverThunk, resetGame, setPlayersJoinedTheGame } from "../redux/slices/currentGameSlice";
+import { handleGameOverThunk, resetGame, setPlayersJoinedTheGame, setWaitingForPlayersToJoin, setPlayers } from "../redux/slices/currentGameSlice";
 import { resetGameplay, setIsGameOver } from "../redux/slices/gameplaySlice";
 import { startGame } from "../api/socket.api";
+import { joinMultiGame } from "../api/http.api";
 
 const Lobby = () => {
 	
@@ -51,7 +52,11 @@ const Lobby = () => {
 
 		
 		socket.on("newPlayerJoined", (data) => {
+			console.log("NEW PLAYER JOINED")
+			console.log(data)
+			dispatch(setWaitingForPlayersToJoin(false));
 			dispatch(setPlayersJoinedTheGame(true));
+			dispatch(setPlayers(data.player));
 			startGame(socket, roomId);
 		  });
 

@@ -86,6 +86,11 @@ const currentGameSlice = createSlice({
 		setPlayersJoinedTheGame: (state,action) => {
 			state.playersJoinedTheGame = action.payload ;
 		},
+		setPlayers(state,action)
+		{
+			console.log("THUNK NEW PLAYER JOINED")
+			state.players.push(action.payload);
+		},
 		setPlayerScore: (state, action) => {
 			const { username, score } = action.payload;
 			console.log("setting score for player " + username + " who got " + score)
@@ -157,6 +162,7 @@ const currentGameSlice = createSlice({
 
 export const { 
 	setGame,
+	setPlayers,
 	setWaitingForPlayersToJoin,
 	setPlayerScore,
 	setPlayersJoinedTheGame,

@@ -21,7 +21,7 @@ const RoomsArray = () => {
 	const joinMultiplayer = async(id) => {
 		console.log('joining multiplayer room');
 		await dispatch(joinMultiGameThunk({id: id, username: username, socket: socket}));		
-		dispatch(joinRoomThunk({roomName: id, userSocket: socket}));
+		dispatch(joinRoomThunk({username: username, userSocket: socket, roomName: id}));
 		dispatch(setPlayersJoinedTheGame(true));
 	}
 
