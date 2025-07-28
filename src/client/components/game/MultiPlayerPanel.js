@@ -9,6 +9,11 @@ const MultiPlayerPanel = () => {
 
 	const gameTime = useSelector((state) => state.gameTime.gameTime);
 	const players =  useSelector((state) => state.currentGame.players);
+	const game =  useSelector((state) => state.currentGame);
+
+	console.log("current game")
+	console.log(game)
+	console.log(players)
 
 	return (
 		<div style={fullTransparentMenuPanelStyle}>

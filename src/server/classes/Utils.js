@@ -90,19 +90,19 @@ class Utils {
     if (game != null) { 
       if (!game.player2_id) {
         await pool.query("UPDATE game SET player2_id = $1 WHERE id = $2", [username, game.id]);
-        game.player2 = username;
+        game.player2_id = username;
       } else if (!game.player3_id) {
         await pool.query("UPDATE game SET player3_id = $1 WHERE id = $2", [username, game.id]);
-        game.player3 = username;
+        game.player3_id = username;
       } else if (!game.player4_id) {
         await pool.query("UPDATE game SET player4_id = $1 WHERE id = $2", [username, game.id]);
-        game.player4 = username;
+        game.player4_id = username;
       } else if (!game.player5_id) {
         await pool.query("UPDATE game SET player5_id = $1 WHERE id = $2", [username, game.id]);
-        game.player5 = username;
+        game.player5_id = username;
       } else {
         await pool.query("UPDATE game SET player6_id = $1 WHERE id = $2", [username, game.id]);
-        game.player6 = username;
+        game.player6_id = username;
       }
       console.log(`${username}: ${username} joined ${game.player1_id}'s game`)
     return game;

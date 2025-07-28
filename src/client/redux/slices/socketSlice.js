@@ -24,20 +24,14 @@ export const socketConnectThunk = createAsyncThunk(
 
 export const joinRoomThunk = createAsyncThunk(
 	'socket/joinRoomThunk',
-	async ({roomName, userSocket}, { rejectWithValue }) => {
+	async ({username, userSocket, roomName}, { rejectWithValue }) => {
 		try {
 			
 			console.log("joinRoomSocketThunk")
 			console.log(roomName)
 			console.log(userSocket)
-			joinRoom(userSocket, roomName)
-			// const response = await new Promise((resolve, reject) => {
-			// 	console.log("promise")
-			// 	socket.on("newPlayerJoined", (data) => {
-			// 		console.log(data)
-			// 	});
-			// });
-			//return response;
+			const response = await joinRoom(username, userSocket, roomName)
+			return response;
 		} catch (err) {
 			return rejectWithValue(err.response.data);
 		}

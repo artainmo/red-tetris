@@ -24,9 +24,15 @@ export const disconnect = (socket) => {
 ** Thus the roomId should be 'game._id'.
 ** This roomId will be used later on for other socket manipulations within the room.
 */
-export const joinRoom = (socket, roomId) => {
+export const joinRoom = (username, socket, roomId) => {
 	console.log("joining room with roomId " + roomId);
-  	socket.emit('joinRoom', roomId);
+	console.log("joiner is " + username);
+  	socket.emit('joinRoom', { username: username, roomId: roomId });
+}
+
+export const startGame = (socket, roomId) => {
+	console.log("starting game with roomId " + roomId);
+  	socket.emit('startGame', roomId);
 }
 /*
 ** Does not return.

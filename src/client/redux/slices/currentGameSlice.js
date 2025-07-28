@@ -45,7 +45,7 @@ export const joinMultiGameThunk = createAsyncThunk(
 			console.log(id)
 			console.log(username)
 			const response = await joinMultiGame(id, username, socket);
-			console.log("response")
+			console.log("response join game")
 			console.log(response)
 			return response;
 		} catch (err) {
@@ -86,6 +86,11 @@ const currentGameSlice = createSlice({
 		setPlayersJoinedTheGame: (state,action) => {
 			state.playersJoinedTheGame = action.payload ;
 		},
+		setPlayers(state,action)
+		{
+			console.log("THUNK NEW PLAYER JOINED")
+			state.players.push(action.payload);
+		},
 		setPlayerScore: (state, action) => {
 			const { username, score } = action.payload;
 			console.log("setting score for player " + username + " who got " + score)
@@ -98,6 +103,7 @@ const currentGameSlice = createSlice({
 			state.error = null		
 			state.multi = false
 			state.roomName = ""
+			state.playersJoinedTheGame = false
 		}
 	},
 	extraReducers: (builder) => {
@@ -116,25 +122,27 @@ const currentGameSlice = createSlice({
 		})
 		.addCase(createMultiGameThunk.fulfilled, (state, action) => {
 			const game = action.payload.game;
-			console.log("succesfully created multi game!")
-			console.log("gameData")
-			console.log(game)
 			state.id = game.id;
 			state.multi = true;
 			state.waitingForPlayersToJoin = true;
-			state.players.push(game.player1)
+			state.players.push(game.player1_id)
 			state.error = null;
 			state.roomName = game.id;
 		})
-		.addCase(createMultiGameThunk.rejected, (state, action) => {S
-			console.log('problem creating multi game');S
+		.addCase(createMultiGameThunk.rejected, (state, action) => {
+			console.log('problem creating multi game');
 			state.error = action.payload; // check this
 		})
 		.addCase(joinMultiGameThunk.fulfilled, (state, action) => {
-			const game = action.payload // <-- to check
+			const game = action.payload.game // <-- to check
+			console.log("fulfilled game")
+			console.log(game)
+			state.id = game.id;
+			state.multi = true;
 			state.playersJoinedTheGame = true;
 			state.waitingForPlayersToJoin = false;
-			state.players = [game._player1, game._player2, game._player3, game._player4].filter((p) => p != undefined && p != null);
+			state.players = [game.player1_id, game.player2_id, game.player3_id, game.player4_id].filter((p) => p != undefined && p != null);
+			console.log(state.players)
 			state.error = null;
 			console.log('succesfully joined multi game!');
 		})
@@ -154,6 +162,7 @@ const currentGameSlice = createSlice({
 
 export const { 
 	setGame,
+	setPlayers,
 	setWaitingForPlayersToJoin,
 	setPlayerScore,
 	setPlayersJoinedTheGame,
