@@ -26,6 +26,7 @@ export const disconnect = (socket) => {
 */
 export const joinRoom = (username, socket, roomId) => {
 	console.log("joining room with roomId " + roomId);
+	console.log("joiner is " + username);
   	socket.emit('joinRoom', { username: username, roomId: roomId });
 }
 

@@ -49,7 +49,6 @@ const Lobby = () => {
 	}, [setMatchmakingText,dotCount]);
 
 		useEffect(() => {
-
 		
 		socket.on("newPlayerJoined", (data) => {
 			console.log("NEW PLAYER JOINED")
