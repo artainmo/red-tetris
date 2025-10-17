@@ -16,6 +16,26 @@ const Auth = () => {
 	const [emptyInputErrMsg, setEmptyInputErrMsg] = useState(false);
 	const [connectionAttempt, setConnectionAttempt] = useState(false);
 
+	const userConnect = createAsyncThunk(
+		'auth/userConnect',
+		async (name, {rejectWithValue}) => {
+			try {
+				const response = await connect(name);
+				
+				if (response.status === 200) {
+					return response.data;
+				} else {
+					return rejectWithValue(response.data);
+				}
+			} catch (err) {
+				if (err.response && err.response.data) {
+					return rejectWithValue(err.response.data);
+				} else {
+					return rejectWithValue({message: 'unknown error happened'});
+				}
+			}
+		}
+	);
 	const handleAuth = () => {
 		console.log("handle Auth!")
 		if (!localName) {

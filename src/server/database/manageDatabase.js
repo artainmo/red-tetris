@@ -1,5 +1,26 @@
 const { readFile } = require('fs/promises');
 const { Client, Pool } = require('pg');
+const client = require('pg/lib/native/client');
+
+(async () => {
+	client = new Client(
+		{
+			host: "localhost",
+			port: "5432",
+			user: "postgres",
+			password: "admin",
+			database: "red_tetris"
+		}
+	);
+	try {
+    await client.connect();
+    console.log("Connexion OK !");
+    await client.end();
+  } catch (err) {
+    console.error("Erreur de connexion :", err.message);
+  }
+})();
+
 
 class database {
 	constructor(connect=true) {
@@ -17,9 +38,13 @@ class database {
 
 	async connectToDatabase() {
 		try {
+			console.log("1");
 			this._pool = new Pool(this._credentials); //A connection pool enables handling multiple requests at once
+			console.log("2");
 			await this._pool.connect();
+			console.log("3");
 			await this._pool.query("SELECT * FROM account;") //Verify if tables exist
+			console.log("Connected to database");
 		} catch(e) {
 			if (e.code === "42P01") {
 				console.log(e.code)
@@ -38,8 +63,9 @@ class database {
 	}
 
 	async createDatabase() {
-		const client = new Client(this._credentials);
+		const client = new Client(client);
 		await client.connect();
+		console.log("Creating database...");
 		const create_database_commands = await readFile(__dirname + "/designDatabase.sql", "utf8");
 		await client.query(create_database_commands);
 		await client.end(); //close connection

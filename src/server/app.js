@@ -1,30 +1,36 @@
 const express = require('express');
 const socketio = require('socket.io');
+const cors = require("cors");
+const http = require("http");
 const { Player } = require(__dirname + '/classes/Player.js');
 const { Game } = require(__dirname + '/classes/Game.js');
 const { PieceBasket } = require(__dirname + '/classes/PieceBasket.js');
 const { database } = require(__dirname + '/database/manageDatabase.js');
+// import { Utils } from './classes/Utils';
+const { Utils } = require(__dirname + '/classes/Utils.js');
 
 const app = express();
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST"],
+}));
 
-// /* only for dev purpose (remove after !)
-const cors = require('cors');
-app.use(cors());
-const { Utils } = require('./classes/Utils');
 
 
-const corsOptions = {
-  	origin: true,
-  	optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204,
-  	allowedHeaders: ['Access-Control-Allow-Origin'],
-}
+// const corsOptions = {
+//   	origin: true,
+//   	optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204,
+//   	allowedHeaders: ['Access-Control-Allow-Origin'],
+// }
 
 // app.get('/', cors(corsOptions), function (req, res, next) {
 //   //res.json({msg: 'This is CORS-enabled for only example.com.'})
 // })
 // * */
 
-const server = app.listen(3000, () => {
+const server = http.createServer(app);
+
+server.listen(3000, () => {
   	console.log(`App listening at http://localhost:3000`);
 });
 
@@ -46,6 +52,10 @@ const router = express.Router()
 app.use('/rest', router);
 
 router.use(express.json()) //Parse incoming json bodies
+
+router.get('/test', (req, res) => {
+  	res.json({msg: 'This is CORS-enabled for all origins!'})
+});	
 
 router.get('/connect/:name', async (req, res, next) => {
   	const name =  decodeURIComponent(req.params.name);

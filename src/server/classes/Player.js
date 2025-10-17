@@ -2,24 +2,36 @@ const { database } = require(__dirname + '/../database/manageDatabase.js');
 const { Game } = require(__dirname + '/Game.js');
 
 class Player {
-	async connect(username) { //Create new account or connect to already existing one
+	constructor() {
+		console.log("New player instance created");
+		this._username = null;
+	}
 
+	async connect(username) { //Create new account or connect to already existing one
+		console.log(`Player trying to connect with name: ${username}`);
 		if (username.length > 19) {
 			throw new Error("Player's username is too long");
 		}
 		var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
 		if (format.test(username)) {
 			throw new Error("Player's username contains special characters");
+
 		}
 		this._username = username;
+		console.log(`Username set to ${this._username}`);
 		await this.tryAccountCreation(username);
 	}
-
+	
 	async tryAccountCreation(username) {
+		console.log("a");
 		const db = new database(false);
+		console.log("b");
 		await db.connectToDatabase();
+		console.log("c");
 		try {
+			console.log("d");
 			await db.query("INSERT INTO account (username) VALUES ($1);", [username]);
+			console.log("e");
 			console.log(`New account created named ${username}`);
 		} catch(e) {
 			if (e.code === "23505") {
