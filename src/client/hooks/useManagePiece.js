@@ -209,6 +209,18 @@ const useManagePiece = (width, height) => {
 		return true;
 	}
 
+	const dropPiece = () => {
+		if (!activePiece) {
+			return;
+		}
+		let dropY = piecePosition.y;
+		while (canMoveDown(activePiece, piecePosition.x, dropY, orientation)) {
+			dropY += 1;
+		}
+		removePiece();
+		dispatch(setPiecePosition({ x: piecePosition.x, y: dropY }));
+	};
+
 	/* update grid when a parameter changes */
 	useEffect(() => {
 
@@ -234,7 +246,7 @@ const useManagePiece = (width, height) => {
 		}		
 	}, [nextActivePiece, nextActivePieceType]);
 
-	return { spawnNewPiece, rotatePiece, movePieceRight, movePieceLeft, movePieceDown };
+	return { spawnNewPiece, rotatePiece, movePieceRight, movePieceLeft, movePieceDown, dropPiece };
 }
 
 export default useManagePiece;

@@ -16,7 +16,7 @@ const useModifyGrid = (width, height) => {
 	const [isInContact, setIsInContact ] = useState(false);
 
 	/* delegate piece management to specialized hook */
-	const { spawnNewPiece, movePieceLeft, movePieceRight, rotatePiece, movePieceDown } 
+	const { spawnNewPiece, movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece } 
 	= useManagePiece(width, height);
 
 	/* delegate line suppression and add unbreakble malus line when opponent player scores */
@@ -48,7 +48,8 @@ const useModifyGrid = (width, height) => {
 				case "ArrowDown":
 					movePieceDown();
 					break;
-				case " ": /* for the spacebar */
+				case " ":
+					dropPiece();
 					break;
 				default:
 					break;
@@ -60,7 +61,7 @@ const useModifyGrid = (width, height) => {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		}
-	}, [movePieceLeft, movePieceRight, rotatePiece, movePieceDown]);
+	}, [movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece]);
 
 	/* gravity manager */
 	const applyGravityRef = useRef(null);
