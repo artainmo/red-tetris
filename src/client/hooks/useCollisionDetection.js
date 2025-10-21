@@ -58,7 +58,13 @@ const useCollisionDetection = (width, height, grid) => {
 		return !checkCollision(piece, x, y, newOrientation, gridWithoutCurrentPiece);
 	}, [grid, width, height]);
 
-	return { canMoveDown, canMoveLeft, canMoveRight, canRotate };
+	const canWallRotate = useCallback((piece, x, y, orientation, newOrientation, offsetX) => {
+		const gridWithoutCurrentPiece = getGridWithoutCurrentPiece(piece, x, y, orientation);
+		
+		return !checkCollision(piece, x + offsetX, y, newOrientation, gridWithoutCurrentPiece);
+	}, [grid, width, height]);
+
+	return { canMoveDown, canMoveLeft, canMoveRight, canRotate, canWallRotate };
 }
 
 export default useCollisionDetection;

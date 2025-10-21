@@ -23,3 +23,5 @@ refresh_front:
 
 unittest:
 	node test/db_player_game/test.js
+
+#  docker start red-tetris-db

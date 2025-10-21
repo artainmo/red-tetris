@@ -3,10 +3,12 @@ import useManagePiece from "./useManagePiece";
 import useManageLines from "./useManageLines";
 import { useSelector, useDispatch } from 'react-redux';
 import { setActivePiece } from "../redux/slices/gameplaySlice";
+import { pauseGame, resumeGame } from "../redux/slices/gameTimeSlice";
 
 const useModifyGrid = (width, height) => {
 
 	const dispatch = useDispatch();
+	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
 	
 	const grid = useSelector((state) => state.gameplay.grid);
 	const activePiece = useSelector((state) => state.gameplay.activePiece);
@@ -35,6 +37,8 @@ const useModifyGrid = (width, height) => {
 	/* player inputs manager */
 	useEffect(() => {
 		const handleKeyDown = (event) => {
+			if (isGamePaused && event.key !== "Escape")
+				return ;
 			switch (event.key) {
 				case "ArrowUp":
 					rotatePiece();
@@ -49,7 +53,15 @@ const useModifyGrid = (width, height) => {
 					movePieceDown();
 					break;
 				case " ":
+					event.preventDefault();
 					dropPiece();
+					break;
+				case "Escape":
+					if (!isGamePaused) {
+						dispatch(pauseGame());
+					} else {
+						dispatch(resumeGame());
+					}
 					break;
 				default:
 					break;
@@ -61,13 +73,16 @@ const useModifyGrid = (width, height) => {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		}
-	}, [movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece]);
+	}, [movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece, isGamePaused, dispatch]);
 
 	/* gravity manager */
 	const applyGravityRef = useRef(null);
 
 	useEffect(() => {
 		applyGravityRef.current = () => {
+			if (isGamePaused) {
+				return;
+			}
 			const pieceCanFall = movePieceDown();
 
 			if (pieceCanFall) {
@@ -81,7 +96,7 @@ const useModifyGrid = (width, height) => {
 				}
 			}
 		};
-	}, [dispatch, movePieceDown, isInContact, clearFullLines]);
+	}, [dispatch, movePieceDown, isInContact, clearFullLines, isGamePaused]);
 
 	useEffect(() => {
 		const interval = setInterval(() => {

@@ -27,7 +27,7 @@ const useManagePiece = (width, height) => {
 	const nextOrientation = useSelector((state) => state.gameplay.nextOrientation);;
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
-	const { canMoveDown, canMoveRight, canMoveLeft, canRotate } = useCollisionDetection(width, height, grid);
+	const { canMoveDown, canMoveRight, canMoveLeft, canRotate, canWallRotate } = useCollisionDetection(width, height, grid);
 	const getNextPiece = usePieceGenerator();
 
 	/* check whether the piece can indeed be inserted */
@@ -153,18 +153,14 @@ const useManagePiece = (width, height) => {
 
 	/* Rotations managers */
 	const rotatePieceWithWallKick = (newOrientation) => {
-		const currentOrientation = orientation;
-		const offsets = WALL_KICK_OFFSETS[activePieceType][currentOrientation];
-
-		console.log('offset X = ', offsets[0], ' and offset Y = ', offsets[1]);
-
-		for (const [offsetX, offsetY] of offsets) {
-			const newX = piecePosition.x + offsetX;
-        	const newY = piecePosition.y + offsetY;
-
-			if (canRotate(activePiece, newX, newY, orientation, newOrientation)) {
+		let places = [0, 1, -1];
+		if (activePieceType == 'I') {
+			places = [0, 1, -1, 2, -2];
+		}
+		for (let i of places) {
+			if (canWallRotate(activePiece, piecePosition.x, piecePosition.y, orientation, newOrientation, i)) {
 				removePiece();
-				dispatch(setPiecePosition({ x: newX, y: newY }));
+				dispatch(setPiecePosition({ x: piecePosition.x + i, y: piecePosition.y}));
 				dispatch(setOrientation(newOrientation));
 				return;
 			}
