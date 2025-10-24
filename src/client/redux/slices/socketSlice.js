@@ -8,32 +8,41 @@ const initialState = {
 }
 
 export const socketConnectThunk = createAsyncThunk(
-	'socket/socketConnect',
-	async (_, {rejectWithValue}) => {
-		try {
-			console.log("socketConnectThunk")
-			const socket = await connect();
-			console.log("socket")
-			console.log(socket)
-			return socket;
-		} catch (err) {
-			return rejectWithValue(err.response.data);
-		}
+	"socket/socketConnect",
+	(token, { dispatch }) => {
+		console.log("socketConnectThunk lancé");
+
+		const socket = connect(token);
+
+		socket.on("connect", () => {
+			console.log("✅ Socket connecté:", socket.id);
+			dispatch(socketConnected());
+		});
+
+		socket.on("connect_error", (err) => {
+			console.error("❌ Erreur de connexion:", err.message);
+			dispatch(socketConnectionFailed(err.message));
+		});
+
+		socket.on("disconnect", (reason) => {
+			console.warn("⚠️ Déconnecté:", reason);
+			dispatch(socketDisconnected(reason));
+		});
+
+		return socket;
 	}
 );
 
 export const joinRoomThunk = createAsyncThunk(
 	'socket/joinRoomThunk',
-	async ({username, userSocket, roomName}, { rejectWithValue }) => {
+	({ username, userSocket, roomName }, { rejectWithValue }) => {
 		try {
-			
-			console.log("joinRoomSocketThunk")
-			console.log(roomName)
-			console.log(userSocket)
-			const response = await joinRoom(username, userSocket, roomName)
+			console.log("joinRoomThunk ", roomName);
+			const response = joinRoom(username, userSocket, roomName);
 			return response;
 		} catch (err) {
-			return rejectWithValue(err.response.data);
+			console.error("Error joinRoom:", err);
+			return rejectWithValue(err.message || "Unknown error occurred while joining room");
 		}
 	}
 );
@@ -42,47 +51,40 @@ const socketSlice = createSlice({
 	name: 'socket',
 	initialState,
 	reducers: {
-		manualDisconnect(state) {
-			if (state.socket) {
-				disconnect(state.socket);
-				state.socket = null;
-				state.status = 'disconnected';
-			}
+		socketConnected(state) {
+			state.status = "connected";
+			state.error = null;
 		},
-		displaySocketState(state) {
-			if (state.socket && state.status === 'connected') {
-				console.log('socket is connected');
-			} else {
-				console.log('socket is disconnected');
-			}
+		socketConnectionFailed(state, action) {
+			state.status = "disconnected";
+			state.error = action.payload;
+		},
+		socketDisconnected(state, action) {
+			state.status = "disconnected";
+			state.error = action.payload || null;
 		}
 	},
 	extraReducers: (builder) => {
 		builder
-		.addCase(socketConnectThunk.pending, (state) => {
-			state.status = 'connecting';
-		})
-		.addCase(socketConnectThunk.fulfilled, (state, action) => {
-			state.socket = action.payload;
-			state.status = 'connected';
-			state.error = null;
-		})
-		.addCase(socketConnectThunk.rejected, (state, action) => {
-			state.socket = null;
-			state.status = 'disconnected';
-			state.error = action.payload;
-		})
-		.addCase(joinRoomThunk.fulfilled, (state, action) => {
-			console.log("player joined the room")
-			state.error = null;
-		})
-		.addCase(joinRoomThunk.rejected, (state, action) => {
-			console.log("error: player could not join the room")
-			state.error = action.payload;
-		})
-	}
+			.addCase(socketConnectThunk.fulfilled, (state, action) => {
+				state.socket = action.payload;
+				state.status = "connecting"; // tentative de connexion en cours
+			})
+			.addCase(joinRoomThunk.fulfilled, (state, action) => {
+				console.log("✅ Player joined the room");
+				state.error = null;
+			})
+			.addCase(joinRoomThunk.rejected, (state, action) => {
+				console.log("❌ Error: player could not join the room");
+				state.error = action.payload;
+			});
+	},
 });
 
-export const { manualDisconnect, displaySocketState } = socketSlice.actions;
+export const {
+	socketConnected,
+	socketConnectionFailed,
+	socketDisconnected,
+} = socketSlice.actions;
 
 export default socketSlice;

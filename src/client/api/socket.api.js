@@ -4,15 +4,19 @@ import { io } from "socket.io-client";
 /*
 ** Use this function to connect to the socket.
 */
-export const connect = () => {
-  	return io(API_ENDPOINT);
-}
-
+export const connect = (token) => {
+	console.log("Connecting to socket with token:", token);
+	const socket = io(API_ENDPOINT, {
+		auth: { token },
+		autoConnect: true,
+	});
+	return socket;
+};
 /*
 ** Disconnects from socket and thus leaves associated room.
 */
 export const disconnect = (socket) => {
-  	socket.disconnect();
+  	if (socket) socket.disconnect();
 }
 /*
 ** Does not return.

@@ -4,8 +4,12 @@ const { Player } = require(__dirname + '/classes/Player.js');
 const { Game } = require(__dirname + '/classes/Game.js');
 const { PieceBasket } = require(__dirname + '/classes/PieceBasket.js');
 const { database } = require(__dirname + '/database/manageDatabase.js');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const app = express();
+const activeUsers = new Map();
+const SECRET_KEY = crypto.randomBytes(64).toString('hex');
 
 // /* only for dev purpose (remove after !)
 const cors = require('cors');
@@ -55,6 +59,7 @@ router.get('/connect/:name', async (req, res, next) => {
     	await player.connect(name);
 		res.status(200).json({
 			message: `Connection success of ${name}`,
+			jwt: jwt.sign({ username: name }, SECRET_KEY, { expiresIn: '24h' }),
             username: name
 		});
   	} catch (e) {
@@ -223,11 +228,31 @@ var pieceBaskets = {};
 var rooms = {}
 var users = {}
 
+io.use((socket, next) => {
+	try {
+		const token = socket.handshake.auth?.token;
+		if (!token) return next(new Error("Token missing"));
+		const decoded = jwt.verify(token, SECRET_KEY);
+		if (activeUsers.get(decoded.username)) {
+			const err = new Error("User already connected elsewhere");
+			err.data = { reason: "User already connected elsewhere" }; // <– sera transmis au client
+			return next(err);
+		}
+
+		socket.userId = decoded.username;
+		next();
+	} catch (err) {
+		next(new Error("Invalid token"));
+	}
+});
+
 io.on('connection', async (socket) => {
   	console.log('A user connected to websocket');
+	activeUsers.set(socket.userId, socket);
 
     socket.on('disconnect', () => {
     	console.log('A user disconnected from websocket and thus left its room');
+		activeUsers.delete(socket.userId);
     });
 
     //Each room represents a game, the roomId is game's id

@@ -25,6 +25,7 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
     "n-readlines": "^1.0.1",
     "nodemon": "^2.0.21",
     "pg": "^8.16.3",

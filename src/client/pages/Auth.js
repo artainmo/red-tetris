@@ -15,8 +15,10 @@ const Auth = () => {
 	const [localName, setLocalName] = useState('');
 	const [emptyInputErrMsg, setEmptyInputErrMsg] = useState(false);
 	const [connectionAttempt, setConnectionAttempt] = useState(false);
+	const socketState = useSelector((state) => state.socket);
+	const { status: socketStatus, error: socketErrMsg } = socketState;
 
-	const handleAuth = () => {
+	const handleAuth = async () => {
 		console.log("handle Auth!")
 		if (!localName) {
 			setEmptyInputErrMsg(true);
@@ -24,15 +26,21 @@ const Auth = () => {
 		}
 		console.log("handle Auth!")
 		setConnectionAttempt(true);
-		dispatch(userConnect(localName));
-		dispatch(socketConnectThunk())
+		const data = await dispatch(userConnect(localName));
+		console.log("data from dispatch:", data);
+		try {
+			const socket = await dispatch(socketConnectThunk(data.payload.jwt)).unwrap();
+		} catch (err) {
+			console.log("Socket connection failed:", err);
+		}
 	}
 
 	useEffect(() => {
-		if (connectionAttempt && user && isAuthenticated) {
+		if (connectionAttempt && user && isAuthenticated && socketStatus === 'connected') {
+			console.log("navigating to main_menu");
 			navigate('/main_menu');
 		}
-	}, [user, navigate, connectionAttempt, isAuthenticated]);
+	}, [user, navigate, connectionAttempt, isAuthenticated, socketStatus]);
 	
 	const inputStyle = {
 		backgroundColor: 'white',
@@ -68,6 +76,7 @@ const Auth = () => {
 					{nameTooLong && <p style={errMsgStyle}>Please enter a shorter username</p>}
 					{emptyInputErrMsg && <p style={errMsgStyle}>Empty inputs are invalid</p>}
 					{nameInvalidChars && <p style={errMsgStyle}>Invalid characters</p>}
+					{socketErrMsg && <p style={errMsgStyle}>{socketErrMsg}</p>}
 					<RedButton style={buttonContainerStyle}
 						textContent='Start'
 						onClick={() => {
