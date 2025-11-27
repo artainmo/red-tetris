@@ -1,8 +1,8 @@
-import React from "react";
-import { CELL_COLORS } from "../../utils/cellColors";
+import React from 'react'
+import PropTypes from 'prop-types'
+import { CELL_COLORS } from '../../utils/cellColors'
 
-const Cell = ({colorCode}) => {
-	
+const Cell = ({ colorCode }) => {
 	const cellStyle = {
 		width: '100%',
 		height: '100%',
@@ -11,7 +11,11 @@ const Cell = ({colorCode}) => {
 		//border: '1px solid white'
 	}
 
-	return <div style={cellStyle}></div>;
+	return <div style={cellStyle}></div>
 }
 
-export default Cell;
+Cell.propTypes = {
+	colorCode: PropTypes.number,
+}
+
+export default Cell

@@ -1,38 +1,38 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit'
 
-import { updateScreenAndScore } from "../../api/socket.api";
+import { updateScreenAndScore } from '../../api/socket.api'
 
 export const setGridAndEmit = (newGrid) => (dispatch, getState) => {
-  const state = getState();
-  const socket = state.socket.socket;
-  const score = state.gameplay.score;
-  
-	if (socket && typeof socket.emit === "function") {
-		updateScreenAndScore(socket, newGrid, score);
+	const state = getState()
+	const socket = state.socket.socket
+	const score = state.gameplay.score
+
+	if (socket && typeof socket.emit === 'function') {
+		updateScreenAndScore(socket, newGrid, score)
 	}
-	
-	dispatch(setGrid(newGrid));
-};
+
+	dispatch(setGrid(newGrid))
+}
 
 export const resetGameplayAndEmit = () => (dispatch, getState) => {
-	const state = getState();
-	const socket = state.socket.socket;
+	const state = getState()
+	const socket = state.socket.socket
 
-	const initialGrid = Array.from({ length: 20 }, () => Array(10).fill(0));
-	const initialScore = 0;
+	const initialGrid = Array.from({ length: 20 }, () => Array(10).fill(0))
+	const initialScore = 0
 
-	if (socket && typeof socket.emit === "function") {
-		updateScreenAndScore(socket, initialGrid, initialScore);
+	if (socket && typeof socket.emit === 'function') {
+		updateScreenAndScore(socket, initialGrid, initialScore)
 	}
 
-	dispatch(resetGameplayAndScore());
-};
+	dispatch(resetGameplayAndScore())
+}
 
 const gameplaySlice = createSlice({
 	name: 'gameplay',
 	initialState: {
 		grid: Array.from({ length: 20 }, () => Array(10).fill(0)),
-		box: Array.from({ length: 10 }, () => Array(10).fill(0)),				// upcoming piece display box
+		box: Array.from({ length: 10 }, () => Array(10).fill(0)), // upcoming piece display box
 		piecePosition: { x: 4, y: 0 },
 		orientation: 0,
 		nextOrientation: 0,
@@ -42,54 +42,54 @@ const gameplaySlice = createSlice({
 	},
 	reducers: {
 		setGrid: (state, action) => {
-			state.grid = action.payload;
+			state.grid = action.payload
 		},
 		setBox: (state, action) => {
-			state.box = action.payload;
+			state.box = action.payload
 		},
 		resetBox: (state) => {
-			state.box = Array.from({ length: 10 }, () => Array(10).fill(0));
+			state.box = Array.from({ length: 10 }, () => Array(10).fill(0))
 		},
 		setPiecePosition: (state, action) => {
-			state.piecePosition = action.payload;
+			state.piecePosition = action.payload
 		},
 		setOrientation: (state, action) => {
-			state.orientation = action.payload;
+			state.orientation = action.payload
 		},
 		setNextOrientation: (state, action) => {
-			state.nextOrientation = action.payload;
+			state.nextOrientation = action.payload
 		},
 		setIsInContact: (state, action) => {
-			state.isInContact = action.payload;
+			state.isInContact = action.payload
 		},
 		setIsGameOver: (state, action) => {
-			state.isGameOver = action.payload;
+			state.isGameOver = action.payload
 		},
-		setScore: (state,action) => {
-			state.score = action.payload;
+		setScore: (state, action) => {
+			state.score = action.payload
 		},
-		resetGameplay: (state,action) => {
-			console.log("resetGameplay")
-			state.grid = Array.from({ length: 20 }, () => Array(10).fill(0)),
-			state.box = Array.from({ length: 10 }, () => Array(10).fill(0)),				// upcoming piece display box
-			state.piecePosition = { x: 4, y: 0 },
-			state.orientation = 0,
-			state.nextOrientation = 0,
-			state.isInContact = false,
-			state.isGameOver = false
+		resetGameplay: (state) => {
+			console.log('resetGameplay')
+			;((state.grid = Array.from({ length: 20 }, () => Array(10).fill(0))),
+				(state.box = Array.from({ length: 10 }, () => Array(10).fill(0))), // upcoming piece display box
+				(state.piecePosition = { x: 4, y: 0 }),
+				(state.orientation = 0),
+				(state.nextOrientation = 0),
+				(state.isInContact = false),
+				(state.isGameOver = false))
 		},
-		resetGameplayAndScore: (state, action) => {
-			resetGameplay(state);
-			state.score = 0;
-		}
-	}
+		resetGameplayAndScore: (state) => {
+			resetGameplay(state)
+			state.score = 0
+		},
+	},
 })
 
-export const { 
+export const {
 	setGrid,
 	setBox,
 	resetBox,
-	setPiecePosition, 
+	setPiecePosition,
 	setOrientation,
 	setNextOrientation,
 	setIsInContact,
@@ -97,7 +97,7 @@ export const {
 	setRank,
 	setScore,
 	resetGameplay,
-	resetGameplayAndScore
-} = gameplaySlice.actions;
+	resetGameplayAndScore,
+} = gameplaySlice.actions
 
-export default gameplaySlice;
+export default gameplaySlice

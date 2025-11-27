@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "../../style/panelStyle";
-import { useSelector } from "react-redux";
-import { getGames } from "../../api/http.api";
+import React from 'react'
+import {
+	arrayContainerStyle,
+	arrayDivStyle,
+	titleStyle,
+	delimiterStyle,
+} from '../../style/panelStyle'
+import { useSelector } from 'react-redux'
+import { getGames } from '../../api/http.api'
 
-const ScoresArray = ({user, scores}) => {
-
+const ScoresArray = ({ user, scores }) => {
 	return (
 		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>
@@ -13,15 +17,15 @@ const ScoresArray = ({user, scores}) => {
 					<div style={delimiterStyle}></div>
 				</div>
 				<div>
-				{
-					scores.map((score, index) => (
-							<p key={index}>{user} got {score} points</p>
-					))
-				}
-				</div>	
+					{scores.map((score, index) => (
+						<p key={index}>
+							{user} got {score} points
+						</p>
+					))}
+				</div>
 			</div>
 		</div>
 	)
 }
 
-export default ScoresArray;
+export default ScoresArray

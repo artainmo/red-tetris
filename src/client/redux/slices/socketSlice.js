@@ -1,68 +1,62 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { connect, disconnect, joinRoom } from "../../api/socket.api";
-
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { connect } from '../../api/socket.api'
 
 export const socketConnectThunk = createAsyncThunk(
-	"socket/socketConnect",
+	'socket/socketConnect',
 	(token, { dispatch }) => {
-		console.log("socketConnectThunk lancé");
+		console.log('socketConnectThunk lancé')
 
-		const socket = connect(token);
+		const socket = connect(token)
 
-		socket.on("connect", () => {
-			console.log("✅ Socket connecté:", socket.id);
-			dispatch(socketConnected());
-		});
+		socket.on('connect', () => {
+			console.log('✅ Socket connecté:', socket.id)
+			dispatch(socketConnected())
+		})
 
-		socket.on("connect_error", (err) => {
-			console.error("❌ Erreur de connexion:", err.message);
-			dispatch(socketConnectionFailed(err.message));
-		});
+		socket.on('connect_error', (err) => {
+			console.error('❌ Erreur de connexion:', err.message)
+			dispatch(socketConnectionFailed(err.message))
+		})
 
-		socket.on("disconnect", (reason) => {
-			console.warn("⚠️ Déconnecté:", reason);
-			dispatch(socketDisconnected(reason));
-		});
+		socket.on('disconnect', (reason) => {
+			console.warn('⚠️ Déconnecté:', reason)
+			dispatch(socketDisconnected(reason))
+		})
 
-		return socket;
+		return socket
 	}
-);
-
+)
 
 const socketSlice = createSlice({
 	name: 'socket',
 	initialState: {
 		socket: null,
 		status: 'null',
-		error: null
+		error: null,
 	},
 	reducers: {
 		socketConnected(state) {
-			state.status = "connected";
-			state.error = null;
+			state.status = 'connected'
+			state.error = null
 		},
 		socketConnectionFailed(state, action) {
-			state.status = "disconnected";
-			state.error = action.payload;
+			state.status = 'disconnected'
+			state.error = action.payload
 		},
 		socketDisconnected(state, action) {
-			state.status = "disconnected";
-			state.error = action.payload || null;
-		}
+			state.status = 'disconnected'
+			state.error = action.payload || null
+		},
 	},
 	extraReducers: (builder) => {
-		builder
-			.addCase(socketConnectThunk.fulfilled, (state, action) => {
-				state.socket = action.payload;
-				state.status = "connecting"; // tentative de connexion en cours
-			})
+		builder.addCase(socketConnectThunk.fulfilled, (state, action) => {
+			state.socket = action.payload
+			state.status = 'connecting' // tentative de connexion en cours
+		})
 	},
-});
+})
 
-export const {
-	socketConnected,
-	socketConnectionFailed,
-	socketDisconnected,
-} = socketSlice.actions;
+export const { socketConnected, socketConnectionFailed, socketDisconnected } =
+	socketSlice.actions
 
-export default socketSlice;
+export default socketSlice

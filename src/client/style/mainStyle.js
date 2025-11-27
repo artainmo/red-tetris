@@ -3,7 +3,7 @@
 export const arrayContainerStyle = {
 	margin: 0,
 	width: '100vw',
-	height: '100vh'
+	height: '100vh',
 }
 
 export const landingPageStyle = {
@@ -15,7 +15,7 @@ export const landingPageStyle = {
 	backgroundRepeat: 'no-repeat',
 	display: 'flex',
 	justifyContent: 'center',
-	alignItems: 'center'
+	alignItems: 'center',
 }
 
 export const buttonStyle = {
@@ -27,19 +27,19 @@ export const buttonStyle = {
 	fontSize: 48,
 	border: 'none',
 	cursor: 'pointer',
-	borderRadius: '40px'
+	borderRadius: '40px',
 }
 
 export const textStyle = {
 	margin: 0,
 	fontSize: 72,
 	color: 'white',
-	paddingBottom: 36
+	paddingBottom: 36,
 }
 
 export const blockStyle = {
 	display: 'flex',
 	flexDirection: 'column',
 	justifyContent: 'center',
-	alignItems: 'center'
+	alignItems: 'center',
 }

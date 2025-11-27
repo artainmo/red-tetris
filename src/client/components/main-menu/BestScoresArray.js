@@ -1,8 +1,13 @@
-import React from "react";
-import { arrayContainerStyle, arrayDivStyle, titleStyle, delimiterStyle } from "../../style/panelStyle";
+import React from 'react'
+import PropTypes from 'prop-types'
+import {
+	arrayContainerStyle,
+	arrayDivStyle,
+	titleStyle,
+	delimiterStyle,
+} from '../../style/panelStyle'
 
-const BestScoresArray = ({scores}) => {
-
+const BestScoresArray = ({ scores }) => {
 	return (
 		<div style={arrayContainerStyle}>
 			<div style={arrayDivStyle}>
@@ -11,15 +16,19 @@ const BestScoresArray = ({scores}) => {
 					<div style={delimiterStyle}></div>
 				</div>
 				<div>
-				{
-					Object.keys(scores).map((key, index) => (
-							<p key={index}>{key} best scores is <mark>{scores[key]}</mark> points</p>
-					))
-				}
-				</div>	
+					{Object.keys(scores).map((key, index) => (
+						<p key={index}>
+							{key} best scores is <mark>{scores[key]}</mark> points
+						</p>
+					))}
+				</div>
 			</div>
 		</div>
 	)
 }
 
-export default BestScoresArray;
+BestScoresArray.propTypes = {
+	scores: PropTypes.object.isRequired,
+}
+
+export default BestScoresArray

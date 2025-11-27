@@ -7,4 +7,4 @@ export const colors = {
 	sovietRed: '#CC0000',
 	sovietYellow: '#FFD700',
 	backgroundDarkGrey: '#222222',
-};
+}

@@ -1,31 +1,33 @@
-import { useRef, useEffect, useState } from "react";
-import useManagePiece from "./useManagePiece";
-import useManageLines from "./useManageLines";
-import { useSelector, useDispatch } from 'react-redux';
-import { pauseGame, resumeGame } from "../redux/slices/gameTimeSlice";
-import { listenLinesCleared } from "../api/socket.api";
-import pieceSlice from "../redux/slices/pieceSlice";
+import { useRef, useEffect, useState } from 'react'
+import useManagePiece from './useManagePiece'
+import useManageLines from './useManageLines'
+import { useSelector, useDispatch } from 'react-redux'
+import { pauseGame, resumeGame } from '../redux/slices/gameTimeSlice'
+import { listenLinesCleared } from '../api/socket.api'
 
 const useModifyGrid = (width, height) => {
+	const dispatch = useDispatch()
+	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused)
+	const startGame = useSelector((state) => state.gameTime.isGameActive)
+	const username = useSelector((state) => state.auth.user)
+	const grid = useSelector((state) => state.gameplay.grid)
+	const socket = useSelector((state) => state.socket?.socket)
 
-	const dispatch = useDispatch();
-	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
-	const startGame = useSelector((state) => state.gameTime.isGameActive);
-	const username = useSelector((state) => state.auth.user);
-	const grid = useSelector((state) => state.gameplay.grid);
-	const socket = useSelector((state) => state.socket?.socket);
-	const activePiece = useSelector((state) => state.gameplay.activePiece);
-	const nextActivePiece = useSelector((state) => state.gameplay.nextActivePiece);
-	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
-
-	const [isInContact, setIsInContact ] = useState(false);
+	const [isInContact, setIsInContact] = useState(false)
 
 	/* delegate piece management to specialized hook */
-	const { spawnNewPiece, movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece, addUnbreakableMalusLine } 
-	= useManagePiece(width, height);
+	const {
+		spawnNewPiece,
+		movePieceLeft,
+		movePieceRight,
+		rotatePiece,
+		movePieceDown,
+		dropPiece,
+		addUnbreakableMalusLine,
+	} = useManagePiece(width, height)
 
 	/* delegate line suppression and add unbreakble malus line when opponent player scores */
-	const {clearFullLines } = useManageLines(width, height);
+	const { clearFullLines } = useManageLines(width, height)
 
 	/* spawn the pieces, at launch and everytime activePiece is resetted to null */
 	// useEffect(() => {
@@ -38,97 +40,112 @@ const useModifyGrid = (width, height) => {
 	// }, [activePiece, nextActivePiece, isGameOver]);
 
 	useEffect(() => {
-        if (!socket) return;
-        const onLinesCleared = (player, linesCleared) => {
-            if (!linesCleared || linesCleared <= 0) return;
-            if (player === username) return;
-            addUnbreakableMalusLine(linesCleared);
-        };
-        listenLinesCleared(socket, onLinesCleared);
-        return () => {
-            if (socket && socket.off) socket.off('linesCleared');
-        };
-    }, [socket, username, addUnbreakableMalusLine]);
+		if (!socket) return
+		const onLinesCleared = (player, linesCleared) => {
+			if (!linesCleared || linesCleared <= 0) return
+			if (player === username) return
+			addUnbreakableMalusLine(linesCleared)
+		}
+		listenLinesCleared(socket, onLinesCleared)
+		return () => {
+			if (socket && socket.off) socket.off('linesCleared')
+		}
+	}, [socket, username, addUnbreakableMalusLine])
 
 	/* player inputs manager */
 	useEffect(() => {
 		const handleKeyDown = (event) => {
-			if ((isGamePaused && event.key !== "Escape") || !startGame)
-				return ;
+			if ((isGamePaused && event.key !== 'Escape') || !startGame) return
 			switch (event.key) {
-				case "ArrowUp":
-					rotatePiece();
-					break;
-				case "ArrowLeft":
-					movePieceLeft();
-					break;
-				case "ArrowRight": 
-					movePieceRight();
-					break;
-				case "ArrowDown":
-					movePieceDown();
-					break;
-				case "u":
-					console.log("Adding unbreakable malus line for testing");
-					addUnbreakableMalusLine(1);
-					break;
-				case " ":
-					event.preventDefault();
-					dropPiece();
-					break;
-				case "Escape":
+				case 'ArrowUp':
+					rotatePiece()
+					break
+				case 'ArrowLeft':
+					movePieceLeft()
+					break
+				case 'ArrowRight':
+					movePieceRight()
+					break
+				case 'ArrowDown':
+					movePieceDown()
+					break
+				case 'u':
+					console.log('Adding unbreakable malus line for testing')
+					addUnbreakableMalusLine(1)
+					break
+				case ' ':
+					event.preventDefault()
+					dropPiece()
+					break
+				case 'Escape':
 					if (!isGamePaused) {
-						dispatch(pauseGame());
+						dispatch(pauseGame())
 					} else {
-						dispatch(resumeGame());
+						dispatch(resumeGame())
 					}
-					break;
+					break
 				default:
-					break;
+					break
 			}
-		};
+		}
 
-		window.addEventListener("keydown", handleKeyDown);
+		window.addEventListener('keydown', handleKeyDown)
 
 		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
+			window.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece, isGamePaused, dispatch, startGame]);
+	}, [
+		movePieceLeft,
+		movePieceRight,
+		rotatePiece,
+		movePieceDown,
+		dropPiece,
+		isGamePaused,
+		dispatch,
+		startGame,
+	])
 
 	/* gravity manager */
-	const applyGravityRef = useRef(null);
+	const applyGravityRef = useRef(null)
 
 	useEffect(() => {
 		applyGravityRef.current = () => {
 			if (isGamePaused || !startGame) {
-				return;
+				return
 			}
-			const pieceCanFall = movePieceDown();
+			const pieceCanFall = movePieceDown()
 
 			if (pieceCanFall) {
-				setIsInContact(false);
+				setIsInContact(false)
 			} else {
 				if (isInContact) {
-					clearFullLines();
+					clearFullLines()
 					// dispatch(pieceSlice.actions.incrementIndex());
 					// dispatch(setActivePiece(false));
-					spawnNewPiece(false);					
+					spawnNewPiece(false)
 				} else {
-					setIsInContact(true);
+					setIsInContact(true)
 				}
 			}
-		};
-	}, [dispatch, movePieceDown, isInContact, clearFullLines, isGamePaused, startGame]);
+		}
+	}, [
+		dispatch,
+		movePieceDown,
+		isInContact,
+		clearFullLines,
+		isGamePaused,
+		startGame,
+	])
 
 	useEffect(() => {
 		const interval = setInterval(() => {
-			applyGravityRef.current();
-		}, 500);
+			applyGravityRef.current()
+		}, 500)
 
-		return () => clearInterval(interval);
-	}, []);
-	
-	return grid;
+		return () => clearInterval(interval)
+	}, [])
+
+	return grid
 }
 
-export default useModifyGrid;
+export default useModifyGrid

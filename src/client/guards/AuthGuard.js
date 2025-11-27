@@ -1,16 +1,21 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import React from 'react'
+import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
+import { Navigate } from 'react-router-dom'
 
 const AuthGuard = ({ children }) => {
-	const isAuthenticated = useSelector((state) => state.auth.user);
+	const isAuthenticated = useSelector((state) => state.auth.user)
 
 	if (!isAuthenticated) {
-		console.log('authGuard : access denied !!!');
-		return <Navigate to="/auth" replace />;
+		console.log('authGuard : access denied !!!')
+		return <Navigate to="/auth" replace />
 	}
-	
-	return children;
+
+	return children
 }
 
-export default AuthGuard;
+AuthGuard.propTypes = {
+	children: PropTypes.node.isRequired,
+}
+
+export default AuthGuard

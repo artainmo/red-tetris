@@ -1,33 +1,30 @@
-import React, { useState, useEffect } from "react";
-import BestScoresArray from "./BestScoresArray";
-import { fullWhiteMenuPanelStyle } from "../../style/panelStyle";
-import { getBestScores } from "../../api/http.api";
-
+import React, { useState, useEffect } from 'react'
+import BestScoresArray from './BestScoresArray'
+import { fullWhiteMenuPanelStyle } from '../../style/panelStyle'
+import { getBestScores } from '../../api/http.api'
 
 const RightMenuPanel = () => {
-	
-	const [scores,setScores] = useState({})
+	const [scores, setScores] = useState({})
 
 	const fetchBestScores = async () => {
 		try {
-			const data = await getBestScores();
-			console.log("fetched best scores:", data);
+			const data = await getBestScores()
+			console.log('fetched best scores:', data)
 			// setScores(data);
 		} catch (error) {
-			console.error("Error fetching best scores:", error);
+			console.error('Error fetching best scores:', error)
 		}
-	};
-	
+	}
+
 	useEffect(() => {
-		fetchBestScores();
-	}, []);
+		fetchBestScores()
+	}, [])
 
 	return (
 		<div style={fullWhiteMenuPanelStyle}>
-			<BestScoresArray scores={scores}/>
+			<BestScoresArray scores={scores} />
 		</div>
-	);
-
+	)
 }
 
-export default RightMenuPanel;
+export default RightMenuPanel

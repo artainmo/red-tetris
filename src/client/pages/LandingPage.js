@@ -1,21 +1,23 @@
-import React from "react";
-import RedButton from "../components/shared/RedButton";
-import { useNavigate } from "react-router-dom";
-import { pageMainContainerStyle, buttonContainerStyle } from "../style/containersStyle";
-import RedTetrisTitle from "../components/shared/RedTetrisTitle";
+import React from 'react'
+import RedButton from '../components/shared/RedButton'
+import { useNavigate } from 'react-router-dom'
+import {
+	pageMainContainerStyle,
+	buttonContainerStyle,
+} from '../style/containersStyle'
+import RedTetrisTitle from '../components/shared/RedTetrisTitle'
 
 const LandingPage = () => {
-	
-	const navigate = useNavigate();
+	const navigate = useNavigate()
 
 	return (
 		<div style={pageMainContainerStyle}>
-			<RedTetrisTitle/>
+			<RedTetrisTitle />
 			<div style={buttonContainerStyle}>
 				<RedButton
-					textContent='Start'
+					textContent="Start"
 					onClick={() => {
-						navigate('/auth');
+						navigate('/auth')
 					}}
 				/>
 			</div>
@@ -23,4 +25,4 @@ const LandingPage = () => {
 	)
 }
 
-export default LandingPage;
+export default LandingPage

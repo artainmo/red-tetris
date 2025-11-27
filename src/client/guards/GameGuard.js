@@ -9,7 +9,7 @@
 // 	if (!isCurrentGame) {
 // 		return <Navigate to="/game_menu" replace />;
 // 	}
-	
+
 // 	return children;
 // }
 

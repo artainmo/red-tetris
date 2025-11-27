@@ -1,21 +1,18 @@
-import React, { useState } from "react";
-import { redOctoberRegular } from "../../style/fonts";
-import { colors } from "../../style/colors";
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+import { redOctoberRegular } from '../../style/fonts'
+import { colors } from '../../style/colors'
 
-const RedButton = ({
-	textContent,
-	onClick,
-}) => {
+const RedButton = ({ textContent, onClick }) => {
+	const [isHovered, setIsHovered] = useState(false)
 
-	const [ isHovered, setIsHovered] = useState(false);
-	
 	const textStyle = {
 		...redOctoberRegular,
 		color: colors.white,
 		fontSize: '18px',
 		lineHeight: '27px',
 		textDecoration: 'none',
-		margin: 0,		
+		margin: 0,
 	}
 
 	const buttonStyle = {
@@ -29,9 +26,9 @@ const RedButton = ({
 		alignItems: 'center',
 		transition: 'background-color 0.3s',
 		border: 'none',
-    	cursor: 'pointer',
-    	outline: 'none',
-		margin: '5px'
+		cursor: 'pointer',
+		outline: 'none',
+		margin: '5px',
 	}
 
 	return (
@@ -41,11 +38,14 @@ const RedButton = ({
 			onMouseLeave={() => setIsHovered(false)}
 			onClick={onClick}
 		>
-			<p style={textStyle}>
-				{textContent}
-			</p>
+			<p style={textStyle}>{textContent}</p>
 		</button>
-	);
+	)
 }
 
-export default RedButton;
+RedButton.propTypes = {
+	textContent: PropTypes.string.isRequired,
+	onClick: PropTypes.func.isRequired,
+}
+
+export default RedButton

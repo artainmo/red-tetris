@@ -4,7 +4,7 @@
 
 export const redOctoberBaseStyle = {
 	fontFamily: 'Red October',
-    fontStyle: 'normal',
+	fontStyle: 'normal',
 }
 
 export const redOctoberRegular = {
@@ -15,7 +15,7 @@ export const redOctoberRegular = {
 export const redOctoberLight = {
 	...redOctoberBaseStyle,
 	fontWeight: 300,
-};
+}
 
 export const redOctoberBold = {
 	...redOctoberBaseStyle,

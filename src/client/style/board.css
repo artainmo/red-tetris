@@ -1,23 +1,23 @@
 .board-wrapper {
-    display: grid;
-    align-items: center;
-    justify-content: center;
-    height: 75vh;
+	display: grid;
+	align-items: center;
+	justify-content: center;
+	height: 75vh;
 }
 
 .board {
-    border: 2px solid black;
-    width: 400px;
-    height: 800px;
+	border: 2px solid black;
+	width: 400px;
+	height: 800px;
 }
 
 .row {
-    display: flex;
+	display: flex;
 }
 
 .cell {
-    box-sizing: border-box;
-    width: 40px;
-    height: 40px;
-    border: 1px solid black;
+	box-sizing: border-box;
+	width: 40px;
+	height: 40px;
+	border: 1px solid black;
 }

@@ -1,57 +1,54 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateGameTime } from "../redux/slices/gameTimeSlice";
-import { startGame } from "../redux/slices/gameTimeSlice";
-import { listenStartGame } from "../api/socket.api";
-import { resetGameplay } from "../redux/slices/gameplaySlice";
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateGameTime } from '../redux/slices/gameTimeSlice'
+import { startGame } from '../redux/slices/gameTimeSlice'
+import { listenStartGame } from '../api/socket.api'
+import { resetGameplay } from '../redux/slices/gameplaySlice'
 
 const useManageTime = () => {
+	const dispatch = useDispatch()
+	const socket = useSelector((state) => state.socket?.socket)
 
-	const dispatch = useDispatch();
-	const socket = useSelector((state) => state.socket?.socket);
-
-	const time = useSelector((state) => state.gameTime.currentTime);
+	const time = useSelector((state) => state.gameTime.currentTime)
 	const gameActive = useSelector((state) => state.gameTime.isGameActive)
-	const [intervalId, setIntervalId] = useState(null);
+	const [intervalId, setIntervalId] = useState(null)
 
 	useEffect(() => {
 		if (gameActive) {
 			const id = setInterval(() => {
-			dispatch(updateGameTime())
-		}, 1000);
+				dispatch(updateGameTime())
+			}, 1000)
 
-		setIntervalId(id);
+			setIntervalId(id)
 
-		return () => clearInterval(id); // Clean up on unmount
+			return () => clearInterval(id) // Clean up on unmount
 		}
-	}, [gameActive]);
-
+	}, [gameActive])
 
 	useEffect(() => {
-		if (time >= 60 * 60 * 1000) { // 60 minutes * 60 seconds * 1000 milliseconds
-		clearInterval(intervalId);
+		if (time >= 60 * 60 * 1000) {
+			// 60 minutes * 60 seconds * 1000 milliseconds
+			clearInterval(intervalId)
 		}
-	}, [time, intervalId]);
+	}, [time, intervalId])
 
 	useEffect(() => {
-		console.log("Setting up listenStartGame in useManageTime");
+		console.log('Setting up listenStartGame in useManageTime')
 		const onGameStarted = () => {
-			dispatch(resetGameplay());
-			dispatch(startGame());
-		};
+			dispatch(resetGameplay())
+			dispatch(startGame())
+		}
 
-		listenStartGame(socket, onGameStarted);
+		listenStartGame(socket, onGameStarted)
 
 		return () => {
 			if (socket) {
-				socket.off('gameStarted', onGameStarted);
+				socket.off('gameStarted', onGameStarted)
 			}
-		};
+		}
+	}, [dispatch, socket])
 
-	}, [dispatch, socket]);
-
-	return time;
+	return time
 }
 
-export default useManageTime;
+export default useManageTime

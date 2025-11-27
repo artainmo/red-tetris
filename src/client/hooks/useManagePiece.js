@@ -1,302 +1,400 @@
-import { useEffect, useCallback, useState } from "react";
-import { TETROMINOS } from "../utils/tetrominoes";
-import { PIECES_COLOR_CODES } from "../utils/piecesColorCodes";
-import { PIECE_STARTING_ORIENTATIONS } from "../utils/pieceStartingOrientation";
-import { WALL_KICK_OFFSETS } from "../utils/wallKickOffsets";
-import useCollisionDetection from "./useCollisionDetection";
-import usePieceGenerator from "./usePieceGenerator";
-import { useDispatch, useSelector } from 'react-redux';
-import { setActivePiece, setActivePieceType, setGrid, setNextActivePiece, setNextActivePieceType, setPiecePosition } from '../redux/slices/gameplaySlice';
-import { setIsGameOver, setOrientation, setNextOrientation, setGridAndEmit, setBox } from "../redux/slices/gameplaySlice";
-import { incrementIndex, useNextPieceListener } from "../redux/slices/pieceSlice";
-import { pauseGame } from "../redux/slices/gameTimeSlice";
-import { looseGame } from "../api/socket.api";
+import { useEffect, useCallback, useState } from 'react'
+import { TETROMINOS } from '../utils/tetrominoes'
+import { PIECES_COLOR_CODES } from '../utils/piecesColorCodes'
+import { PIECE_STARTING_ORIENTATIONS } from '../utils/pieceStartingOrientation'
+import useCollisionDetection from './useCollisionDetection'
+import { useDispatch, useSelector } from 'react-redux'
+import { setPiecePosition } from '../redux/slices/gameplaySlice'
+import {
+	setIsGameOver,
+	setOrientation,
+	setNextOrientation,
+	setGridAndEmit,
+	setBox,
+} from '../redux/slices/gameplaySlice'
+import { incrementIndex } from '../redux/slices/pieceSlice'
+import { pauseGame } from '../redux/slices/gameTimeSlice'
+import { looseGame } from '../api/socket.api'
 
 const useManagePiece = (width, height) => {
-	
-	const dispatch = useDispatch();
+	const dispatch = useDispatch()
 
 	const username = useSelector((state) => state.auth.user)
 	const scores = useSelector((state) => state.currentGame.scores)
-	const grid = useSelector((state) => state.gameplay.grid);
-	const activePiece = useSelector((state) => state.piece.tetrominosCurrentPiece);
-	const activePieceType = useSelector((state) => state.piece.currentPiece);
-	const nextActivePiece = useSelector((state) => state.piece.tetrominosNextPiece);
-	const nextActivePieceType = useSelector((state) => state.piece.nextPiece);
-	const piecePosition = useSelector((state) => state.gameplay.piecePosition);
-	const orientation = useSelector((state) => state.gameplay.orientation);
-	const nextPiecePosition = { x: 4, y: 4 };
-	const nextOrientation = useSelector((state) => state.gameplay.nextOrientation);
-	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
-	const socket = useSelector((state) => state.socket?.socket);
-	const [update, setUpdate] = useState(false);
-	
-	const { canMoveDown, canMoveRight, canMoveLeft, canRotate, canWallRotate } = useCollisionDetection(width, height, grid);
+	const grid = useSelector((state) => state.gameplay.grid)
+	const activePiece = useSelector((state) => state.piece.tetrominosCurrentPiece)
+	const activePieceType = useSelector((state) => state.piece.currentPiece)
+	const nextActivePiece = useSelector(
+		(state) => state.piece.tetrominosNextPiece
+	)
+	const nextActivePieceType = useSelector((state) => state.piece.nextPiece)
+	const piecePosition = useSelector((state) => state.gameplay.piecePosition)
+	const orientation = useSelector((state) => state.gameplay.orientation)
+	const nextPiecePosition = { x: 4, y: 4 }
+	const nextOrientation = useSelector((state) => state.gameplay.nextOrientation)
+	const isGameOver = useSelector((state) => state.gameplay.isGameOver)
+	const socket = useSelector((state) => state.socket?.socket)
+	const [update, setUpdate] = useState(false)
+
+	const { canMoveDown, canMoveRight, canMoveLeft, canRotate, canWallRotate } =
+		useCollisionDetection(width, height, grid)
 	// const nextPieceListener = useNextPieceListener();
 	// const getNextPiece = usePieceGenerator();
 	// const currentPiece = useSelector((state) => state.piece.currentPiece);
 	// const nextPieces = useSelector((state) => state.piece.nextPiece);
 
 	/* check whether the piece can indeed be inserted */
-	const isPieceInsertable = async(piece, x, y, orientation) => {
-		const shapeCoords = piece[orientation];
-		const gameOver =  shapeCoords.some(([relY, relX]) => {
-			const newY = y + relY;
-			const newX = x + relX;
-			return grid[newY] && grid[newY][newX] !== 0;
-		});
+	const isPieceInsertable = async (piece, x, y, orientation) => {
+		const shapeCoords = piece[orientation]
+		const gameOver = shapeCoords.some(([relY, relX]) => {
+			const newY = y + relY
+			const newX = x + relX
+			return grid[newY] && grid[newY][newX] !== 0
+		})
 
 		if (gameOver && !isGameOver) {
-			console.log("dispatching game over")
-			const score = scores[username];
+			console.log('dispatching game over')
+			const score = scores[username]
 			console.log(score)
 
 			dispatch(setIsGameOver(true))
 
-			dispatch(pauseGame());
-			looseGame(socket);
-			return false;
+			dispatch(pauseGame())
+			looseGame(socket)
+			return false
 		}
-		return true;
+		return true
 	}
 
 	/* spawn an new piece */
 	const spawnNewPiece = (both) => {
-		console.log("Spawning new piece, both:", both);
-		console.log("Active piece type:", activePieceType);
-		if (isGameOver)
-			return ;
+		console.log('Spawning new piece, both:', both)
+		console.log('Active piece type:', activePieceType)
+		if (isGameOver) return
 		if (both) {
-			const pieceLetterCode = activePieceType;
+			const pieceLetterCode = activePieceType
 			// const nextPieceLetterCode = nextActivePieceType;
-			const piece = TETROMINOS[pieceLetterCode];
+			const piece = TETROMINOS[pieceLetterCode]
 			// const nextPiece = TETROMINOS[nextPieceLetterCode];
-	
+
 			if (!piece) {
-				console.error('Unknown piece type: ', pieceLetterCode);
-				return;
-			}
-	
-			const initialX = Math.floor(width / 2) - Math.floor(TETROMINOS[pieceLetterCode][0].length / 2);
-			const initialY = 0;
-	
-			if (!isPieceInsertable(piece, initialX,initialY, PIECE_STARTING_ORIENTATIONS[pieceLetterCode])) {
-				return; 
+				console.error('Unknown piece type: ', pieceLetterCode)
+				return
 			}
 
-			dispatch(setPiecePosition({x: initialX, y: initialY}));
-			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
-			setUpdate(!update);
+			const initialX =
+				Math.floor(width / 2) -
+				Math.floor(TETROMINOS[pieceLetterCode][0].length / 2)
+			const initialY = 0
+
+			if (
+				!isPieceInsertable(
+					piece,
+					initialX,
+					initialY,
+					PIECE_STARTING_ORIENTATIONS[pieceLetterCode]
+				)
+			) {
+				return
+			}
+
+			dispatch(setPiecePosition({ x: initialX, y: initialY }))
+			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]))
+			setUpdate(!update)
 			// dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[nextPieceLetterCode]));
-		}
-		else {
-			dispatch(incrementIndex());
+		} else {
+			dispatch(incrementIndex())
 
-			const piece = activePiece;
-	
+			const piece = activePiece
+
 			if (!piece) {
-				console.error('Unknown piece type: ', activePieceType);
-				return;
-			}
-	
-			const initialX = Math.floor(width / 2) - Math.floor(TETROMINOS[activePieceType][0].length / 2);
-			const initialY = 0;
-
-			if (!isPieceInsertable(piece, initialX,initialY, PIECE_STARTING_ORIENTATIONS[activePieceType])) {
-				return; 
+				console.error('Unknown piece type: ', activePieceType)
+				return
 			}
 
-			dispatch(setPiecePosition({x: initialX, y: initialY}));
+			const initialX =
+				Math.floor(width / 2) -
+				Math.floor(TETROMINOS[activePieceType][0].length / 2)
+			const initialY = 0
+
+			if (
+				!isPieceInsertable(
+					piece,
+					initialX,
+					initialY,
+					PIECE_STARTING_ORIENTATIONS[activePieceType]
+				)
+			) {
+				return
+			}
+
+			dispatch(setPiecePosition({ x: initialX, y: initialY }))
 			// dispatch(setActivePiece(nextActivePiece));
 			// dispatch(setActivePieceType(nextActivePieceType));
 			// dispatch(setNextActivePiece(piece));
 			// dispatch(setNextActivePieceType(currentPiece));
-			dispatch(setOrientation(nextOrientation));
-			dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[activePieceType]));
-			setUpdate(!update);
+			dispatch(setOrientation(nextOrientation))
+			dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[activePieceType]))
+			setUpdate(!update)
 		}
 	}
 
 	/* general updater for the grid when there is a move */
 	const updateGridWithPiece = (shapeCoords, x, y, colorCode) => {
-		console.log("Updating grid with piece at position:", x, y);
-		if (!shapeCoords) return;
-		console.log("shapeCoords:", shapeCoords);
-		const newGrid = grid.map((row) => [...row]);
+		console.log('Updating grid with piece at position:', x, y)
+		if (!shapeCoords) return
+		console.log('shapeCoords:', shapeCoords)
+		const newGrid = grid.map((row) => [...row])
 
 		shapeCoords.forEach(([relY, relX]) => {
-			const newY = y + relY;
-			const newX = x + relX;
-			newGrid[newY][newX] = colorCode;
-		});
+			const newY = y + relY
+			const newX = x + relX
+			newGrid[newY][newX] = colorCode
+		})
 
-		dispatch(setGridAndEmit(newGrid));
-	};
+		dispatch(setGridAndEmit(newGrid))
+	}
 
 	const updateUpcomingPieceBox = (boxCoords, x, y, colorCode) => {
+		if (!boxCoords) return
 
-		if (!boxCoords) return;
-
-		const newBox = Array.from({ length: 10 }, () => Array(10).fill(0));
+		const newBox = Array.from({ length: 10 }, () => Array(10).fill(0))
 
 		boxCoords.forEach(([relY, relX]) => {
-			const newY = y + relY;
-			const newX = x + relX;
-			newBox[newY][newX] = colorCode;
-		});
+			const newY = y + relY
+			const newX = x + relX
+			newBox[newY][newX] = colorCode
+		})
 
-		dispatch(setBox(newBox));
-	};
+		dispatch(setBox(newBox))
+	}
 
 	/* used to removed the piece when producing a move, to later display the piece in new position */
 	const removePiece = useCallback(() => {
-		const newGrid = grid.map((row) => [...row]);
+		const newGrid = grid.map((row) => [...row])
 
 		if (activePiece) {
 			activePiece[orientation].forEach(([relY, relX]) => {
-				const oldY = piecePosition.y + relY;
-				const oldX = piecePosition.x + relX;
-				newGrid[oldY][oldX] = 0;
-			})	
+				const oldY = piecePosition.y + relY
+				const oldX = piecePosition.x + relX
+				newGrid[oldY][oldX] = 0
+			})
 		}
-		dispatch(setGridAndEmit(newGrid));
-	}, [dispatch, activePiece, grid, orientation, piecePosition]);
+		dispatch(setGridAndEmit(newGrid))
+	}, [dispatch, activePiece, grid, orientation, piecePosition])
 
 	const removePieceSync = () => {
-		const newGrid = grid.map((row) => [...row]);
+		const newGrid = grid.map((row) => [...row])
 
 		if (activePiece) {
 			activePiece[orientation].forEach(([relY, relX]) => {
-				const oldY = piecePosition.y + relY;
-				const oldX = piecePosition.x + relX;
-				newGrid[oldY][oldX] = 0;
-			})	
+				const oldY = piecePosition.y + relY
+				const oldX = piecePosition.x + relX
+				newGrid[oldY][oldX] = 0
+			})
 		}
-		console.log(newGrid);
-		return newGrid;
-	};
+		console.log(newGrid)
+		return newGrid
+	}
 
 	/* Rotations managers */
 	const rotatePieceWithWallKick = (newOrientation) => {
-		let places = [0, 1, -1];
+		let places = [0, 1, -1]
 		if (activePieceType == 'I') {
-			places = [0, 1, -1, 2, -2];
+			places = [0, 1, -1, 2, -2]
 		}
 		for (let i of places) {
-			if (canWallRotate(activePiece, piecePosition.x, piecePosition.y, orientation, newOrientation, i)) {
-				removePiece();
-				dispatch(setPiecePosition({ x: piecePosition.x + i, y: piecePosition.y}));
-				dispatch(setOrientation(newOrientation));
-				return;
+			if (
+				canWallRotate(
+					activePiece,
+					piecePosition.x,
+					piecePosition.y,
+					orientation,
+					newOrientation,
+					i
+				)
+			) {
+				removePiece()
+				dispatch(
+					setPiecePosition({ x: piecePosition.x + i, y: piecePosition.y })
+				)
+				dispatch(setOrientation(newOrientation))
+				return
 			}
-		};
-		console.log('no rotation possible');
-	};
+		}
+		console.log('no rotation possible')
+	}
 
 	const rotatePiece = useCallback(() => {
 		if (activePiece) {
-			const newOrientation = (orientation + 90) % 360;
-		  	if (canRotate(activePiece, piecePosition.x, piecePosition.y, orientation, newOrientation)) {
-				removePiece();
-				dispatch(setOrientation(newOrientation));
-		  	} else {
-				rotatePieceWithWallKick(newOrientation);
+			const newOrientation = (orientation + 90) % 360
+			if (
+				canRotate(
+					activePiece,
+					piecePosition.x,
+					piecePosition.y,
+					orientation,
+					newOrientation
+				)
+			) {
+				removePiece()
+				dispatch(setOrientation(newOrientation))
+			} else {
+				rotatePieceWithWallKick(newOrientation)
 			}
 		}
-	}, [activePiece, piecePosition, orientation, canRotate, removePiece, dispatch]);
+	}, [
+		activePiece,
+		piecePosition,
+		orientation,
+		canRotate,
+		removePiece,
+		dispatch,
+	])
 
 	const movePieceRight = useCallback(() => {
-		if (!activePiece || !canMoveRight(activePiece, piecePosition.x, piecePosition.y, orientation)) {
-			return;
+		if (
+			!activePiece ||
+			!canMoveRight(activePiece, piecePosition.x, piecePosition.y, orientation)
+		) {
+			return
 		}
-		removePiece();
-		dispatch(setPiecePosition({ x: piecePosition.x + 1, y: piecePosition.y }));
-	}, [dispatch, activePiece, piecePosition, orientation, canMoveRight, removePiece]);
+		removePiece()
+		dispatch(setPiecePosition({ x: piecePosition.x + 1, y: piecePosition.y }))
+	}, [
+		dispatch,
+		activePiece,
+		piecePosition,
+		orientation,
+		canMoveRight,
+		removePiece,
+	])
 
-	const movePieceLeft = useCallback (() => {
-		if (!activePiece || !canMoveLeft(activePiece, piecePosition.x, piecePosition.y, orientation)) {
-			return;
+	const movePieceLeft = useCallback(() => {
+		if (
+			!activePiece ||
+			!canMoveLeft(activePiece, piecePosition.x, piecePosition.y, orientation)
+		) {
+			return
 		}
-		removePiece();
-		dispatch(setPiecePosition({ x: piecePosition.x - 1, y: piecePosition.y }));
-	}, [dispatch, activePiece, piecePosition, orientation, canMoveLeft, removePiece]);
+		removePiece()
+		dispatch(setPiecePosition({ x: piecePosition.x - 1, y: piecePosition.y }))
+	}, [
+		dispatch,
+		activePiece,
+		piecePosition,
+		orientation,
+		canMoveLeft,
+		removePiece,
+	])
 
-	const movePieceDown = () => {	
-		if (!activePiece || !canMoveDown(activePiece, piecePosition.x, piecePosition.y, orientation)) {
-			return false;
+	const movePieceDown = () => {
+		if (
+			!activePiece ||
+			!canMoveDown(activePiece, piecePosition.x, piecePosition.y, orientation)
+		) {
+			return false
 		}
-		removePiece();
-		dispatch(setPiecePosition({ x: piecePosition.x, y: piecePosition.y + 1 }));
-		return true;
+		removePiece()
+		dispatch(setPiecePosition({ x: piecePosition.x, y: piecePosition.y + 1 }))
+		return true
 	}
 
 	const dropPiece = () => {
 		if (!activePiece) {
-			return;
+			return
 		}
-		let dropY = piecePosition.y;
+		let dropY = piecePosition.y
 		while (canMoveDown(activePiece, piecePosition.x, dropY, orientation)) {
-			dropY += 1;
+			dropY += 1
 		}
-		removePiece();
-		dispatch(setPiecePosition({ x: piecePosition.x, y: dropY }));
-	};
+		removePiece()
+		dispatch(setPiecePosition({ x: piecePosition.x, y: dropY }))
+	}
 
 	useEffect(() => {
-		console.log("useEffect updateGridWithPiece triggered");
-		console.log("Dependencies:", {activePiece, activePieceType, piecePosition, orientation});
-		if (activePiece && activePieceType && piecePosition && orientation !== null) {
+		console.log('useEffect updateGridWithPiece triggered')
+		console.log('Dependencies:', {
+			activePiece,
+			activePieceType,
+			piecePosition,
+			orientation,
+		})
+		if (
+			activePiece &&
+			activePieceType &&
+			piecePosition &&
+			orientation !== null
+		) {
 			updateGridWithPiece(
 				activePiece[orientation],
 				piecePosition.x,
 				piecePosition.y,
 				PIECES_COLOR_CODES[activePieceType]
-			);
+			)
 		}
-	}, [activePiece, activePieceType, piecePosition, orientation, update]);
+	}, [activePiece, activePieceType, piecePosition, orientation, update])
 
 	useEffect(() => {
-
 		if (nextActivePiece && nextActivePieceType) {
 			updateUpcomingPieceBox(
 				nextActivePiece[nextOrientation],
 				nextPiecePosition.x,
 				nextPiecePosition.y,
 				PIECES_COLOR_CODES[nextActivePieceType]
-			);
-		}		
-	}, [nextActivePiece, nextActivePieceType]);
+			)
+		}
+	}, [nextActivePiece, nextActivePieceType])
 
-	const addUnbreakableMalusLine = useCallback((nlines) => {
-		let piecePutDown = false;
-		let actualGrid = grid;
-		for (let i = 0; i < nlines; i++) {
-			if (canMoveDown(activePiece, piecePosition.x, piecePosition.y, orientation, i + 1) === false && piecePutDown === false)
-			{
-				for (let j = 0; j < i + 1; j++) {
-					movePieceDown();
+	const addUnbreakableMalusLine = useCallback(
+		(nlines) => {
+			let piecePutDown = false
+			let actualGrid = grid
+			for (let i = 0; i < nlines; i++) {
+				if (
+					canMoveDown(
+						activePiece,
+						piecePosition.x,
+						piecePosition.y,
+						orientation,
+						i + 1
+					) === false &&
+					piecePutDown === false
+				) {
+					for (let j = 0; j < i + 1; j++) {
+						movePieceDown()
+					}
+					piecePutDown = true
 				}
-				piecePutDown = true;
 			}
-		}
-		if (piecePutDown === false) {
-			actualGrid = removePieceSync();
-			console.log("removing piece before adding malus line");
-		}
-		const newGrid = actualGrid.slice(nlines);
-		console.log(newGrid);
-		const malusRows = Array.from({ length: nlines }, () => 
-			Array.from({ length: width }, () => 9)
-		);
-		const updatedGrid = [...newGrid, ...malusRows];
-		if (!piecePutDown) {
-			dispatch(setPiecePosition({ x: piecePosition.x, y: piecePosition.y }));
-		}
+			if (piecePutDown === false) {
+				actualGrid = removePieceSync()
+				console.log('removing piece before adding malus line')
+			}
+			const newGrid = actualGrid.slice(nlines)
+			console.log(newGrid)
+			const malusRows = Array.from({ length: nlines }, () =>
+				Array.from({ length: width }, () => 9)
+			)
+			const updatedGrid = [...newGrid, ...malusRows]
+			if (!piecePutDown) {
+				dispatch(setPiecePosition({ x: piecePosition.x, y: piecePosition.y }))
+			}
 
-		dispatch(setGridAndEmit(updatedGrid));
-	}, [dispatch, grid, width]);
+			dispatch(setGridAndEmit(updatedGrid))
+		},
+		[dispatch, grid, width]
+	)
 
-	return { spawnNewPiece, rotatePiece, movePieceRight, movePieceLeft, movePieceDown, dropPiece, addUnbreakableMalusLine };
+	return {
+		spawnNewPiece,
+		rotatePiece,
+		movePieceRight,
+		movePieceLeft,
+		movePieceDown,
+		dropPiece,
+		addUnbreakableMalusLine,
+	}
 }
 
-export default useManagePiece;
+export default useManagePiece
