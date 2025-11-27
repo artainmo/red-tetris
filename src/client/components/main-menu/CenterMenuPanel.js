@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import RoomsArray from "./RoomsArray";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createSoloGameThunk, createMultiGameThunk, setWaitingForPlayersToJoin } from "../../redux/slices/currentGameSlice";
-import { joinRoomThunk } from "../../redux/slices/socketSlice";
+import { createSoloGameThunk } from "../../redux/slices/currentGameSlice";
+import { createMultiGameRoomThunk } from "../../redux/slices/roomSlice";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
 import { fullWhiteMenuPanelStyle, middlePanelStyle, middleArrayContainerStyle } from "../../style/panelStyle";
@@ -12,6 +12,24 @@ const CenterMenuPanel = () => {
 
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const [localName, setLocalName] = useState('');
+	const [emptyInputErrMsg, setEmptyInputErrMsg] = useState(false);
+	const socketErrMsg = useSelector((state) => state.socket.error);
+	const { nameTooLong, nameInvalidChars } = useSelector((state) => state.auth);
+	const inputStyle = {
+		backgroundColor: 'white',
+		border: 'none',
+		borderRadius: '20px',
+		fontSize: '16px',
+		padding: '10px 20px',
+		margin: '24px',
+		width: '60%'
+	}
+
+	const errMsgStyle = {
+		color: 'red',
+		fontSize: '12px',
+	}
 
 	const [gameCreated, setGameCreated] = useState(false);
 	const [multiplayerGameCreated, setMultiplayerGameCreated] = useState(false);
@@ -21,17 +39,14 @@ const CenterMenuPanel = () => {
 	const gameId = useSelector((state) => state.currentGame.id);
 
 	/* create a solo game and store it to the currentGame slice, then connect to socket to exhange data with server */
-	const handleSoloGameCreation = async() => {
-		dispatch(createSoloGameThunk(username));
-		setGameCreated(true);
-	}
-	const handleMultiplayerGameCreation = async() => {
-		console.log('starting matchmaking process for multiplayer');
-		const res = await dispatch(createMultiGameThunk(username));
-		const gameId = res.payload.game.id
-		dispatch(joinRoomThunk({username: username, userSocket: socket, roomName: gameId}));		
-		setMultiplayerGameCreated(true);
-		dispatch(setWaitingForPlayersToJoin(true));
+	const handleCreateGame = async() => {
+		if (!localName) {
+			setEmptyInputErrMsg(true);
+			return;
+		}
+		navigate('/game/' + localName + '/' + username)
+		// dispatch(createSoloGameThunk(localName));
+		// setGameCreated(true);
 	}
 
 	/* redirect to game when game has been created */
@@ -67,16 +82,25 @@ const CenterMenuPanel = () => {
 			<div style={middleArrayContainerStyle}>
 				<div style={buttonColStyle}>
 					<div style={buttonDivStyle}>
+						<input 
+						style={inputStyle}
+						type='text'
+						placeholder='Enter game name to create'
+						value={localName}
+						onChange={(e) => {
+							setLocalName(e.target.value);
+							setEmptyInputErrMsg(false);
+						}}
+					/>
+					{nameTooLong && <p style={errMsgStyle}>Please enter a shorter username</p>}
+					{emptyInputErrMsg && <p style={errMsgStyle}>Empty inputs are invalid</p>}
+					{nameInvalidChars && <p style={errMsgStyle}>Invalid characters</p>}
+					{socketErrMsg && <p style={errMsgStyle}>{socketErrMsg}</p>}
 						<RedButton
-							textContent='Solo'
-							onClick={handleSoloGameCreation} 
+							textContent='Create Game'
+							onClick={handleCreateGame} 
 						/>
-					</div>
-					<div style={buttonDivStyle}>
-						<YellowButton 
-							textContent='Multi'
-							onClick={handleMultiplayerGameCreation} 
-						/>
+						
 					</div>
 				</div>
 				<div style={fullWhiteMenuPanelStyle}>

@@ -104,15 +104,15 @@ export const joinMultiGame = async (id, username) => {
 
 /*
 ** Lock a joinable game so that no-one can join anymore and the game can be started.
-*/
-export const gameStart = async (game) => {
-	try {
-		var response = await axios.patch("/game/start", game);
-		return {status: response.status, data: response.data};
-	} catch (e) {
-		return {status: e.response.status, data: e.response.data};
-	}
-}
+// */
+// export const gameStart = async (game) => {
+// 	try {
+// 		var response = await axios.patch("/game/start", game);
+// 		return {status: response.status, data: response.data};
+// 	} catch (e) {
+// 		return {status: e.response.status, data: e.response.data};
+// 	}
+// }
 /*
 ** Return on success example:
 {
@@ -129,15 +129,15 @@ export const gameStart = async (game) => {
 /*
 ** A specific player in a specific game quits that game.
 */
-export const gameQuit = async (game, name) => {
-  if (game === null) return ;
-	try {
-		var response = await axios.patch("/game/quit/" + name, game);
-		return {status: response.status, game: response.data};
-	} catch (e) {
-		return {status: e.response.status, game: e.response.data};
-	}
-}
+// export const gameQuit = async (game, name) => {
+//   if (game === null) return ;
+// 	try {
+// 		var response = await axios.patch("/game/quit/" + name, game);
+// 		return {status: response.status, game: response.data};
+// 	} catch (e) {
+// 		return {status: e.response.status, game: e.response.data};
+// 	}
+// }
 /*
 ** Return on success example:
 {
@@ -184,14 +184,14 @@ export const gameQuit = async (game, name) => {
 ** Returns the same game if no-one joined.
 ** Returns the game with new player if someone joined.
 */
-export const gameWaitForSomeoneToJoin = async (game) => {
-	try {
-		const response = await axios.post("/game/wait/join", game);
-		return {status: response.status, game: response.data};
-	} catch (e) {
-		return {status: e.response.status, game: e.response.data};
-	}
-}
+// export const gameWaitForSomeoneToJoin = async (game) => {
+// 	try {
+// 		const response = await axios.post("/game/wait/join", game);
+// 		return {status: response.status, game: response.data};
+// 	} catch (e) {
+// 		return {status: e.response.status, game: e.response.data};
+// 	}
+// }
 /*
 ** Return on failure when no-one joined example:
 {
@@ -238,14 +238,14 @@ export const gameWaitForSomeoneToJoin = async (game) => {
 ** Returns the same game if no-one quitted.
 ** Returns the game with new composition of players if someone quitted.
 */
-export const gameWaitQuit = async (game) => {
-	try {
-		var response = await axios.patch("/game/wait/quit", game);
-		return {status: response.status, game: response.data};
-	} catch (e) {
-		return {status: e.response.status, game: e.response.data};
-	}
-}
+// export const gameWaitQuit = async (game) => {
+// 	try {
+// 		var response = await axios.patch("/game/wait/quit", game);
+// 		return {status: response.status, game: response.data};
+// 	} catch (e) {
+// 		return {status: e.response.status, game: e.response.data};
+// 	}
+// }
 /*
 ** Return on failure when no-one quitted example:
 {
@@ -318,19 +318,19 @@ export const gameWaitStart = async (game) => {
 ** If unable to add game score, returns same game object with status code 400.
 ** Else returns game object with new scores.
 */
-export const gameFinalScore = async(gameId, playerId, score) => {
+// export const gameFinalScore = async(gameId, playerId, score) => {
 
-  try {
-    var response = await axios.post("/game/" + gameId + "/score/", {
-      playerId,
-      score,
-    });
-		return {status: response.status, game: response.data};
-	} catch (e) {
-    console.log(e)
-		return {status: e.response.status, game: e.response.data};
-	}
-}
+//   try {
+//     var response = await axios.post("/game/" + gameId + "/score/", {
+//       playerId,
+//       score,
+//     });
+// 		return {status: response.status, game: response.data};
+// 	} catch (e) {
+//     console.log(e)
+// 		return {status: e.response.status, game: e.response.data};
+// 	}
+// }
 /*
 ** Return on success:
 {
@@ -393,22 +393,7 @@ export const gameNext = async (game) => {
 }
 */
 
-/*
-** Get a list of all the games 
-*/
-export const getAllGames = async () => {
-	var response = await axios.get("/games/");
-	return {status: response.status, games: response.data};
-}
-
-/*
-** Get a list of all the games someone has participated in.
-*/
-export const getGames = async (name) => {
-	var response = await axios.get("/games/" + name);
-	return {status: response.status, games: response.data};
-}
-/*
+/*  
 ** On success example 1:
 {
   status: 200,
@@ -455,4 +440,14 @@ export const getGames = async (name) => {
 export const getJoinableGames = async () => {
 	var response = await axios.get("/joinablegames/");
 	return {status: response.status, games: response.data};
+}
+
+export const getUserScores = async (name) => {
+  var response = await axios.get("/scores/" + name);
+  return {status: response.status, scores: response.data};
+}
+
+export const getBestScores = async () => {
+  var response = await axios.get("/bestscores/");
+  return {status: response.status, scores: response.data};
 }

@@ -2,7 +2,7 @@ export 	const panelsStyle = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: '100%',
+    height: '90%',
     width: '100%',
     margin: 'auto',
     marginTop: '2rem'
@@ -20,7 +20,7 @@ export const arrayContainerStyle = {
 
 export const middlePanelStyle = {
     width: '100%',
-    height: '100%',
+    height: '60%',
     margin: 'auto',
     display: 'flex',
     flexGrow: 1,

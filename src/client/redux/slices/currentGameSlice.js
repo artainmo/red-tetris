@@ -1,16 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { createSoloGame, createMultiGame, joinMultiGame, gameFinalScore } from '../../api/http.api';
 
-const initialState = {
-	id: null,
-	players: [],
-	scores: {},
-	error: null,
-	multi: false,
-	waitingForPlayersToJoin: false,
-	playersJoinedTheGame: false,
-	roomName: ""
-}
 
 export const createSoloGameThunk = createAsyncThunk(
 	'currentGame/createSoloGameThunk',
@@ -25,55 +15,18 @@ export const createSoloGameThunk = createAsyncThunk(
 	}
 );
 
-export const createMultiGameThunk = createAsyncThunk(
-	'currentGame/createMultiGameThunk',
-	async (name, { rejectWithValue }) => {
-		try {
-			const response = await createMultiGame(name);
-			return response;
-		} catch (err) {
-			return rejectWithValue(err.response.data);
-		}
-	}
-);
-
-export const joinMultiGameThunk = createAsyncThunk(
-	'currentGame/joinMultiGameThunk',
-	async ({id, username, socket}, { rejectWithValue }) => {
-		try {
-			console.log("joinMultiGameThunk")
-			console.log(id)
-			console.log(username)
-			const response = await joinMultiGame(id, username, socket);
-			console.log("response join game")
-			console.log(response)
-			return response;
-		} catch (err) {
-			return rejectWithValue(err.response.data);
-		}
-	}
-);
-
-export const handleGameOverThunk = createAsyncThunk(
-	'currentGame/handleGameOverThunk',
-	async ({user, score}, { getState, rejectWithValue }) => {
-		try {
-			console.log("handleGameOverThunk")
-			console.log(user)
-			console.log(score)
-			const game = getState().currentGame;
-			const response = await gameFinalScore(game.id, user, score);
-			return response;
-		} catch (err) {
-			console.error('Error in handleGameOverThunk:', err);
-			return rejectWithValue(err.response.data);
-		}
-	}
-);
-
 const currentGameSlice = createSlice({
 	name: 'currentGame',
-	initialState,
+	initialState : {
+		id: null,
+		players: [],
+		scores: {},
+		error: null,
+		multi: false,
+		waitingForPlayersToJoin: false,
+		playersJoinedTheGame: false,
+		roomName: ""
+	},
 	reducers: {
 		setGame: (state,action) => {
 			const game = action.payload ;
@@ -111,50 +64,13 @@ const currentGameSlice = createSlice({
 		.addCase(createSoloGameThunk.fulfilled, (state, action) => {
 			const gameData = action.payload.game;
 			console.log("fulfilled")
-			state.id = gameData._id;
-			state.players.push(gameData._player1);
+			state.id = gameData.id;
+			state.players.push(gameData.host);
 			state.error = null;
-			state.roomName = gameData._id;
+			state.roomName = gameData.id;
 		})
 		.addCase(createSoloGameThunk.rejected, (state, action) => {
 			console.log('problem creating solo game');
-			state.error = action.payload; // check this
-		})
-		.addCase(createMultiGameThunk.fulfilled, (state, action) => {
-			const game = action.payload.game;
-			state.id = game.id;
-			state.multi = true;
-			state.waitingForPlayersToJoin = true;
-			state.players.push(game.player1_id)
-			state.error = null;
-			state.roomName = game.id;
-		})
-		.addCase(createMultiGameThunk.rejected, (state, action) => {
-			console.log('problem creating multi game');
-			state.error = action.payload; // check this
-		})
-		.addCase(joinMultiGameThunk.fulfilled, (state, action) => {
-			const game = action.payload.game // <-- to check
-			console.log("fulfilled game")
-			console.log(game)
-			state.id = game.id;
-			state.multi = true;
-			state.playersJoinedTheGame = true;
-			state.waitingForPlayersToJoin = false;
-			state.players = [game.player1_id, game.player2_id, game.player3_id, game.player4_id].filter((p) => p != undefined && p != null);
-			console.log(state.players)
-			state.error = null;
-			console.log('succesfully joined multi game!');
-		})
-		.addCase(joinMultiGameThunk.rejected, (state, action) => {
-			console.log('problem joining multi game');
-			state.error = action.payload; // check this
-		})
-		.addCase(handleGameOverThunk.fulfilled, (state, action) => {
-			console.log('updating the game in the db before game over');
-		})
-		.addCase(handleGameOverThunk.rejected, (state, action) => {
-			console.log('problem when exiting the game / game is over');
 			state.error = action.payload; // check this
 		})
 	}

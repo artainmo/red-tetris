@@ -24,11 +24,9 @@ const Auth = () => {
 			setEmptyInputErrMsg(true);
 			return;
 		}
-		console.log("handle Auth!")
 		setConnectionAttempt(true);
-		const data = await dispatch(userConnect(localName));
-		console.log("data from dispatch:", data);
 		try {
+			const data = await dispatch(userConnect(localName));
 			const socket = await dispatch(socketConnectThunk(data.payload.jwt)).unwrap();
 		} catch (err) {
 			console.log("Socket connection failed:", err);

@@ -26,8 +26,9 @@ const MultiPlayerPanel = () => {
 					</p>
 				</div>
 				<div style={wrapFlexContainerStyle}>
-					<PlayerCard username={players[0].username}/>
-					<PlayerCard username={players[1].username}/>
+					{players?.map((p,i) => (
+						p && <PlayerCard key={i} username={p.username} />
+					))}
 				</div>
 				<div style={wrapFlexContainerStyle}>
 				{

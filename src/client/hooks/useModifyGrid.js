@@ -2,15 +2,18 @@ import { useRef, useEffect, useState } from "react";
 import useManagePiece from "./useManagePiece";
 import useManageLines from "./useManageLines";
 import { useSelector, useDispatch } from 'react-redux';
-import { setActivePiece } from "../redux/slices/gameplaySlice";
 import { pauseGame, resumeGame } from "../redux/slices/gameTimeSlice";
+import { listenLinesCleared } from "../api/socket.api";
+import pieceSlice from "../redux/slices/pieceSlice";
 
 const useModifyGrid = (width, height) => {
 
 	const dispatch = useDispatch();
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
-	
+	const startGame = useSelector((state) => state.gameTime.isGameActive);
+	const username = useSelector((state) => state.auth.user);
 	const grid = useSelector((state) => state.gameplay.grid);
+	const socket = useSelector((state) => state.socket?.socket);
 	const activePiece = useSelector((state) => state.gameplay.activePiece);
 	const nextActivePiece = useSelector((state) => state.gameplay.nextActivePiece);
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
@@ -18,26 +21,39 @@ const useModifyGrid = (width, height) => {
 	const [isInContact, setIsInContact ] = useState(false);
 
 	/* delegate piece management to specialized hook */
-	const { spawnNewPiece, movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece } 
+	const { spawnNewPiece, movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece, addUnbreakableMalusLine } 
 	= useManagePiece(width, height);
 
 	/* delegate line suppression and add unbreakble malus line when opponent player scores */
-	const {clearFullLines, addUnbreakableMalusLine } = useManageLines(width, height);
+	const {clearFullLines } = useManageLines(width, height);
 
 	/* spawn the pieces, at launch and everytime activePiece is resetted to null */
+	// useEffect(() => {
+	// 	if (!activePiece && !nextActivePiece && !isGameOver) {
+	// 		spawnNewPiece(true);
+	// 	}
+	// 	else if (!activePiece && nextActivePiece) {
+	// 		spawnNewPiece(false);
+	// 	}
+	// }, [activePiece, nextActivePiece, isGameOver]);
+
 	useEffect(() => {
-		if (!activePiece && !nextActivePiece && !isGameOver) {
-			spawnNewPiece(true);
-		}
-		else if (!activePiece && nextActivePiece) {
-			spawnNewPiece(false);
-		}
-	}, [activePiece, nextActivePiece, isGameOver]);
+        if (!socket) return;
+        const onLinesCleared = (player, linesCleared) => {
+            if (!linesCleared || linesCleared <= 0) return;
+            if (player === username) return;
+            addUnbreakableMalusLine(linesCleared);
+        };
+        listenLinesCleared(socket, onLinesCleared);
+        return () => {
+            if (socket && socket.off) socket.off('linesCleared');
+        };
+    }, [socket, username, addUnbreakableMalusLine]);
 
 	/* player inputs manager */
 	useEffect(() => {
 		const handleKeyDown = (event) => {
-			if (isGamePaused && event.key !== "Escape")
+			if ((isGamePaused && event.key !== "Escape") || !startGame)
 				return ;
 			switch (event.key) {
 				case "ArrowUp":
@@ -51,6 +67,10 @@ const useModifyGrid = (width, height) => {
 					break;
 				case "ArrowDown":
 					movePieceDown();
+					break;
+				case "u":
+					console.log("Adding unbreakable malus line for testing");
+					addUnbreakableMalusLine(1);
 					break;
 				case " ":
 					event.preventDefault();
@@ -73,14 +93,14 @@ const useModifyGrid = (width, height) => {
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 		}
-	}, [movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece, isGamePaused, dispatch]);
+	}, [movePieceLeft, movePieceRight, rotatePiece, movePieceDown, dropPiece, isGamePaused, dispatch, startGame]);
 
 	/* gravity manager */
 	const applyGravityRef = useRef(null);
 
 	useEffect(() => {
 		applyGravityRef.current = () => {
-			if (isGamePaused) {
+			if (isGamePaused || !startGame) {
 				return;
 			}
 			const pieceCanFall = movePieceDown();
@@ -90,13 +110,15 @@ const useModifyGrid = (width, height) => {
 			} else {
 				if (isInContact) {
 					clearFullLines();
-					dispatch(setActivePiece(false));
+					// dispatch(pieceSlice.actions.incrementIndex());
+					// dispatch(setActivePiece(false));
+					spawnNewPiece(false);					
 				} else {
 					setIsInContact(true);
 				}
 			}
 		};
-	}, [dispatch, movePieceDown, isInContact, clearFullLines, isGamePaused]);
+	}, [dispatch, movePieceDown, isInContact, clearFullLines, isGamePaused, startGame]);
 
 	useEffect(() => {
 		const interval = setInterval(() => {

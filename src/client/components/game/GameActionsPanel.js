@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { startGame, endGame, resumeGame, pauseGame } from "../../redux/slices/gameTimeSlice";
+import { endGame, resumeGame, pauseGame } from "../../redux/slices/gameTimeSlice";
+import { leaveRoom, startGame } from "../../api/socket.api";
 import { resetGame } from "../../redux/slices/currentGameSlice";
-import { resetGameplay } from "../../redux/slices/gameplaySlice";
+import { resetGameplayAndEmit } from "../../redux/slices/gameplaySlice";
 import { inlineContainerStyle, smallWhiteStyle, statsContainerStyle, stackedContainerStyle, wrapFlexContainerStyle, titleContainerStyle } from "../../style/containersStyle";
 import Cell from "./Cell";
 import RedButton from "../shared/RedButton";
 import YellowButton from "../shared/YellowButton";
 import { middlePanelStyle } from "../../style/panelStyle";
 import useManageTime from "../../hooks/useManageTime";
+import { useGameSocket } from "../../hooks/useRoomSocket";
+import { pieceContainerStyle } from "../../style/containerStyle";
+
+
+
 
 const GameActionsPanel = ({isMultiPlayer}) => {
 
@@ -17,10 +24,29 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const navigate = useNavigate();
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused);
 	const isGameStarted = useSelector((state) => state.gameTime.isGameActive);
-	const box = useSelector((state) => state.gameplay.box)
-	const gameRank = useSelector((state) => state.gameplay.rank);
-	const gameScore = useSelector((state) => state.gameplay.score);
+	const box = useSelector((state) => state.gameplay.box);
+	const opponents = useSelector((state) => state.opponents);
+	const roomId = useSelector((state) => state.room.id);
+	const socket = useSelector((state) => state.socket?.socket);
+	const host = useSelector((state) => state.room.host);
+	const username = useSelector((state) => state.auth.user);
+	const [isHost, setIsHost] = useState(false);
+	const players = useSelector((state) => state.room.players);
+	const  [opponentsList, setOpponentsList] = useState([]);
+		console.log("opponents in GameActionsPanel:", opponents);
+	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
+	React.useEffect(() => {
+		if (username === host) {
+			setIsHost(true);
+		} else {
+			setIsHost(false);
+		}
+	}, [host]);
 
+	useEffect(() => {
+		console.log(players);
+	}, [players]);
+ 
 	useManageTime();
 
 	/* dimensions of the board, in numbers of cells */
@@ -33,15 +59,24 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	const BOX_WIDTH_PIXELS = BOX_WIDTH * CELL_WIDTH;
 	const BOX_HEIGHT_PIXELS = BOX_HEIGHT * CELL_HEIGHT;
 
-	const pieceContainerStyle = {
-		width: '100%',
-		height: 'auto',
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'start',
-		margin: 0
-	}
+	useEffect(() => {
+		console.log("opponents updated:", opponents);
+		if (opponents && opponents.byId.length > 0) {
+			setOpponentsList(opponents.byId.map(opponent => ({
+				id: opponent,
+				grid: opponents.entities[opponent].grid,
+				score: opponents.entities[opponent].score
+			})));
+		}
 
+
+	}, [opponents, setOpponentsList]);
+
+	useEffect(() => {
+		// updateScreenAndScore(socket, newGrid, score);
+	}, [socket]);
+
+	
 	const pieceSquare = {
 		width: BOX_WIDTH_PIXELS,
 		height: BOX_HEIGHT_PIXELS,
@@ -49,7 +84,8 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 		gridTemplateRows: `repeat(${BOX_HEIGHT}, 1fr)`,
 		gridTemplateColumns: `repeat(${BOX_WIDTH}, 1fr)`,
 		boxSizing: 'border-box',
-		border: '1rem solid white'
+		border: '1rem solid white',
+		filter: isGameOver ? 'grayscale(100%) brightness(0.7)' : 'none'
 	}
 
 	const alignSelfEnd = {
@@ -58,8 +94,11 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 	}
 
 	const handleClickStartButton = () => {
-		console.log('should start the game');
-		dispatch(startGame());
+		startGame(socket, roomId);
+	}
+
+	const handleClickRestartButton = () => {
+		startGame(socket, roomId);
 	}
 
 	const handleClickPauseResumeButton = () => {
@@ -73,9 +112,10 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 
 	const handleClickCancelButton = () => {
 		console.log('should cancel the game');
+		leaveRoom(socket);
 		dispatch(endGame());
 		dispatch(resetGame());
-		dispatch(resetGameplay());
+		dispatch(resetGameplayAndEmit());
 		navigate('/main_menu');
 	}
 
@@ -92,37 +132,24 @@ const GameActionsPanel = ({isMultiPlayer}) => {
 					}
 				</div>
 			</div>
-				<div style={stackedContainerStyle}>
-				{
-					isMultiPlayer && 
-					<>
-						<div style={titleContainerStyle}>
-							<h3 style={smallWhiteStyle}>GAME STATS</h3>
-						</div>
-						<div style={wrapFlexContainerStyle}>
-							<div style={statsContainerStyle}>
-								<h5 style={smallWhiteStyle}>SCORE</h5>
-								<p style={smallWhiteStyle}>{gameScore}</p>
-							</div>
-							<div style={statsContainerStyle}>
-								<h5 style={smallWhiteStyle}>RANK</h5>
-								<p style={smallWhiteStyle}>{gameRank}</p>
-							</div>
-						</div>
-					</>
-				}
-				</div>
+			{isHost && <div>Host</div>}
 			<div style={inlineContainerStyle}>
 				<div style={alignSelfEnd}>
 				{
-					isGameStarted ?
+					(isGameStarted && !isGameOver) ?
 					<RedButton 
 						textContent={isGamePaused ? "Resume" : "Pause"}
 						onClick={handleClickPauseResumeButton}/>
 					:
-					<RedButton 
+					isHost && 
+						isGameOver ?
+						 <RedButton 
+						textContent="Restart"
+						onClick={handleClickRestartButton}/>
+						: <RedButton 
 						textContent="Start"
 						onClick={handleClickStartButton}/>
+					
 				}
 				</div>
 				<div style={alignSelfEnd}>

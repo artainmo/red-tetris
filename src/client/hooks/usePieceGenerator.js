@@ -1,33 +1,50 @@
-
-//hook to create a bag of random pieces. To be replace when integrating to the main project 
-//!This code has also been put in the backend!
-
-
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
 const usePieceGenerator = () => {
-	  
-	const [bag,setBag] = useState([])
+  const [bag, setBag] = useState([]);
+  const roomId = useSelector((state) => state.room.id);
 
-	const PIECES_TYPE = ["I", "O", "T", "L", "J", "S", "Z"];
-	const shuffleArrayWithFisherYatesPermutationAlgo = ([...arr]) => {
-		for (let i = arr.length - 1; i > 0; i--) {
-			// random number from 0 to i (included)
-			let j = Math.floor(Math.random() * (i + 1));
-			// swap i index to the randomly chosen j index
-			[arr[i], arr[j]] = [arr[j], arr[i]] ;
-		}
-		setBag([...arr]);
-		const piece = bag.pop();
-		return piece ;
-	}
+  const PIECES_TYPE = ["I", "O", "T", "L", "J", "S", "Z"];
 
-	const getNextPiece = () => {
-		return shuffleArrayWithFisherYatesPermutationAlgo(PIECES_TYPE);
-	}
+  const seed = roomId
+    .toString()
+    .split("")
+    .map(c => c.charCodeAt(0))
+    .reduce((a, b) => a + b, 0);
 
-	return getNextPiece;
+  const rng = makeSeededRandom(seed);
+
+  const shuffleArrayWithFisherYatesPermutationAlgo = ([...arr]) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
+  const getNextPiece = () => {
+    if (bag.length === 0) {
+      const newBag = shuffleArrayWithFisherYatesPermutationAlgo(PIECES_TYPE);
+      setBag(newBag);
+      return newBag.pop();
+    } else {
+      const newBag = [...bag];
+      const piece = newBag.pop();
+      setBag(newBag);
+      return piece;
+    }
+  };
+
+  return getNextPiece;
 };
 
-export default usePieceGenerator;
+function makeSeededRandom(seed) {
+  let state = seed;
+  return function() {
+    state = (state * 1664525 + 1013904223) % 4294967296;
+    return state / 4294967296;
+  };
+}
 
+export default usePieceGenerator;

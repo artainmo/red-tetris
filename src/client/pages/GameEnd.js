@@ -4,7 +4,7 @@ import { pageMainContainerStyle, buttonContainerStyle } from "../style/container
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
 import RedButton from "../components/shared/RedButton";
 import { resetGame } from "../redux/slices/currentGameSlice";
-import { resetGameplay } from "../redux/slices/gameplaySlice";
+import { resetGameplay, resetGameplayAndEmit } from "../redux/slices/gameplaySlice";
 import { useDispatch } from "react-redux";
 
 const GameEnd = ({firstLine, secondLine}) => {
@@ -20,7 +20,7 @@ const GameEnd = ({firstLine, secondLine}) => {
 					textContent='Back To Menu'
 					onClick={() => {
 						dispatch(resetGame());
-						dispatch(resetGameplay());
+						dispatch(resetGameplayAndEmit());
 						navigate('/main_menu');
 					}}
 				/>

@@ -28,19 +28,8 @@ const App = () => {
                             <Lobby /> 
                         </AuthGuard>
                     } />
-                    <Route path='/game/:room_id' element={
-                        <AuthGuard>
-                            <GameGuard>
-                                <Game/>
-                            </GameGuard>
-                        </AuthGuard>
-                    } />
-                    <Route path='/multiplayer/:room_id' element={
-                        <AuthGuard>
-                            <GameGuard>
-                                <MultiGame/>
-                            </GameGuard>
-                        </AuthGuard>
+                    <Route path='/game/:room_id/:username' element={
+                        <Game/>
                     } />
                 </Routes>
             </Router>

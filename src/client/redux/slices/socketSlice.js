@@ -1,11 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { connect, disconnect, joinRoom } from "../../api/socket.api";
 
-const initialState = {
-	socket: null,
-	status: 'disconnected',
-	error: null
-}
 
 export const socketConnectThunk = createAsyncThunk(
 	"socket/socketConnect",
@@ -33,23 +28,14 @@ export const socketConnectThunk = createAsyncThunk(
 	}
 );
 
-export const joinRoomThunk = createAsyncThunk(
-	'socket/joinRoomThunk',
-	({ username, userSocket, roomName }, { rejectWithValue }) => {
-		try {
-			console.log("joinRoomThunk ", roomName);
-			const response = joinRoom(username, userSocket, roomName);
-			return response;
-		} catch (err) {
-			console.error("Error joinRoom:", err);
-			return rejectWithValue(err.message || "Unknown error occurred while joining room");
-		}
-	}
-);
 
 const socketSlice = createSlice({
 	name: 'socket',
-	initialState,
+	initialState: {
+		socket: null,
+		status: 'null',
+		error: null
+	},
 	reducers: {
 		socketConnected(state) {
 			state.status = "connected";
@@ -70,14 +56,6 @@ const socketSlice = createSlice({
 				state.socket = action.payload;
 				state.status = "connecting"; // tentative de connexion en cours
 			})
-			.addCase(joinRoomThunk.fulfilled, (state, action) => {
-				console.log("✅ Player joined the room");
-				state.error = null;
-			})
-			.addCase(joinRoomThunk.rejected, (state, action) => {
-				console.log("❌ Error: player could not join the room");
-				state.error = action.payload;
-			});
 	},
 });
 

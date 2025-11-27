@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { TETROMINOS } from "../utils/tetrominoes";
 import { PIECES_COLOR_CODES } from "../utils/piecesColorCodes";
 import { PIECE_STARTING_ORIENTATIONS } from "../utils/pieceStartingOrientation";
@@ -6,9 +6,11 @@ import { WALL_KICK_OFFSETS } from "../utils/wallKickOffsets";
 import useCollisionDetection from "./useCollisionDetection";
 import usePieceGenerator from "./usePieceGenerator";
 import { useDispatch, useSelector } from 'react-redux';
-import { setActivePiece, setActivePieceType, setNextActivePiece, setNextActivePieceType, setPiecePosition } from '../redux/slices/gameplaySlice';
-import { setIsGameOver, setOrientation, setNextOrientation, setGrid, setBox } from "../redux/slices/gameplaySlice";
-import { handleGameOverThunk } from "../redux/slices/currentGameSlice";
+import { setActivePiece, setActivePieceType, setGrid, setNextActivePiece, setNextActivePieceType, setPiecePosition } from '../redux/slices/gameplaySlice';
+import { setIsGameOver, setOrientation, setNextOrientation, setGridAndEmit, setBox } from "../redux/slices/gameplaySlice";
+import { incrementIndex, useNextPieceListener } from "../redux/slices/pieceSlice";
+import { pauseGame } from "../redux/slices/gameTimeSlice";
+import { looseGame } from "../api/socket.api";
 
 const useManagePiece = (width, height) => {
 	
@@ -17,18 +19,23 @@ const useManagePiece = (width, height) => {
 	const username = useSelector((state) => state.auth.user)
 	const scores = useSelector((state) => state.currentGame.scores)
 	const grid = useSelector((state) => state.gameplay.grid);
-	const activePiece = useSelector((state) => state.gameplay.activePiece);
-	const activePieceType = useSelector((state) => state.gameplay.activePieceType);
-	const nextActivePiece = useSelector((state) => state.gameplay.nextActivePiece);
-	const nextActivePieceType = useSelector((state) => state.gameplay.nextActivePieceType);
+	const activePiece = useSelector((state) => state.piece.tetrominosCurrentPiece);
+	const activePieceType = useSelector((state) => state.piece.currentPiece);
+	const nextActivePiece = useSelector((state) => state.piece.tetrominosNextPiece);
+	const nextActivePieceType = useSelector((state) => state.piece.nextPiece);
 	const piecePosition = useSelector((state) => state.gameplay.piecePosition);
 	const orientation = useSelector((state) => state.gameplay.orientation);
 	const nextPiecePosition = { x: 4, y: 4 };
-	const nextOrientation = useSelector((state) => state.gameplay.nextOrientation);;
+	const nextOrientation = useSelector((state) => state.gameplay.nextOrientation);
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
-
+	const socket = useSelector((state) => state.socket?.socket);
+	const [update, setUpdate] = useState(false);
+	
 	const { canMoveDown, canMoveRight, canMoveLeft, canRotate, canWallRotate } = useCollisionDetection(width, height, grid);
-	const getNextPiece = usePieceGenerator();
+	// const nextPieceListener = useNextPieceListener();
+	// const getNextPiece = usePieceGenerator();
+	// const currentPiece = useSelector((state) => state.piece.currentPiece);
+	// const nextPieces = useSelector((state) => state.piece.nextPiece);
 
 	/* check whether the piece can indeed be inserted */
 	const isPieceInsertable = async(piece, x, y, orientation) => {
@@ -43,8 +50,11 @@ const useManagePiece = (width, height) => {
 			console.log("dispatching game over")
 			const score = scores[username];
 			console.log(score)
-			dispatch(handleGameOverThunk({user: username, score: score}))
+
 			dispatch(setIsGameOver(true))
+
+			dispatch(pauseGame());
+			looseGame(socket);
 			return false;
 		}
 		return true;
@@ -52,13 +62,15 @@ const useManagePiece = (width, height) => {
 
 	/* spawn an new piece */
 	const spawnNewPiece = (both) => {
+		console.log("Spawning new piece, both:", both);
+		console.log("Active piece type:", activePieceType);
 		if (isGameOver)
 			return ;
 		if (both) {
-			const pieceLetterCode = getNextPiece();
-			const nextPieceLetterCode = getNextPiece();
+			const pieceLetterCode = activePieceType;
+			// const nextPieceLetterCode = nextActivePieceType;
 			const piece = TETROMINOS[pieceLetterCode];
-			const nextPiece = TETROMINOS[nextPieceLetterCode];
+			// const nextPiece = TETROMINOS[nextPieceLetterCode];
 	
 			if (!piece) {
 				console.error('Unknown piece type: ', pieceLetterCode);
@@ -73,44 +85,43 @@ const useManagePiece = (width, height) => {
 			}
 
 			dispatch(setPiecePosition({x: initialX, y: initialY}));
-			dispatch(setActivePiece(piece));
-			dispatch(setActivePieceType(pieceLetterCode));
-			dispatch(setNextActivePiece(nextPiece));
-			dispatch(setNextActivePieceType(nextPieceLetterCode));
 			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
-			dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[nextPieceLetterCode]));
+			setUpdate(!update);
+			// dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[nextPieceLetterCode]));
 		}
 		else {
-			const pieceLetterCode = getNextPiece();
-			const piece = TETROMINOS[pieceLetterCode];
+			dispatch(incrementIndex());
+
+			const piece = activePiece;
 	
 			if (!piece) {
-				console.error('Unknown piece type: ', pieceLetterCode);
+				console.error('Unknown piece type: ', activePieceType);
 				return;
 			}
 	
-			const initialX = Math.floor(width / 2) - Math.floor(TETROMINOS[pieceLetterCode][0].length / 2);
+			const initialX = Math.floor(width / 2) - Math.floor(TETROMINOS[activePieceType][0].length / 2);
 			const initialY = 0;
 
-			if (!isPieceInsertable(piece, initialX,initialY, PIECE_STARTING_ORIENTATIONS[pieceLetterCode])) {
+			if (!isPieceInsertable(piece, initialX,initialY, PIECE_STARTING_ORIENTATIONS[activePieceType])) {
 				return; 
 			}
 
 			dispatch(setPiecePosition({x: initialX, y: initialY}));
-			dispatch(setActivePiece(nextActivePiece));
-			dispatch(setActivePieceType(nextActivePieceType));
-			dispatch(setNextActivePiece(piece));
-			dispatch(setNextActivePieceType(pieceLetterCode));
+			// dispatch(setActivePiece(nextActivePiece));
+			// dispatch(setActivePieceType(nextActivePieceType));
+			// dispatch(setNextActivePiece(piece));
+			// dispatch(setNextActivePieceType(currentPiece));
 			dispatch(setOrientation(nextOrientation));
-			dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]));
+			dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[activePieceType]));
+			setUpdate(!update);
 		}
 	}
 
 	/* general updater for the grid when there is a move */
 	const updateGridWithPiece = (shapeCoords, x, y, colorCode) => {
-		
+		console.log("Updating grid with piece at position:", x, y);
 		if (!shapeCoords) return;
-
+		console.log("shapeCoords:", shapeCoords);
 		const newGrid = grid.map((row) => [...row]);
 
 		shapeCoords.forEach(([relY, relX]) => {
@@ -119,7 +130,7 @@ const useManagePiece = (width, height) => {
 			newGrid[newY][newX] = colorCode;
 		});
 
-		dispatch(setGrid(newGrid));
+		dispatch(setGridAndEmit(newGrid));
 	};
 
 	const updateUpcomingPieceBox = (boxCoords, x, y, colorCode) => {
@@ -148,8 +159,22 @@ const useManagePiece = (width, height) => {
 				newGrid[oldY][oldX] = 0;
 			})	
 		}
-		dispatch(setGrid(newGrid));
+		dispatch(setGridAndEmit(newGrid));
 	}, [dispatch, activePiece, grid, orientation, piecePosition]);
+
+	const removePieceSync = () => {
+		const newGrid = grid.map((row) => [...row]);
+
+		if (activePiece) {
+			activePiece[orientation].forEach(([relY, relX]) => {
+				const oldY = piecePosition.y + relY;
+				const oldX = piecePosition.x + relX;
+				newGrid[oldY][oldX] = 0;
+			})	
+		}
+		console.log(newGrid);
+		return newGrid;
+	};
 
 	/* Rotations managers */
 	const rotatePieceWithWallKick = (newOrientation) => {
@@ -217,9 +242,9 @@ const useManagePiece = (width, height) => {
 		dispatch(setPiecePosition({ x: piecePosition.x, y: dropY }));
 	};
 
-	/* update grid when a parameter changes */
 	useEffect(() => {
-
+		console.log("useEffect updateGridWithPiece triggered");
+		console.log("Dependencies:", {activePiece, activePieceType, piecePosition, orientation});
 		if (activePiece && activePieceType && piecePosition && orientation !== null) {
 			updateGridWithPiece(
 				activePiece[orientation],
@@ -227,8 +252,8 @@ const useManagePiece = (width, height) => {
 				piecePosition.y,
 				PIECES_COLOR_CODES[activePieceType]
 			);
-		}		
-	}, [activePiece, activePieceType, piecePosition, orientation]);
+		}
+	}, [activePiece, activePieceType, piecePosition, orientation, update]);
 
 	useEffect(() => {
 
@@ -242,7 +267,36 @@ const useManagePiece = (width, height) => {
 		}		
 	}, [nextActivePiece, nextActivePieceType]);
 
-	return { spawnNewPiece, rotatePiece, movePieceRight, movePieceLeft, movePieceDown, dropPiece };
+	const addUnbreakableMalusLine = useCallback((nlines) => {
+		let piecePutDown = false;
+		let actualGrid = grid;
+		for (let i = 0; i < nlines; i++) {
+			if (canMoveDown(activePiece, piecePosition.x, piecePosition.y, orientation, i + 1) === false && piecePutDown === false)
+			{
+				for (let j = 0; j < i + 1; j++) {
+					movePieceDown();
+				}
+				piecePutDown = true;
+			}
+		}
+		if (piecePutDown === false) {
+			actualGrid = removePieceSync();
+			console.log("removing piece before adding malus line");
+		}
+		const newGrid = actualGrid.slice(nlines);
+		console.log(newGrid);
+		const malusRows = Array.from({ length: nlines }, () => 
+			Array.from({ length: width }, () => 9)
+		);
+		const updatedGrid = [...newGrid, ...malusRows];
+		if (!piecePutDown) {
+			dispatch(setPiecePosition({ x: piecePosition.x, y: piecePosition.y }));
+		}
+
+		dispatch(setGridAndEmit(updatedGrid));
+	}, [dispatch, grid, width]);
+
+	return { spawnNewPiece, rotatePiece, movePieceRight, movePieceLeft, movePieceDown, dropPiece, addUnbreakableMalusLine };
 }
 
 export default useManagePiece;

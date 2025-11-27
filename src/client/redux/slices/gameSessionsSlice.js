@@ -1,10 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const initialState = {
-	currentGameId: null,
-	status: 'idle',
-	error: null
-}
 
 // update the logic when understanding backend functionning
 export const fetchGameId = createAsyncThunk(
@@ -23,7 +18,11 @@ export const fetchGameId = createAsyncThunk(
 
 const gameSessionsSlice = createSlice({
 	name: 'game',
-	initialState,
+	initialState : {
+		currentGameId: null,
+		status: 'idle',
+		error: null
+	},
 	reducers: {
 		displayGameSliceState(state) {
 			if (state.currentGameId) {

@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import useModifyGrid from "../../hooks/useModifyGrid";
 import Cell from "./Cell";
 import GameActionsPanel from "./GameActionsPanel";
 import { fullTransparentMenuPanelStyle } from "../../style/panelStyle";
+import Panel from "./Panel";
+import { useSelector } from "react-redux";
 
 const Board = ({isMultiPlayer}) => {
-	
+	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 	/* dimensions of the board, in numbers of cells */
 	const BOARD_WIDTH = 10;
 	const BOARD_HEIGHT = 20;
@@ -23,32 +25,16 @@ const Board = ({isMultiPlayer}) => {
 		height: '100%',
 		display: 'flex',
 		justifyContent: 'center',
-		alignItems: 'center'	
-	}
+		alignItems: 'center',
+		filter: isGameOver ? 'grayscale(100%) brightness(0.7)' : 'none'
 
-	const boardCellsContainerStyle = {
-		width: BOARD_WIDTH_PIXELS,
-		height: BOARD_HEIGHT_PIXELS,
-		display: 'grid',
-		gridTemplateRows: `repeat(${BOARD_HEIGHT}, 1fr)`,
-		gridTemplateColumns: `repeat(${BOARD_WIDTH}, 1fr)`,
-		boxSizing: 'border-box',
-		border: '1rem solid white'
 	}
 	
 	return (
 		<>
 			<div style={fullTransparentMenuPanelStyle}>
 				<div style={boardContainerStyle}>
-					<div style={boardCellsContainerStyle}>
-						{
-							grid.map((row, rowIndex) =>
-								row.map((cell, cellIndex) => (
-									<Cell key={`${rowIndex}-${cellIndex}`} colorCode={cell} />
-								))
-							)
-						}
-					</div>
+					<Panel grid={grid} />
 				</div>
 			</div>
 			<div style={fullTransparentMenuPanelStyle}>

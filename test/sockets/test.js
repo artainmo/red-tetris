@@ -113,19 +113,19 @@ async function test() {
 						['BG', 'T', 'BG']]
 		};
 		console.log("Alfred listens for other players' game structure")
-		socketAlfred.on('otherPlayerGameStructure', (data) => {
+		socketAlfred.on('screenUpdate', (data) => {
 			console.log("Alfred: new incoming game structure:");
     		console.log(data)
   		});
 		console.log("Alfred sends his game structure to other members")
-		socketAlfred.emit('sendPersonalGameStructure',
-      		{roomId: roomId, gameStructure: AlfredGameStructure});
+		socketAlfred.emit('updateScreen',
+      		{roomId: roomId, structure: AlfredGameStructure});
 		console.log("Conrad sends his game structure to other members")
-		socketConrad.emit('sendPersonalGameStructure',
-      		{roomId: roomId, gameStructure: ConradGameStructure});
+		socketConrad.emit('updateScreen',
+      		{roomId: roomId, structure: ConradGameStructure});
 		console.log("Philip sends his game structure to other members")
-		socketPhilip.emit('sendPersonalGameStructure',
-      		{roomId: roomId, gameStructure: PhilipGameStructure});
+		socketPhilip.emit('updateScreen',
+      		{roomId: roomId, structure: PhilipGameStructure});
 	} else if (process.argv.length > 2 && process.argv[2] === "next") {
 		console.log("---------- Get next game ----------")
 		nextGame = {

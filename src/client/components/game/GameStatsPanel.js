@@ -1,12 +1,13 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { fullTransparentMenuPanelStyle } from "../../style/panelStyle";
-import { statsContainerStyle, stackedContainerStyle, smallWhiteStyle } from "../../style/containersStyle";
+import { statsContainerStyle, stackedContainerStyle, smallWhiteStyle, redStyle } from "../../style/containersStyle";
 
 const GameStatsPanel = () => {
 
 	const gameTime = useSelector((state) => state.gameTime.currentTime);
 	const gameScore = useSelector((state) => state.gameplay.score);
+	const isGameOver = useSelector((state) => state.gameplay.isGameOver);
 
 	const formatTime = (milliseconds) => {
 		const minutes = Math.floor(milliseconds / (60 * 1000));
@@ -28,6 +29,11 @@ const GameStatsPanel = () => {
 					<p style={smallWhiteStyle}>SCORE</p>
 					<p style={smallWhiteStyle}>{gameScore}</p>
 				</div>
+				{isGameOver && (
+					<div style={stackedContainerStyle}>
+						<p style={redStyle}>GAME OVER</p>
+					</div>
+				)}
 			</div>
 		</div>
 	);

@@ -34,10 +34,9 @@ const useCollisionDetection = (width, height, grid) => {
 		return false;
 	}
 
-	const canMoveDown = useCallback((piece,x, y, orientation) => {
+	const canMoveDown = useCallback((piece,x, y, orientation, nlines = 1) => {
 		const gridWithoutCurrentPiece = getGridWithoutCurrentPiece(piece, x, y, orientation);
-		
-		return !checkCollision(piece, x, y + 1, orientation, gridWithoutCurrentPiece);
+		return !checkCollision(piece, x, y + nlines, orientation, gridWithoutCurrentPiece);
 	}, [grid, width, height]);
 
 	const canMoveLeft = useCallback((piece, x, y, orientation) => {

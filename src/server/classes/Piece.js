@@ -5,25 +5,48 @@
 	Check at this website : https://tetris.fandom.com/wiki/Tetromino#I for more detailled information
 */
 
+const ALL_PIECES = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
+
 class Piece {
-	constructor(type) {
-    	this._type = type;
+	#pieceBasket;
 
-			// Directions and positions are handled by the front as they are always the same
-			// this._directions = ["left", "up", "down", "right"];
-		 	// this._positions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-			// this._direction = this._directions[Math.floor(Math.random() * 4)];
-      // this._position = this._positions[Math.floor(Math.random() * 10)];
+	constructor() {
+    	this.#pieceBasket = [];
+		this.generatePieceBasket();
 	}
 
-	getPieceType() {
-		return this._type;
-	}
-
-	/* debug purpose only */
 	displayPiece() {
-		console.log('new piece : ');
 		console.log(`type = ${this._type}`);
+	}
+
+	get pieceBasket() {
+		return this.#pieceBasket;
+	}
+
+	set pieceBasket(value) {
+		this.#pieceBasket = value;
+	}
+
+	generatePieceBasket() {
+		const shuffledPieces = ALL_PIECES
+			.map(value => ({ value, sort: Math.random() }))
+			.sort((a, b) => a.sort - b.sort)
+			.map(({ value }) => value);
+		
+		this.#pieceBasket = this.#pieceBasket.concat(shuffledPieces);
+		return shuffledPieces;
+	}
+
+	toJSON() {
+		return {
+			pieceBasket: this.#pieceBasket
+		};
+	}
+
+	async setDB(db, gameId) {
+		await db.query("UPDATE game SET piece_basket = $1 WHERE id = $2 RETURNING *",
+			[this.#pieceBasket, gameId]);
+		return this;
 	}
 }
 

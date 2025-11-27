@@ -4,20 +4,6 @@ import { io } from "socket.io-client";
 /*
 ** Use this function to connect to the socket.
 */
-export const connect = (token) => {
-	console.log("Connecting to socket with token:", token);
-	const socket = io(API_ENDPOINT, {
-		auth: { token },
-		autoConnect: true,
-	});
-	return socket;
-};
-/*
-** Disconnects from socket and thus leaves associated room.
-*/
-export const disconnect = (socket) => {
-  	if (socket) socket.disconnect();
-}
 /*
 ** Does not return.
 */
@@ -28,16 +14,6 @@ export const disconnect = (socket) => {
 ** Thus the roomId should be 'game._id'.
 ** This roomId will be used later on for other socket manipulations within the room.
 */
-export const joinRoom = (username, socket, roomId) => {
-	console.log("joining room with roomId " + roomId);
-	console.log("joiner is " + username);
-  	socket.emit('joinRoom', { username: username, roomId: roomId });
-}
-
-export const startGame = (socket, roomId) => {
-	console.log("starting game with roomId " + roomId);
-  	socket.emit('startGame', roomId);
-}
 /*
 ** Does not return.
 */
@@ -47,7 +23,7 @@ export const startGame = (socket, roomId) => {
 ** each tetris turn. This new piece is sent to all room/game members.
 */
 export const askNewPiece = (socket, roomId) => {
-  	socket.emit('askNewPiece', roomId);
+	socket.emit('askNewPiece', roomId);
 }
 /*
 ** Does not return.
@@ -58,13 +34,13 @@ export const askNewPiece = (socket, roomId) => {
 ** The room host will ask for a new piece with 'askNewPiece' function to the socket.
 ** And 'listenNewPiece' will receive the socket's response.
 */
-export const listenNewPiece = (socket, setNewPiece) => {
-  	//console.log("Listening to incoming piece");
-  	socket.on('newPiece', (data) => {
-		   //console.log("New incoming piece");
-		  setNewPiece(data);
-  	});
-}
+// export const listenNewPiece = (socket, setNewPiece) => {
+// 	//console.log("Listening to incoming piece");
+// 	socket.on('nextPiece', (data) => {
+// 		//console.log("New incoming piece");
+// 		setNewPiece(data);
+// 	});
+// }
 /*
 ** Does not explicitly return.
 ** However, takes 'setNewPiece' which is supposed to come from:
@@ -72,40 +48,144 @@ export const listenNewPiece = (socket, setNewPiece) => {
 ** Thus the new piece send by socket should be found in 'newPiece'.
 ** The newPiece object looks like this for example:
 {
-  _type: 'J'
-}
-*/
-
-
-/*
-** Each player should be able to see other players' games.
-** Thus each player needs to send their game to other players.
-** This function allows a player to send their game to the other players of the room/game.
+	_type: 'J'
+	}
+	*/
+	
+	
+	/*
+	** Each player should be able to see other players' games.
+	** Thus each player needs to send their game to other players.
+	** This function allows a player to send their game to the other players of the room/game.
 ** The gameStructure parameter should look like this for example:
 {
-  player: 'Philip',
-  structure: [ [ 'I', 'BG', 'BG' ], [ 'BG', 'BG', 'BG' ], [ 'BG', 'T', 'BG' ] ]
-}
-** The structure of the game is represented in a double array with BG indicating
-** background and other letters indicating a tetrimono type.
-*/
-export const sendPersonalGameStructure = (socket, roomId, gameStructure) => {
-  	socket.emit('sendPersonalGameStructure',
-      	{roomId: roomId, gameStructure: gameStructure});
-}
-/*
-** Does not return.
-*/
+	player: 'Philip',
+	structure: [ [ 'I', 'BG', 'BG' ], [ 'BG', 'BG', 'BG' ], [ 'BG', 'T', 'BG' ] ]
+	}
+	** The structure of the game is represented in a double array with BG indicating
+	** background and other letters indicating a tetrimono type.
+	*/
+	/*
+	** Does not return.
+	*/
+	
+	/*
+	** This function receives the structure that got sent by other players
+	** in the room with updateScreen.
+	*/
 
-/*
-** This function receives the gameStructure that got sent by other players
-** in the room with sendPersonalGameStructure.
-*/
-export const listenOtherPlayerGameStructure = (socket, setOtherPlayerGameStructure) => {
-  	socket.on('otherPlayerGameStructure', (data) => {
-    	setOtherPlayerGameStructure(data);
+export const connect = (token) => {
+	console.log("Connecting to socket with token:", token);
+	const socket = io(API_ENDPOINT, {
+		auth: { token },
+		autoConnect: true,
+	});
+	return socket;
+};
+
+export const disconnect = (socket) => {
+	if (socket) socket.disconnect();
+};
+
+export const joinRoom = async (username, socket, roomId) => {
+	console.log("joining room with roomId " + roomId);
+	console.log("joiner is " + username);
+	return new Promise((resolve, reject) => {
+        socket.emit('joinRoom', { username: username, roomId: roomId }, (response) => {
+            if (response.success) {
+                resolve(response.data);
+            } else {
+                reject(new Error(response.error || "Unknown socket error"));
+            }
+        });
+    });
+	// socket.emit('joinRoom', { username: username, roomId: roomId });
+}
+
+export const listenRoomJoined = (socket, onRoomJoined) => {
+  	socket.on('roomJoined', (data) => {
+		onRoomJoined(data.roomId, data.players);
   	});
 }
+
+export const startGame = (socket, roomId) => {
+	console.log("starting game with roomId " + roomId);
+		socket.emit('startGame', roomId);
+}
+
+export const updateScreenAndScore = (socket, structure, score) => {
+	socket.emit('updateScreenAndScore',
+		{structure: structure, score: score});
+}
+
+export const listenOtherScreenAndScore = (socket, onScreenAndScoreUpdate) => {
+  	socket.on('screenAndScoreUpdate', (data) => {
+		onScreenAndScoreUpdate(data);
+	});
+}
+
+export const sendLinesCleared = (socket, linesCleared) => {
+  	socket.emit('linesCleared',
+	  	{linesCleared: linesCleared});
+}
+
+export const listenLinesCleared = (socket, onLinesCleared) => {
+  	socket.on('linesCleared', (data) => {
+		onLinesCleared(data.player, data.linesCleared);
+  	});
+}
+
+export const listenStartGame = (socket, onGameStarted) => {
+  	socket.on('startGame', () => {
+		console.log("Received gameStarted event from socket");
+		onGameStarted();
+  	});
+}
+
+export const listenNextPiece = (socket, onNextPiece) => {
+  	socket.on('nextPiece', (data) => {
+		onNextPiece(data);
+  	});
+}
+
+export const requestPieceBasket = (socket) => {
+  	socket.emit('needPieceBasket');
+}
+
+export const leaveRoom = (socket) => {
+	console.log("Leaving room");
+  	socket.emit('leaveRoom');
+}
+
+export const listenPlayerLeft = (socket, onPlayerLeft) => {
+  	socket.on('playerLeft', (data) => {
+		onPlayerLeft(data.player);
+  	});
+}
+
+export const listenNewHost = (socket, onNewHost) => {
+  	socket.on('newHost', (data) => {
+		onNewHost(data.newHost);
+  	});
+}
+
+export const listenPlayerJoined = (socket, onPlayerJoined) => {
+  	socket.on('playerJoined', (data) => {
+		onPlayerJoined(data.player);
+  	});
+}
+
+export const updateScore = (socket, onScoreUpdate) => {
+  	socket.on('updateScore', (data) => {
+		onScoreUpdate(data);
+  	});
+}
+
+export const looseGame = (socket) => {
+  	socket.emit('looseGame');
+}
+
+
 /*
 ** Does not explicitly return.
 ** However, takes 'setOtherPlayerGameStructure' which is supposed to come from:

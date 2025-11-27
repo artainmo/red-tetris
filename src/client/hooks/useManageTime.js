@@ -3,18 +3,19 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateGameTime } from "../redux/slices/gameTimeSlice";
 import { startGame } from "../redux/slices/gameTimeSlice";
+import { listenStartGame } from "../api/socket.api";
+import { resetGameplay } from "../redux/slices/gameplaySlice";
 
 const useManageTime = () => {
 
 	const dispatch = useDispatch();
+	const socket = useSelector((state) => state.socket?.socket);
 
 	const time = useSelector((state) => state.gameTime.currentTime);
 	const gameActive = useSelector((state) => state.gameTime.isGameActive)
 	const [intervalId, setIntervalId] = useState(null);
 
 	useEffect(() => {
-		if (!gameActive)
-			dispatch(startGame())
 		if (gameActive) {
 			const id = setInterval(() => {
 			dispatch(updateGameTime())
@@ -32,6 +33,23 @@ const useManageTime = () => {
 		clearInterval(intervalId);
 		}
 	}, [time, intervalId]);
+
+	useEffect(() => {
+		console.log("Setting up listenStartGame in useManageTime");
+		const onGameStarted = () => {
+			dispatch(resetGameplay());
+			dispatch(startGame());
+		};
+
+		listenStartGame(socket, onGameStarted);
+
+		return () => {
+			if (socket) {
+				socket.off('gameStarted', onGameStarted);
+			}
+		};
+
+	}, [dispatch, socket]);
 
 	return time;
 }

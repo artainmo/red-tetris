@@ -1,24 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-	startTime: null,
-	endTime: null,
-	currentTime: 0,
-	totalBreakTime: 0,
-	currentBreakTime: 0,
-	isGameActive: false,
-	isGamePaused: false,
-}
-
 const gameTimeSlice = createSlice({
 	name: 'gameTime',
-	initialState,
+	initialState : {
+		startTime: null,
+		endTime: null,
+		currentTime: 0,
+		totalBreakTime: 0,
+		currentBreakTime: 0,
+		isGameActive: false,
+		isGamePaused: false,
+	},
 	reducers: {
 		startGame(state) {
 			state.startTime = Date.now();
 			state.isGameActive = true;
 			state.endTime = null;
 			state.currentTime = 0;
+			state.totalBreakTime = 0;
+			state.currentBreakTime = 0;
+			state.isGamePaused = false;
 		},
 		endGame(state) {
 			state.endTime = Date.now();

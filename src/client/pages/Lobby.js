@@ -10,9 +10,9 @@ import { pageMainContainerStyle, buttonContainerStyle } from "../style/container
 import FullPageWithCentralText from "../components/shared/FullPageWithCentralText";
 import RedButton from "../components/shared/RedButton";
 import { endGame } from "../redux/slices/gameTimeSlice";
-import { handleGameOverThunk, resetGame, setPlayersJoinedTheGame, setWaitingForPlayersToJoin, setPlayers } from "../redux/slices/currentGameSlice";
-import { resetGameplay, setIsGameOver } from "../redux/slices/gameplaySlice";
-import { startGame } from "../api/socket.api";
+import { resetGame, setPlayersJoinedTheGame, setWaitingForPlayersToJoin, setPlayers } from "../redux/slices/currentGameSlice";
+import { resetGameplayAndEmit, setIsGameOver } from "../redux/slices/gameplaySlice";
+import { leaveRoom, startGame } from "../api/socket.api";
 import { joinMultiGame } from "../api/http.api";
 
 const Lobby = () => {
@@ -70,11 +70,11 @@ const Lobby = () => {
 	const handleCancelButton = () => {
 		// add some API call to remove the player form the match
 		console.log('should cancel the game');
-		dispatch(handleGameOverThunk({user: username, score: 0}))
+		leaveRoom(socket);
 		dispatch(setIsGameOver(true))
 		dispatch(endGame());
 		dispatch(resetGame());
-		dispatch(resetGameplay());
+		dispatch(resetGameplayAndEmit());
 		navigate('/main_menu');
 	}
 	
