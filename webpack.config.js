@@ -30,14 +30,6 @@ module.exports = {
 				use: ['file-loader'],
 			},
 		],
-		//		loaders: [{
-		//      		test: /\.js$/,
-		//      		exclude: /node_modules/,
-		//      		loader: 'babel',
-		//      		query:{
-		//        		presets: ["es2015", "react", "stage-0"]
-		//      		}
-		//    	}]
 	},
 
 	plugins: [
@@ -47,18 +39,11 @@ module.exports = {
 		}),
 	],
 
-	/* add this when reloading page to serve html file everytime so react router can works properly */
 	devServer: {
 		historyApiFallback: true,
 		static: {
 			directory: path.join(__dirname, 'dist'),
 		},
 		hot: true,
-		// If you need to define a base path for all the assets served by Webpack Dev Server, use the static.publicPath option:
-		// static: {
-		//   directory: path.join(__dirname, 'dist'),
-		//   publicPath: '/',
-		// },
-		// Remove the publicPath line from here
 	},
 }

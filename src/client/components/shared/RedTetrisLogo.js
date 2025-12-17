@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { logoWhiteStyle, logoRedStyle } from '../../style/containersStyle'
 
 const logoContainerStyle = {
@@ -25,4 +26,9 @@ export default function RedTetrisLogo({ firstLine, secondLine }) {
 			</div>
 		</div>
 	)
+}
+
+RedTetrisLogo.propTypes = {
+	firstLine: PropTypes.string.isRequired,
+	secondLine: PropTypes.string.isRequired,
 }

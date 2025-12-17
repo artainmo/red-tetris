@@ -21,13 +21,12 @@ const useManageTime = () => {
 
 			setIntervalId(id)
 
-			return () => clearInterval(id) // Clean up on unmount
+			return () => clearInterval(id)
 		}
 	}, [gameActive])
 
 	useEffect(() => {
 		if (time >= 60 * 60 * 1000) {
-			// 60 minutes * 60 seconds * 1000 milliseconds
 			clearInterval(intervalId)
 		}
 	}, [time, intervalId])
@@ -35,7 +34,7 @@ const useManageTime = () => {
 	useEffect(() => {
 		console.log('Setting up listenStartGame in useManageTime')
 		const onGameStarted = () => {
-			dispatch(resetGameplay())
+			// dispatch(resetGameplay())
 			dispatch(startGame())
 		}
 

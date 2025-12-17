@@ -1,7 +1,3 @@
-/* 
-	for every piece, give the starting orientation
-*/
-
 export const PIECE_STARTING_ORIENTATIONS = {
 	I: 90,
 	O: 0,

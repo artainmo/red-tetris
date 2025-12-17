@@ -34,7 +34,7 @@ const useCollisionDetection = (width, height, grid) => {
 	) => {
 		const shapeCoords = piece[orientation]
 
-		for (let [relY, relX] of shapeCoords) {
+		for (const [relY, relX] of shapeCoords) {
 			const newX = x + relX
 			const newY = y + relY
 			if (

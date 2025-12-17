@@ -7,7 +7,6 @@ import { useSelector } from 'react-redux'
 
 const Board = () => {
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver)
-	/* dimensions of the board, in numbers of cells */
 	const BOARD_WIDTH = 10
 	const BOARD_HEIGHT = 20
 

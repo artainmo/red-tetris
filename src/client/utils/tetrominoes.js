@@ -1,8 +1,3 @@
-/* 
-	Contains, for every tetromino, the different positions
-	taking account for every possible rotation
-*/
-
 export const TETROMINOS = {
 	I: {
 		0: [

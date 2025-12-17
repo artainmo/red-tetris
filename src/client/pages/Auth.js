@@ -36,9 +36,7 @@ const Auth = () => {
 		setConnectionAttempt(true)
 		try {
 			const data = await dispatch(userConnect(localName))
-			const socket = await dispatch(
-				socketConnectThunk(data.payload.jwt)
-			).unwrap()
+			await dispatch(socketConnectThunk(data.payload.jwt)).unwrap()
 		} catch (err) {
 			console.log('Socket connection failed:', err)
 		}

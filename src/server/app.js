@@ -5,18 +5,12 @@ const { Utils } = require(__dirname + '/classes/Utils.js')
 const { Game } = require('./classes/Game.js')
 const { database } = require(__dirname + '/database/manageDatabase.js')
 const jwt = require('jsonwebtoken')
-const crypto = require('crypto')
+const cryptoModule = require('crypto')
 
 const app = express()
 const activeUsers = new Map()
-const SECRET_KEY = crypto.randomBytes(64).toString('hex')
+const SECRET_KEY = cryptoModule.randomBytes(64).toString('hex')
 const db = new database()
-
-const corsOptions = {
-	origin: true,
-	optionsSuccessStatus: 200,
-	allowedHeaders: ['Access-Control-Allow-Origin'],
-}
 
 const server = app.listen(3000, () => {
 	console.log(`App listening at http://localhost:3000`)
@@ -31,10 +25,9 @@ app.use('/rest', router)
 
 router.use(express.json())
 
-var pieceBaskets = {}
-var socketToGame = new Map()
+const socketToGame = new Map()
 
-router.get('/connect/:name', async (req, res, next) => {
+router.get('/connect/:name', async (req, res) => {
 	console.log('connect route called: ' + req.params.name)
 	const name = decodeURIComponent(req.params.name)
 	const user = new User()
@@ -99,7 +92,9 @@ const io = socketio(server, {
 io.use((socket, next) => {
 	try {
 		const token = socket.handshake.auth?.token
-		if (!token) return next(new Error('Token missing'))
+		if (!token) {
+			return next(new Error('Token missing'))
+		}
 		const decoded = jwt.verify(token, SECRET_KEY)
 		if (activeUsers.get(decoded.username)) {
 			const err = new Error('User already connected elsewhere')
@@ -109,7 +104,7 @@ io.use((socket, next) => {
 
 		socket.userId = decoded.username
 		next()
-	} catch (err) {
+	} catch {
 		next(new Error('Invalid token'))
 	}
 })
@@ -130,7 +125,7 @@ const leaveRoom = async (socket) => {
 	if (!game) {
 		return
 	}
-	host = game.host
+	const host = game.host
 	game.removePlayer(socket.userId)
 	if (host !== game.host) {
 		socket.broadcast
@@ -177,7 +172,9 @@ io.on('connection', async (socket) => {
 					)
 					// io.to(data.roomId).emit('playerJoined', { player: data.username, room: data.roomId});
 					for (const player of existingGame.players) {
-						if (player.username === data.username) continue
+						if (player.username === data.username) {
+							continue
+						}
 						socket.emit('screenAndScoreUpdate', {
 							player: player.username,
 							structure: Array(20)
@@ -231,9 +228,13 @@ io.on('connection', async (socket) => {
 
 	socket.on('startGame', async () => {
 		const roomId = socketToGame.get(socket.id)
-		if (!roomId) return
+		if (!roomId) {
+			return
+		}
 		const game = activeGames.get(roomId)
-		if (!game) return
+		if (!game) {
+			return
+		}
 		if (game.host !== socket.userId) {
 			console.log(
 				'Only the host can start the game, id of host: ' +
@@ -250,9 +251,13 @@ io.on('connection', async (socket) => {
 
 	socket.on('gameOver', async () => {
 		const roomId = socketToGame.get(socket.id)
-		if (!roomId) return
+		if (!roomId) {
+			return
+		}
 		const game = activeGames.get(roomId)
-		if (!game) return
+		if (!game) {
+			return
+		}
 		console.log(`Game over for player ${socket.userId} in room ${roomId}`)
 		socket.broadcast
 			.to(roomId)
@@ -261,9 +266,13 @@ io.on('connection', async (socket) => {
 
 	socket.on('looseGame', async () => {
 		const roomId = socketToGame.get(socket.id)
-		if (!roomId) return
+		if (!roomId) {
+			return
+		}
 		const game = activeGames.get(roomId)
-		if (!game) return
+		if (!game) {
+			return
+		}
 		console.log(`Player ${socket.userId} lost the game in room ${roomId}`)
 		game.playerLoosed(socket.userId)
 		if (game.allPlayersLoosed()) {
@@ -272,7 +281,7 @@ io.on('connection', async (socket) => {
 				username: socket.userId,
 				score:
 					game.players.find((p) => p.username === socket.userId).score +
-					250 * game.players.length,
+					50 * game.players.length,
 			})
 		}
 		socket.broadcast.to(roomId).emit('playerLoosed', { player: socket.userId })
@@ -281,40 +290,46 @@ io.on('connection', async (socket) => {
 	socket.on('updateScreenAndScore', (data) => {
 		const lobby = socketToGame.get(socket.id)
 		const game = activeGames.get(lobby)
-		if (!game || game.players.length === 0) return
+		if (!game || game.players.length === 0) {
+			return
+		}
 		const player = game.players.find((p) => p.username === socket.userId)
 		if (player) {
 			player.score = data.score
 		}
-		if (!lobby) return
-		socket.broadcast
-			.to(lobby)
-			.emit('screenAndScoreUpdate', {
-				player: socket.userId,
-				structure: data.structure,
-				score: data.score,
-			})
+		if (!lobby) {
+			return
+		}
+		socket.broadcast.to(lobby).emit('screenAndScoreUpdate', {
+			player: socket.userId,
+			structure: data.structure,
+			score: data.score,
+		})
 	})
 
 	socket.on('linesCleared', (data) => {
 		const linesCleared = data.linesCleared - 1
 		const lobby = socketToGame.get(socket.id)
-		if (!lobby) return
+		if (!lobby) {
+			return
+		}
 		if (linesCleared > 0) {
-			socket.broadcast
-				.to(lobby)
-				.emit('linesCleared', {
-					player: socket.userId,
-					linesCleared: linesCleared,
-				})
+			socket.broadcast.to(lobby).emit('linesCleared', {
+				player: socket.userId,
+				linesCleared: linesCleared,
+			})
 		}
 	})
 
 	socket.on('askNewPiece', () => {
 		const roomId = socketToGame.get(socket.id)
-		if (!roomId) return
+		if (!roomId) {
+			return
+		}
 		const game = activeGames.get(roomId)
-		if (!game) return
+		if (!game) {
+			return
+		}
 		console.log(`Sending new piece baskets to room ${roomId}`)
 		const piece = game.piece
 		const pieceBaskets = piece.generatePieceBasket()
@@ -323,7 +338,9 @@ io.on('connection', async (socket) => {
 
 	socket.on('restartGame', () => {
 		const roomId = socketToGame.get(socket.id)
-		if (!roomId) return
+		if (!roomId) {
+			return
+		}
 		const game = activeGames.get(roomId)
 		if (game.host !== socket.userId) {
 			console.log('Only the host can restart the game')

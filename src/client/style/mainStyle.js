@@ -1,5 +1,3 @@
-// contains styles in js for the main element
-
 export const arrayContainerStyle = {
 	margin: 0,
 	width: '100vw',

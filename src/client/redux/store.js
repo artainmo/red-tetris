@@ -21,8 +21,7 @@ const store = configureStore({
 	},
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({
-			serializableCheck: false /* this is to fix "A non serializable object was detected in socket.socket error" */,
-			/* see https://stackoverflow.com/questions/61704805/getting-an-error-a-non-serializable-value-was-detected-in-the-state-when-using*/
+			serializableCheck: false,
 		}),
 })
 

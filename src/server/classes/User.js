@@ -3,7 +3,7 @@ class User {
 		if (username.length > 19) {
 			throw new Error("Player's username is too long")
 		}
-		var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/
+		const format = /[ `!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/
 		if (format.test(username)) {
 			throw new Error("Player's username contains special characters")
 		}

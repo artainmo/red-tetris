@@ -5,8 +5,8 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { TETROMINOS } from '../../utils/tetrominoes'
 
-export const incrementIndex = () => (dispatch, getState) => {
-	dispatch(pieceSlice.actions.incrementIndex())
+export const incrementIndexFun = () => (dispatch, getState) => {
+	dispatch(incrementIndex())
 	const { listPieces, index } = getState().piece
 	console.log('Current piece index:', index)
 	console.log('Total pieces available:', listPieces.length)
@@ -19,7 +19,9 @@ export const useNextPieceListener = () => {
 	const socket = useSelector((state) => state.socket?.socket)
 	const dispatch = useDispatch()
 	useEffect(() => {
-		if (!socket) return
+		if (!socket) {
+			return
+		}
 
 		const onNewPiece = (newPieces) => {
 			console.log('Received new pieces from server:', newPieces)
@@ -28,7 +30,9 @@ export const useNextPieceListener = () => {
 		console.log('Setting up listener for nextPiece')
 		listenNextPiece(socket, onNewPiece)
 		return () => {
-			if (socket && socket.off) socket.off('nextPiece')
+			if (socket && socket.off) {
+				socket.off('nextPiece')
+			}
 		}
 	}, [socket, dispatch])
 }
@@ -90,5 +94,7 @@ const pieceSlice = createSlice({
 		})
 	},
 })
+
+export const { incrementIndex, removeCurrentPiece } = pieceSlice.actions
 
 export default pieceSlice

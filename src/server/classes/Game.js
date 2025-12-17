@@ -48,7 +48,7 @@ class Game {
 			'INSERT INTO game (id, locked, finished, host) VALUES ($1, $2, $3, $4) RETURNING *',
 			[this.#id, this.#locked, this.#finished, this.#host]
 		)
-		for (let player of this.#historicalPlayers) {
+		for (const player of this.#historicalPlayers) {
 			await player.setDB(db)
 		}
 		console.log(`Game ${this.#id} created in database.`)

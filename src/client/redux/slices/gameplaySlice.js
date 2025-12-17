@@ -15,6 +15,7 @@ export const setGridAndEmit = (newGrid) => (dispatch, getState) => {
 }
 
 export const resetGameplayAndEmit = () => (dispatch, getState) => {
+	console.log('resetGameplayAndEmit called')
 	const state = getState()
 	const socket = state.socket.socket
 
@@ -32,7 +33,7 @@ const gameplaySlice = createSlice({
 	name: 'gameplay',
 	initialState: {
 		grid: Array.from({ length: 20 }, () => Array(10).fill(0)),
-		box: Array.from({ length: 10 }, () => Array(10).fill(0)), // upcoming piece display box
+		box: Array.from({ length: 10 }, () => Array(10).fill(0)),
 		piecePosition: { x: 4, y: 0 },
 		orientation: 0,
 		nextOrientation: 0,
@@ -70,16 +71,22 @@ const gameplaySlice = createSlice({
 		},
 		resetGameplay: (state) => {
 			console.log('resetGameplay')
-			;((state.grid = Array.from({ length: 20 }, () => Array(10).fill(0))),
-				(state.box = Array.from({ length: 10 }, () => Array(10).fill(0))), // upcoming piece display box
-				(state.piecePosition = { x: 4, y: 0 }),
-				(state.orientation = 0),
-				(state.nextOrientation = 0),
-				(state.isInContact = false),
-				(state.isGameOver = false))
+			state.grid = Array.from({ length: 20 }, () => Array(10).fill(0))
+			state.box = Array.from({ length: 10 }, () => Array(10).fill(0))
+			state.piecePosition = { x: 4, y: 0 }
+			state.orientation = 0
+			state.nextOrientation = 0
+			state.isInContact = false
+			state.isGameOver = false
 		},
 		resetGameplayAndScore: (state) => {
-			resetGameplay(state)
+			state.grid = Array.from({ length: 20 }, () => Array(10).fill(0))
+			state.box = Array.from({ length: 10 }, () => Array(10).fill(0))
+			state.piecePosition = { x: 4, y: 0 }
+			state.orientation = 0
+			state.nextOrientation = 0
+			state.isInContact = false
+			state.isGameOver = false
 			state.score = 0
 		},
 	},

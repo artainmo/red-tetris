@@ -37,15 +37,6 @@ const useManageLines = (width, height) => {
 		return clearedLines
 	}, [dispatch, grid, width, height, score, socket, username])
 
-	// const addUnbreakableMalusLine = useCallback((nlines) => {
-	// 	const newGrid = grid.slice(nlines);
-	// 	const malusRows = Array.from({ length: nlines }, () =>
-	// 		Array.from({ length: width }, () => 9)
-	// 	);
-	// 	const updatedGrid = [...newGrid, ...malusRows];
-	// 	dispatch(setGridAndEmit({ grid: updatedGrid, keepCurrentPiece: true }));
-	// }, [dispatch, grid, width]);
-
 	return { clearFullLines }
 }
 

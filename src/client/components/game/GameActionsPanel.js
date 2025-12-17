@@ -17,6 +17,9 @@ import YellowButton from '../shared/YellowButton'
 import { middlePanelStyle } from '../../style/panelStyle'
 import useManageTime from '../../hooks/useManageTime'
 import { pieceContainerStyle } from '../../style/containerStyle'
+import { redOctoberBaseStyle } from '../../style/fonts'
+import { colors } from '../../style/colors'
+import pieceSlice, { removeCurrentPiece } from '../../redux/slices/pieceSlice'
 
 const GameActionsPanel = () => {
 	const dispatch = useDispatch()
@@ -24,15 +27,12 @@ const GameActionsPanel = () => {
 	const isGamePaused = useSelector((state) => state.gameTime.isGamePaused)
 	const isGameStarted = useSelector((state) => state.gameTime.isGameActive)
 	const box = useSelector((state) => state.gameplay.box)
-	const opponents = useSelector((state) => state.opponents)
 	const roomId = useSelector((state) => state.room.id)
 	const socket = useSelector((state) => state.socket?.socket)
 	const host = useSelector((state) => state.room.host)
 	const username = useSelector((state) => state.auth.user)
 	const [isHost, setIsHost] = useState(false)
 	const players = useSelector((state) => state.room.players)
-	const [opponentsList, setOpponentsList] = useState([])
-	console.log('opponents in GameActionsPanel:', opponents)
 	const isGameOver = useSelector((state) => state.gameplay.isGameOver)
 	React.useEffect(() => {
 		if (username === host) {
@@ -48,32 +48,12 @@ const GameActionsPanel = () => {
 
 	useManageTime()
 
-	/* dimensions of the board, in numbers of cells */
 	const BOX_WIDTH = 10
 	const BOX_HEIGHT = 10
-	/* dimensions of an individual cell */
 	const CELL_WIDTH = 30
 	const CELL_HEIGHT = 30
-	/* dimensions of the BOX, in pixels */
 	const BOX_WIDTH_PIXELS = BOX_WIDTH * CELL_WIDTH
 	const BOX_HEIGHT_PIXELS = BOX_HEIGHT * CELL_HEIGHT
-
-	useEffect(() => {
-		console.log('opponents updated:', opponents)
-		if (opponents && opponents.byId.length > 0) {
-			setOpponentsList(
-				opponents.byId.map((opponent) => ({
-					id: opponent,
-					grid: opponents.entities[opponent].grid,
-					score: opponents.entities[opponent].score,
-				}))
-			)
-		}
-	}, [opponents, setOpponentsList])
-
-	useEffect(() => {
-		// updateScreenAndScore(socket, newGrid, score);
-	}, [socket])
 
 	const pieceSquare = {
 		width: BOX_WIDTH_PIXELS,
@@ -108,12 +88,13 @@ const GameActionsPanel = () => {
 		}
 	}
 
-	const handleClickCancelButton = () => {
+	const handleClickCancelButton = async () => {
 		console.log('should cancel the game')
-		leaveRoom(socket)
 		dispatch(endGame())
 		dispatch(resetGame())
+		dispatch(removeCurrentPiece())
 		dispatch(resetGameplayAndEmit())
+		leaveRoom(socket)
 		navigate('/main_menu')
 	}
 
@@ -128,21 +109,31 @@ const GameActionsPanel = () => {
 					)}
 				</div>
 			</div>
-			{isHost && <div>Host</div>}
+			{isHost && (
+				<div style={{ ...redOctoberBaseStyle, color: colors.white }}>
+					You are tHe Host
+				</div>
+			)}
 			<div style={inlineContainerStyle}>
 				<div style={alignSelfEnd}>
-					{isGameStarted && !isGameOver ? (
-						<RedButton
-							textContent={isGamePaused ? 'Resume' : 'Pause'}
-							onClick={handleClickPauseResumeButton}
-						/>
-					) : isHost && isGameOver ? (
-						<RedButton
-							textContent="Restart"
-							onClick={handleClickRestartButton}
-						/>
+					{isGameStarted ? (
+						isGameOver ? (
+							isHost && (
+								<RedButton
+									textContent="Restart"
+									onClick={handleClickRestartButton}
+								/>
+							)
+						) : (
+							<RedButton
+								textContent={isGamePaused ? 'Resume' : 'Pause'}
+								onClick={handleClickPauseResumeButton}
+							/>
+						)
 					) : (
-						<RedButton textContent="Start" onClick={handleClickStartButton} />
+						isHost && (
+							<RedButton textContent="Start" onClick={handleClickStartButton} />
+						)
 					)}
 				</div>
 				<div style={alignSelfEnd}>

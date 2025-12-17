@@ -1,7 +1,3 @@
-/*
-	match numbers to colors for tetris cells
-*/
-
 export const CELL_COLORS = {
 	0: 'black', // Empty cell (black)
 	1: 'cyan', // I-piece

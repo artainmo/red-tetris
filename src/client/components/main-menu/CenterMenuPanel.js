@@ -31,34 +31,24 @@ const CenterMenuPanel = () => {
 	}
 
 	const [gameCreated, setGameCreated] = useState(false)
-	const [multiplayerGameCreated, setMultiplayerGameCreated] = useState(false)
 
 	const username = useSelector((state) => state.auth.user)
 	const gameId = useSelector((state) => state.currentGame.id)
 
-	/* create a solo game and store it to the currentGame slice, then connect to socket to exhange data with server */
 	const handleCreateGame = async () => {
 		if (!localName) {
 			setEmptyInputErrMsg(true)
 			return
 		}
 		navigate('/game/' + localName + '/' + username)
-		// dispatch(createSoloGameThunk(localName));
-		// setGameCreated(true);
 	}
 
-	/* redirect to game when game has been created */
 	useEffect(() => {
 		if (gameCreated && gameId && username) {
 			setGameCreated(false)
 			navigate(`/game/${gameId}`)
 		}
-
-		if (multiplayerGameCreated && gameId && username) {
-			setMultiplayerGameCreated(false)
-			navigate(`/lobby`)
-		}
-	}, [navigate, multiplayerGameCreated, gameCreated, gameId, username])
+	}, [navigate, gameCreated, gameId, username])
 
 	const buttonColStyle = {
 		height: 'fit-content',

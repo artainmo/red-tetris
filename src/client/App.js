@@ -7,7 +7,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import AuthGuard from './guards/AuthGuard'
 import store from './redux/store'
-import Lobby from './pages/Lobby'
 
 const App = () => {
 	return (
@@ -21,14 +20,6 @@ const App = () => {
 						element={
 							<AuthGuard>
 								<MainMenu />
-							</AuthGuard>
-						}
-					/>
-					<Route
-						path="/lobby"
-						element={
-							<AuthGuard>
-								<Lobby />
 							</AuthGuard>
 						}
 					/>

@@ -1,18 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createSoloGame } from '../../api/http.api'
-
-export const createSoloGameThunk = createAsyncThunk(
-	'currentGame/createSoloGameThunk',
-	async (name, { rejectWithValue }) => {
-		try {
-			console.log('createGameThunk')
-			const response = await createSoloGame(name)
-			return response
-		} catch (err) {
-			return rejectWithValue(err.response.data)
-		}
-	}
-)
+import { createSlice } from '@reduxjs/toolkit'
 
 const currentGameSlice = createSlice({
 	name: 'currentGame',
@@ -48,7 +34,7 @@ const currentGameSlice = createSlice({
 			state.scores[username] = score
 		},
 		resetGame: (state) => {
-			state.id = null // resetting to initial state
+			state.id = null
 			state.players = []
 			state.scores = {}
 			state.error = null
@@ -56,21 +42,6 @@ const currentGameSlice = createSlice({
 			state.roomName = ''
 			state.playersJoinedTheGame = false
 		},
-	},
-	extraReducers: (builder) => {
-		builder
-			.addCase(createSoloGameThunk.fulfilled, (state, action) => {
-				const gameData = action.payload.game
-				console.log('fulfilled')
-				state.id = gameData.id
-				state.players.push(gameData.host)
-				state.error = null
-				state.roomName = gameData.id
-			})
-			.addCase(createSoloGameThunk.rejected, (state, action) => {
-				console.log('problem creating solo game')
-				state.error = action.payload // check this
-			})
 	},
 })
 

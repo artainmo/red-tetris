@@ -51,7 +51,7 @@ const socketSlice = createSlice({
 	extraReducers: (builder) => {
 		builder.addCase(socketConnectThunk.fulfilled, (state, action) => {
 			state.socket = action.payload
-			state.status = 'connecting' // tentative de connexion en cours
+			state.status = 'connecting'
 		})
 	},
 })

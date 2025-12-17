@@ -20,12 +20,9 @@ const useRoomSocket = () => {
 	const dispatch = useDispatch()
 
 	useEffect(() => {
-		if (!socket) return
-
-		// const onRoomJoined = (roomId, players) => {
-		//     if (roomId) dispatch(setRoomId(roomId));
-		//     if (Array.isArray(players)) dispatch(setPlayers(players));
-		// };
+		if (!socket) {
+			return
+		}
 
 		const onPlayerLeft = (data) => {
 			console.log('Player left: ', data)
@@ -43,16 +40,13 @@ const useRoomSocket = () => {
 			dispatch(resetAllOpponents())
 		}
 
-		// listenRoomJoined(socket, onRoomJoined);
 		listenPlayerLeft(socket, onPlayerLeft)
 		listenPlayerJoined(socket, onPlayerJoined)
-		// listenStartGame(socket, onGameStarted);
 
 		return () => {
 			if (socket && socket.off) {
 				socket.off('playerLeft')
 				socket.off('playerJoined')
-				// socket.off("gameStarted");
 			}
 		}
 	}, [socket, dispatch])
@@ -66,7 +60,9 @@ const useGameSocket = () => {
 	const dispatch = useDispatch()
 
 	useEffect(() => {
-		if (!socket) return
+		if (!socket) {
+			return
+		}
 
 		const onScreenAndScoreUpdate = (data) => {
 			dispatch(
@@ -84,21 +80,22 @@ const useGameSocket = () => {
 		}
 
 		const onLinesCleared = (player, linesCleared) => {
-			// Handle lines cleared by opponent
 			console.log(`Player ${player} cleared ${linesCleared} lines.`)
 		}
 
 		const onScoreUpdate = (data) => {
 			console.log(`Score update for ${data.username}: ${data.score}`)
 			if (data.username && data.score !== undefined) {
-				if (data.username === username) dispatch(setScore(data.score))
-				else
+				if (data.username === username) {
+					dispatch(setScore(data.score))
+				} else {
 					dispatch(
 						setOpponentGridAndScore({
 							id: data.username,
 							score: data.score,
 						})
 					)
+				}
 			}
 		}
 

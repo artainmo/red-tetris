@@ -1,33 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { createMultiGame } from '../../api/http.api'
 import { joinRoom, leaveRoom } from '../../api/socket.api'
-
-export const createMultiGameThunk = createAsyncThunk(
-	'roomSlice/createMultiGameThunk',
-	async (name, { rejectWithValue }) => {
-		try {
-			const response = await createMultiGame(name)
-			return response
-		} catch (err) {
-			return rejectWithValue(err.response.data)
-		}
-	}
-)
-
-export const createMultiGameRoomThunk = createAsyncThunk(
-	'roomSlice/createMultiGameRoomThunk',
-	async (username, { rejectWithValue }) => {
-		try {
-			console.log('createMultiGameRoomThunk')
-			const response = await createMultiGame(username)
-
-			console.log(response)
-			return response
-		} catch (err) {
-			return rejectWithValue(err.response.data)
-		}
-	}
-)
 
 export const joinRoomThunk = createAsyncThunk(
 	'socket/joinRoomThunk',
@@ -79,7 +51,6 @@ const roomSlice = createSlice({
 		},
 		playerJoined(state, action) {
 			const p = action.payload
-			// state.players = p ? [...p] : [];
 			state.players.push(p)
 			state.players = state.players
 		},
@@ -95,18 +66,6 @@ const roomSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(createMultiGameRoomThunk.fulfilled, (state, action) => {
-				const game = action.payload.game
-				state.id = game.id
-				state.gameStarted = false
-				state.players.push(game.players[0])
-				state.error = null
-			})
-			.addCase(createMultiGameRoomThunk.rejected, (state, action) => {
-				console.log('problem creating multi game')
-				state.error = action.payload
-			})
-
 			.addCase(joinRoomThunk.fulfilled, (state, action) => {
 				console.log('✅ Player joined the room')
 				console.log(action.payload)

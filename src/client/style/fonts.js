@@ -1,7 +1,3 @@
-/* 
-	Font for the design of the website
-*/
-
 export const redOctoberBaseStyle = {
 	fontFamily: 'Red October',
 	fontStyle: 'normal',

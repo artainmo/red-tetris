@@ -1,4 +1,3 @@
-const { Player } = require('./Player')
 const { Game } = require('./Game')
 
 class Utils {
@@ -6,23 +5,19 @@ class Utils {
 
 	async FindGameById(db, id) {
 		try {
-			if (id == null || id == undefined) {
+			if (id === null || id === undefined) {
 				console.log('Id in invalid, game could not be found')
 				throw 'Id is null'
 			}
-			let game = await db.query('SELECT * FROM game WHERE id = $1', [id])
-			if (game != null) return game.rows[0]
+			const game = await db.query('SELECT * FROM game WHERE id = $1', [id])
+			if (game !== null) {
+				return game.rows[0]
+			}
 			console.log('No game with this id found in the database')
-		} catch (error) {
+		} catch {
 			console.log('The game could not be found')
 			return null
 		}
-	}
-
-	async BuildGameFromId(db, gameId) {
-		const gameRow = await this.FindGameById(db, gameId)
-		if (!gameRow) throw new Error('Game not found')
-		return new Game(gameRow.id, gameRow.locked, gameRow.finished, gameRow.host)
 	}
 
 	async getUserScores(db, username) {

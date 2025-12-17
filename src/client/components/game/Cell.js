@@ -8,7 +8,6 @@ const Cell = ({ colorCode }) => {
 		height: '100%',
 		backgroundColor: CELL_COLORS[colorCode],
 		boxSizing: 'border-box',
-		//border: '1px solid white'
 	}
 
 	return <div style={cellStyle}></div>

@@ -12,7 +12,7 @@ import {
 	setGridAndEmit,
 	setBox,
 } from '../redux/slices/gameplaySlice'
-import { incrementIndex } from '../redux/slices/pieceSlice'
+import { incrementIndexFun } from '../redux/slices/pieceSlice'
 import { pauseGame } from '../redux/slices/gameTimeSlice'
 import { looseGame } from '../api/socket.api'
 
@@ -38,12 +38,7 @@ const useManagePiece = (width, height) => {
 
 	const { canMoveDown, canMoveRight, canMoveLeft, canRotate, canWallRotate } =
 		useCollisionDetection(width, height, grid)
-	// const nextPieceListener = useNextPieceListener();
-	// const getNextPiece = usePieceGenerator();
-	// const currentPiece = useSelector((state) => state.piece.currentPiece);
-	// const nextPieces = useSelector((state) => state.piece.nextPiece);
 
-	/* check whether the piece can indeed be inserted */
 	const isPieceInsertable = async (piece, x, y, orientation) => {
 		const shapeCoords = piece[orientation]
 		const gameOver = shapeCoords.some(([relY, relX]) => {
@@ -66,16 +61,15 @@ const useManagePiece = (width, height) => {
 		return true
 	}
 
-	/* spawn an new piece */
 	const spawnNewPiece = (both) => {
 		console.log('Spawning new piece, both:', both)
 		console.log('Active piece type:', activePieceType)
-		if (isGameOver) return
+		if (isGameOver) {
+			return
+		}
 		if (both) {
 			const pieceLetterCode = activePieceType
-			// const nextPieceLetterCode = nextActivePieceType;
 			const piece = TETROMINOS[pieceLetterCode]
-			// const nextPiece = TETROMINOS[nextPieceLetterCode];
 
 			if (!piece) {
 				console.error('Unknown piece type: ', pieceLetterCode)
@@ -101,9 +95,8 @@ const useManagePiece = (width, height) => {
 			dispatch(setPiecePosition({ x: initialX, y: initialY }))
 			dispatch(setOrientation(PIECE_STARTING_ORIENTATIONS[pieceLetterCode]))
 			setUpdate(!update)
-			// dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[nextPieceLetterCode]));
 		} else {
-			dispatch(incrementIndex())
+			dispatch(incrementIndexFun())
 
 			const piece = activePiece
 
@@ -129,20 +122,17 @@ const useManagePiece = (width, height) => {
 			}
 
 			dispatch(setPiecePosition({ x: initialX, y: initialY }))
-			// dispatch(setActivePiece(nextActivePiece));
-			// dispatch(setActivePieceType(nextActivePieceType));
-			// dispatch(setNextActivePiece(piece));
-			// dispatch(setNextActivePieceType(currentPiece));
 			dispatch(setOrientation(nextOrientation))
 			dispatch(setNextOrientation(PIECE_STARTING_ORIENTATIONS[activePieceType]))
 			setUpdate(!update)
 		}
 	}
 
-	/* general updater for the grid when there is a move */
 	const updateGridWithPiece = (shapeCoords, x, y, colorCode) => {
 		console.log('Updating grid with piece at position:', x, y)
-		if (!shapeCoords) return
+		if (!shapeCoords) {
+			return
+		}
 		console.log('shapeCoords:', shapeCoords)
 		const newGrid = grid.map((row) => [...row])
 
@@ -156,7 +146,9 @@ const useManagePiece = (width, height) => {
 	}
 
 	const updateUpcomingPieceBox = (boxCoords, x, y, colorCode) => {
-		if (!boxCoords) return
+		if (!boxCoords) {
+			return
+		}
 
 		const newBox = Array.from({ length: 10 }, () => Array(10).fill(0))
 
@@ -169,7 +161,6 @@ const useManagePiece = (width, height) => {
 		dispatch(setBox(newBox))
 	}
 
-	/* used to removed the piece when producing a move, to later display the piece in new position */
 	const removePiece = useCallback(() => {
 		const newGrid = grid.map((row) => [...row])
 
@@ -197,13 +188,12 @@ const useManagePiece = (width, height) => {
 		return newGrid
 	}
 
-	/* Rotations managers */
 	const rotatePieceWithWallKick = (newOrientation) => {
 		let places = [0, 1, -1]
-		if (activePieceType == 'I') {
+		if (activePieceType === 'I') {
 			places = [0, 1, -1, 2, -2]
 		}
-		for (let i of places) {
+		for (const i of places) {
 			if (
 				canWallRotate(
 					activePiece,

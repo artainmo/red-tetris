@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { socketConnectThunk } from '../redux/slices/socketSlice'
@@ -16,12 +16,9 @@ import { useNextPieceListener } from '../redux/slices/pieceSlice'
 const Game = () => {
 	const { room_id, username } = useParams()
 	const authentificationStatus = useSelector((state) => state.socket.status)
-	// guard against undefined roomSlice to avoid runtime error when reading id
-	// const gameStatus = useSelector((state) => state.roomSlice?.id ?? null);
 	const roomError = useSelector((state) => state.room.error)
 	const socket = useSelector((state) => state.socket.socket)
 	const roomId = useSelector((state) => state.room.id)
-	const [roomJoined, setRoomJoined] = useState(false)
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const roomSocket = useRoomSocket()
@@ -39,7 +36,6 @@ const Game = () => {
 				return
 			}
 			console.log('handle Auth!')
-			// setConnectionAttempt(true);
 			const data = await dispatch(userConnect(username))
 			console.log('data from dispatch:', data)
 			try {
@@ -53,7 +49,7 @@ const Game = () => {
 
 	useEffect(() => {
 		if (authentificationStatus === 'disconnected') {
-			navigate(`/auth`, { replace: true })
+			navigate('/auth', { replace: true })
 		}
 		if (authentificationStatus === 'connected') {
 			console.log('Socket connected')
@@ -63,7 +59,7 @@ const Game = () => {
 	useEffect(() => {
 		if (roomError !== null && authentificationStatus === 'connected') {
 			console.error('Room error:', roomError)
-			navigate(`/main_menu`, { replace: true })
+			navigate('/main_menu', { replace: true })
 		}
 	}, [roomError, authentificationStatus, navigate])
 
@@ -75,26 +71,15 @@ const Game = () => {
 		}
 	}, [authentificationStatus, room_id, username, socket, dispatch])
 
-	// useEffect(() => {
-	// 	dispatch(joinRoomThunk({ room: room_id, playerName: username }));
-	// }, [room_id, username, dispatch]);
-
-	useEffect(() => {
-		if (roomId !== null) {
-			console.log('Game started!')
-			setRoomJoined(true)
-		}
-	}, [roomId])
-
 	return authentificationStatus === 'null' ? (
 		<div>Loading...</div>
 	) : authentificationStatus === 'connected' && roomId !== null ? (
 		<div style={pageMainContainerStyle}>
 			<RedTetrisLogo firstLine={'Red'} secondLine={'Tetris'} />
 			<div style={panelsStyle}>
-				<OpponentsPanel /> {/* Right panel */}
-				<GameStatsPanel /> {/* Left panel */}
-				<Board /> {/* Center and right panel */}
+				<OpponentsPanel />
+				<GameStatsPanel />
+				<Board />
 			</div>
 		</div>
 	) : (

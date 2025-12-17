@@ -60,7 +60,7 @@ class database {
 
 if (process.argv.length === 3 && process.argv[2] === 'create') {
 	;(async () => {
-		db = new database(false)
+		const db = new database(false)
 		try {
 			await db.createDatabase()
 			console.log('Database created.')
@@ -71,11 +71,11 @@ if (process.argv.length === 3 && process.argv[2] === 'create') {
 	})()
 } else if (process.argv.length === 3 && process.argv[2] === 'destroy') {
 	;(async () => {
-		db = new database(false)
+		const db = new database(false)
 		try {
 			await db.destroy_database()
 			console.log('Database destroyed.')
-		} catch (e) {
+		} catch {
 			console.log('Database already non-existent.')
 			process.exit(0)
 		}

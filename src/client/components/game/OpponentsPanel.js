@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useSelector } from 'react-redux'
 import Panel from './Panel'
 import { smallWhiteStyle } from '../../style/containersStyle'
@@ -13,9 +13,6 @@ export default function OpponentsPanel() {
 	}
 
 	const opponents = useSelector((state) => state.opponents)
-	useEffect(() => {
-		console.log('Opponents updated:', opponents)
-	}, [opponents])
 
 	return (
 		opponents &&
