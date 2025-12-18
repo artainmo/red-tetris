@@ -39,7 +39,7 @@ class database {
 		const client = new Client(this._credentials)
 		await client.connect()
 		const create_database_commands = await readFile(
-			__dirname + '/designDatabase.sql',
+			__dirname + '../../../db/designDatabase.sql',
 			'utf8'
 		)
 		await client.query(create_database_commands)
@@ -49,7 +49,7 @@ class database {
 	async destroy_database() {
 		const client = new Client(this._credentials)
 		await client.connect()
-		await client.query('DROP TABLE game, account;')
+		await client.query('DROP TABLE game, account, player;')
 		await client.end() //close connection
 	}
 
