@@ -39,7 +39,7 @@ class database {
 		const client = new Client(this._credentials)
 		await client.connect()
 		const create_database_commands = await readFile(
-			__dirname + '../../../db/designDatabase.sql',
+			__dirname + '/../../../db/designDatabase.sql',
 			'utf8'
 		)
 		await client.query(create_database_commands)
@@ -64,8 +64,9 @@ if (process.argv.length === 3 && process.argv[2] === 'create') {
 		try {
 			await db.createDatabase()
 			console.log('Database created.')
-		} catch {
+		} catch (err) {
 			console.log('Database already exist.')
+			console.log(err.message)
 			process.exit(0)
 		}
 	})()
@@ -75,8 +76,9 @@ if (process.argv.length === 3 && process.argv[2] === 'create') {
 		try {
 			await db.destroy_database()
 			console.log('Database destroyed.')
-		} catch {
+		} catch (err) {
 			console.log('Database already non-existent.')
+			console.log(err.message)
 			process.exit(0)
 		}
 	})()
