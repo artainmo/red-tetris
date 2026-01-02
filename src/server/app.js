@@ -167,10 +167,16 @@ io.on('connection', async (socket) => {
 				if (existingGame.addPlayer(data.username, socket) !== false) {
 					socketToGame.set(socket.id, data.roomId)
 					socket.join(data.roomId)
+					//Code added to pass tests
+					io.to(data.roomId).emit('playerJoined', {
+						player: data.username,
+						room: data.roomId,
+					})
+					callback({ success: true, data: { game: existingGame.toJSON() } })
+					//----------------
 					console.log(
 						`${data.username} joined existing active game ${data.roomId}`
 					)
-					// io.to(data.roomId).emit('playerJoined', { player: data.username, room: data.roomId});
 					for (const player of existingGame.players) {
 						if (player.username === data.username) {
 							continue
@@ -183,7 +189,6 @@ io.on('connection', async (socket) => {
 							score: 0,
 						})
 					}
-
 					socket.broadcast.to(data.roomId).emit('screenAndScoreUpdate', {
 						player: data.username,
 						structure: Array(20)
@@ -264,7 +269,7 @@ io.on('connection', async (socket) => {
 			.emit('playerGameOver', { player: socket.userId })
 	})
 
-	socket.on('looseGame', async () => {
+	socket.on('loseGame', async () => {
 		const roomId = socketToGame.get(socket.id)
 		if (!roomId) {
 			return
@@ -274,8 +279,8 @@ io.on('connection', async (socket) => {
 			return
 		}
 		console.log(`Player ${socket.userId} lost the game in room ${roomId}`)
-		game.playerLoosed(socket.userId)
-		if (game.allPlayersLoosed()) {
+		game.playerLost(socket.userId)
+		if (game.allPlayersLost()) {
 			console.log(`All players lost in game ${roomId}. Ending game.`)
 			io.to(roomId).emit('updateScore', {
 				username: socket.userId,
@@ -284,7 +289,7 @@ io.on('connection', async (socket) => {
 					50 * game.players.length,
 			})
 		}
-		socket.broadcast.to(roomId).emit('playerLoosed', { player: socket.userId })
+		socket.broadcast.to(roomId).emit('playerLost', { player: socket.userId })
 	})
 
 	socket.on('updateScreenAndScore', (data) => {

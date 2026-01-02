@@ -21,7 +21,12 @@ dev_back_front:
 refresh_front:
 	npm run build
 
-unittest:
-	node test/db_player_game/test.js
+test: refresh_database
+	npm test -- integration.test.js -dbg=false
+#'npm test' as described in 'package.json' will run Jest.
+#Jest is a Javascript testing framework.
 
-#  docker start red-tetris-db
+test_debug: refresh_database
+	npm test -- integration.test.js -dbg=true
+#'-dbg=true' is an argument the file can take to indicate you want debug logs
+#If you want to debug open handles in the test file: 'make refresh_database && npx jest --detectOpenHandles -- integration.test.js -dbg=false'
