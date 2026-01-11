@@ -33,7 +33,6 @@ const CenterMenuPanel = () => {
 	const [gameCreated, setGameCreated] = useState(false)
 
 	const username = useSelector((state) => state.auth.user)
-	const gameId = useSelector((state) => state.currentGame.id)
 
 	const handleCreateGame = async () => {
 		if (!localName) {
@@ -43,12 +42,12 @@ const CenterMenuPanel = () => {
 		navigate('/game/' + localName + '/' + username)
 	}
 
-	useEffect(() => {
-		if (gameCreated && gameId && username) {
-			setGameCreated(false)
-			navigate(`/game/${gameId}`)
-		}
-	}, [navigate, gameCreated, gameId, username])
+	// useEffect(() => {
+	// 	if (gameCreated && gameId && username) {
+	// 		setGameCreated(false)
+	// 		navigate(`/game/${gameId}`)
+	// 	}
+	// }, [navigate, gameCreated, gameId, username])
 
 	const buttonColStyle = {
 		height: 'fit-content',

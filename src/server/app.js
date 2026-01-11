@@ -288,6 +288,12 @@ io.on('connection', async (socket) => {
 	})
 
 	socket.on('updateScreenAndScore', (data) => {
+		console.log(
+			'updating screen and score for player ' +
+				socket.userId +
+				'score to ' +
+				data.score
+		)
 		const lobby = socketToGame.get(socket.id)
 		const game = activeGames.get(lobby)
 		if (!game || game.players.length === 0) {

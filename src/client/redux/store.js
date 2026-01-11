@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './slices/authSlice'
-import currentGameSlice from './slices/currentGameSlice'
 import gameTimeSlice from './slices/gameTimeSlice'
 import socketSlice from './slices/socketSlice'
 import gameplaySlice from './slices/gameplaySlice'
@@ -12,7 +11,6 @@ const store = configureStore({
 	reducer: {
 		auth: authSlice.reducer,
 		gameplay: gameplaySlice.reducer,
-		currentGame: currentGameSlice.reducer,
 		socket: socketSlice.reducer,
 		gameTime: gameTimeSlice.reducer,
 		piece: pieceSlice.reducer,

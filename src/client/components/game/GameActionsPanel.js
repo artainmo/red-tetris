@@ -8,7 +8,6 @@ import {
 	pauseGame,
 } from '../../redux/slices/gameTimeSlice'
 import { leaveRoom, startGame } from '../../api/socket.api'
-import { resetGame } from '../../redux/slices/currentGameSlice'
 import { resetGameplayAndEmit } from '../../redux/slices/gameplaySlice'
 import { inlineContainerStyle } from '../../style/containersStyle'
 import Cell from './Cell'
@@ -90,11 +89,6 @@ const GameActionsPanel = () => {
 
 	const handleClickCancelButton = async () => {
 		console.log('should cancel the game')
-		dispatch(endGame())
-		dispatch(resetGame())
-		dispatch(removeCurrentPiece())
-		dispatch(resetGameplayAndEmit())
-		leaveRoom(socket)
 		navigate('/main_menu')
 	}
 

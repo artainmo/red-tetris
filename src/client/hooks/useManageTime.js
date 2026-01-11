@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { updateGameTime } from '../redux/slices/gameTimeSlice'
 import { startGame } from '../redux/slices/gameTimeSlice'
 import { listenStartGame } from '../api/socket.api'
-import { resetGameplay } from '../redux/slices/gameplaySlice'
+import {
+	resetGameplay,
+	resetGameplayNotBox,
+} from '../redux/slices/gameplaySlice'
 
 const useManageTime = () => {
 	const dispatch = useDispatch()
@@ -34,7 +37,7 @@ const useManageTime = () => {
 	useEffect(() => {
 		console.log('Setting up listenStartGame in useManageTime')
 		const onGameStarted = () => {
-			// dispatch(resetGameplay())
+			dispatch(resetGameplayNotBox())
 			dispatch(startGame())
 		}
 

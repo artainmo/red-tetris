@@ -8,7 +8,6 @@ import {
 import SmallButton from '../shared/SmallButton'
 import { getJoinableGames } from '../../api/http.api'
 import { useDispatch, useSelector } from 'react-redux'
-import { setPlayersJoinedTheGame } from '../../redux/slices/currentGameSlice'
 import { joinRoomThunk } from '../../redux/slices/roomSlice'
 import { useNavigate } from 'react-router-dom'
 
@@ -20,10 +19,10 @@ const RoomsArray = () => {
 	const [loading, setLoading] = useState(false)
 	const username = useSelector((state) => state.auth.user)
 	const socket = useSelector((state) => state.socket.socket)
-	const gameId = useSelector((state) => state.currentGame.id)
-	const playersJoinedTheGame = useSelector(
-		(state) => state.currentGame.playersJoinedTheGame
-	)
+	// const gameId = useSelector((state) => state.currentGame.id)
+	// const playersJoinedTheGame = useSelector(
+	// 	(state) => state.currentGame.playersJoinedTheGame
+	// )
 	const fetchRooms = async () => {
 		setLoading(true)
 		try {
@@ -42,17 +41,16 @@ const RoomsArray = () => {
 		dispatch(
 			joinRoomThunk({ username: username, userSocket: socket, roomName: id })
 		)
-		dispatch(setPlayersJoinedTheGame(true))
 	}
 
-	useEffect(() => {
-		fetchRooms()
+	// useEffect(() => {
+	// 	fetchRooms()
 
-		if (playersJoinedTheGame) {
-			console.log('navigate multiplayer')
-			navigate(`/multiplayer/${gameId}`)
-		}
-	}, [playersJoinedTheGame])
+	// 	if (playersJoinedTheGame) {
+	// 		console.log('navigate multiplayer')
+	// 		navigate(`/game/${gameId}/${username}`)
+	// 	}
+	// }, [playersJoinedTheGame])
 
 	return (
 		<div style={arrayContainerStyle}>

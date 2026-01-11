@@ -69,6 +69,15 @@ const gameplaySlice = createSlice({
 		setScore: (state, action) => {
 			state.score = action.payload
 		},
+		resetGameplayNotBox: (state) => {
+			console.log('resetGameplayNotBox')
+			state.grid = Array.from({ length: 20 }, () => Array(10).fill(0))
+			state.piecePosition = { x: 4, y: 0 }
+			state.orientation = 0
+			state.nextOrientation = 0
+			state.isInContact = false
+			state.isGameOver = false
+		},
 		resetGameplay: (state) => {
 			console.log('resetGameplay')
 			state.grid = Array.from({ length: 20 }, () => Array(10).fill(0))
@@ -80,6 +89,7 @@ const gameplaySlice = createSlice({
 			state.isGameOver = false
 		},
 		resetGameplayAndScore: (state) => {
+			console.log('resetGameplayAndScore')
 			state.grid = Array.from({ length: 20 }, () => Array(10).fill(0))
 			state.box = Array.from({ length: 10 }, () => Array(10).fill(0))
 			state.piecePosition = { x: 4, y: 0 }
@@ -104,6 +114,7 @@ export const {
 	setRank,
 	setScore,
 	resetGameplay,
+	resetGameplayNotBox,
 	resetGameplayAndScore,
 } = gameplaySlice.actions
 

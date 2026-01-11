@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import AuthGuard from './guards/AuthGuard'
 import store from './redux/store'
+import GameGuard from './guards/GameGuard'
 
 const App = () => {
 	return (
@@ -15,15 +16,17 @@ const App = () => {
 				<Routes>
 					<Route path="/" element={<LandingPage />} />
 					<Route path="/auth" element={<Auth />} />
-					<Route
-						path="/main_menu"
-						element={
-							<AuthGuard>
-								<MainMenu />
-							</AuthGuard>
-						}
-					/>
-					<Route path="/game/:room_id/:username" element={<Game />} />
+					<Route element={<GameGuard />}>
+						<Route
+							path="/main_menu"
+							element={
+								<AuthGuard>
+									<MainMenu />
+								</AuthGuard>
+							}
+						/>
+						<Route path="/game/:room_id/:username" element={<Game />} />
+					</Route>
 				</Routes>
 			</Router>
 		</Provider>

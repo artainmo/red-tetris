@@ -20,7 +20,7 @@ const useManagePiece = (width, height) => {
 	const dispatch = useDispatch()
 
 	const username = useSelector((state) => state.auth.user)
-	const scores = useSelector((state) => state.currentGame.scores)
+	// const scores = useSelector((state) => state.currentGame.scores)
 	const grid = useSelector((state) => state.gameplay.grid)
 	const activePiece = useSelector((state) => state.piece.tetrominosCurrentPiece)
 	const activePieceType = useSelector((state) => state.piece.currentPiece)
@@ -49,8 +49,8 @@ const useManagePiece = (width, height) => {
 
 		if (gameOver && !isGameOver) {
 			console.log('dispatching game over')
-			const score = scores[username]
-			console.log(score)
+			// const score = scores[username]
+			// console.log(score)
 
 			dispatch(setIsGameOver(true))
 
