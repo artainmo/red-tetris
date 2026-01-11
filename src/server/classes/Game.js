@@ -120,7 +120,7 @@ class Game {
 		return this
 	}
 
-	playerLoosed(username) {
+	playerLost(username) {
 		const index = this.#players.findIndex(
 			(player) => player.username === username
 		)
@@ -132,7 +132,7 @@ class Game {
 		return this
 	}
 
-	allPlayersLoosed() {
+	allPlayersLost() {
 		for (const player of this.#players) {
 			if (!player.hasLost) {
 				return false

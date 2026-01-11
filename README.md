@@ -1,6 +1,6 @@
 # red-tetris
 
-42 school [subject](https://cdn.intra.42.fr/pdf/pdf/72691/en.subject.pdf).
+42 school [subject](https://cdn.intra.42.fr/pdf/pdf/170191/en.subject.pdf).
 
 The **front-end** must be a **single-page-application** and we must use **functions (functional programming)** instead of classes (object-oriented-programming).<br>
 We will use the framework **React** with library Redux.<br>
@@ -10,7 +10,7 @@ In the **backend** we will use **classes (object-oriented-programming)** and wri
 
 ## Use
 
-Before launching this app make sure a PostgreSQL database named `red_tetris` runs.
+Before launching this app make sure a PostgreSQL database named `red_tetris` runs. This is possible on mac using the [postgres app](https://postgresapp.com/). Else it can run via docker when you launch the app using: `docker-compose up -d --build`.
 
 Launch the whole app in one command:
 
@@ -45,12 +45,15 @@ make dev_back
 make dev_back_front
 ```
 
-Run unit-tests:
+Run tests:
 
 ```
-make unittest
+make test //Run tests without debug logs
+make test_debug //Run tests with debug logs
 ```
 
 ## Bonus
 
-Creation de [maquette](https://www.figma.com/design/EcSggVnGa2EQdxmYEQqPvL/Red-Tetris).
+* Creation de [maquette](https://www.figma.com/design/EcSggVnGa2EQdxmYEQqPvL/Red-Tetris).
+* Scoring system
+* Persistance of player scores.
