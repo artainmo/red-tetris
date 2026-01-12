@@ -38,9 +38,10 @@ const RoomsArray = () => {
 
 	const joinMultiplayer = async (id) => {
 		console.log('joining multiplayer room')
-		dispatch(
-			joinRoomThunk({ username: username, userSocket: socket, roomName: id })
-		)
+		// dispatch(
+		// 	joinRoomThunk({ username: username, userSocket: socket, roomName: id })
+		// )
+		navigate(`/game/${id}/${username}`)
 	}
 
 	// useEffect(() => {
