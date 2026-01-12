@@ -6,6 +6,7 @@ import { endGame } from '../redux/slices/gameTimeSlice'
 import { removeCurrentPiece } from '../redux/slices/pieceSlice'
 import { resetGameplayAndEmit } from '../redux/slices/gameplaySlice'
 import { leaveRoom } from '../api/socket.api'
+import { resetAllOpponents } from '../redux/slices/opponentsSlice'
 
 const GameGuard = () => {
 	const location = useLocation()
@@ -30,6 +31,7 @@ const GameGuard = () => {
 			dispatch(removeCurrentPiece())
 			if (socket) leaveRoom(socket)
 			dispatch(resetGameplayAndEmit())
+			dispatch(resetAllOpponents())
 		}
 
 		prevLocationRef.current = location
