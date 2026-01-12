@@ -36,6 +36,10 @@ const RoomsArray = () => {
 		}
 	}
 
+	useEffect(() => {
+		fetchRooms()
+	}, [])
+
 	const joinMultiplayer = async (id) => {
 		console.log('joining multiplayer room')
 		// dispatch(
