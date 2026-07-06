@@ -7,4 +7,5 @@ export const CELL_COLORS = {
 	5: 'blue', // J-piece
 	6: 'green', // S-piece
 	7: 'red', // Z-piece
+	8: 'gray', // Ghost piece
 }

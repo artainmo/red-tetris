@@ -2,16 +2,15 @@ import { createSlice } from '@reduxjs/toolkit'
 
 import { updateScreenAndScore } from '../../api/socket.api'
 
-export const setGridAndEmit = (newGrid) => (dispatch, getState) => {
+export const EmitGridAndScore = () => (dispatch, getState) => {
 	const state = getState()
 	const socket = state.socket.socket
 	const score = state.gameplay.score
+	const grid = state.gameplay.grid
 
 	if (socket && typeof socket.emit === 'function') {
-		updateScreenAndScore(socket, newGrid, score)
+		updateScreenAndScore(socket, grid, score)
 	}
-
-	dispatch(setGrid(newGrid))
 }
 
 export const resetGameplayAndEmit = () => (dispatch, getState) => {

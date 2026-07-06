@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setGridAndEmit, setScore } from '../redux/slices/gameplaySlice'
+import { setGrid, setScore } from '../redux/slices/gameplaySlice'
 import { sendLinesCleared } from '../api/socket.api'
 
 const useManageLines = (width, height) => {
@@ -27,7 +27,7 @@ const useManageLines = (width, height) => {
 				sendLinesCleared(socket, clearedLines)
 			}
 
-			dispatch(setGridAndEmit(updatedGrid))
+			dispatch(setGrid(updatedGrid))
 			const currScore = score + clearedLines * 10
 			dispatch(setScore(currScore))
 		}
