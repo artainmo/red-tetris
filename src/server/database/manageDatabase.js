@@ -8,7 +8,7 @@ class database {
 			port: '5432',
 			user: 'postgres',
 			password: 'admin',
-			database: 'red_tetris',
+			database: 'red-tetris',
 		}
 		if (connect) {
 			this.connectToDatabase()
@@ -16,19 +16,7 @@ class database {
 	}
 
 	async connectToDatabase() {
-		try {
-			this._pool = new Pool(this._credentials) //A connection pool enables handling multiple requests at once
-		} catch (e) {
-			if (e.code === '42P01') {
-				console.log(e.code)
-				console.log('Create the database...')
-				await this.createDatabase()
-				this.connectToDatabase()
-			} else {
-				console.log(e.message)
-				process.exit(1)
-			}
-		}
+		this._pool = new Pool(this._credentials) //A connection pool enables handling multiple requests at once
 	}
 
 	async close_connection() {
@@ -54,7 +42,16 @@ class database {
 	}
 
 	async query(request, values = []) {
-		return await this._pool.query(request, values)
+		try {
+			return await this._pool.query(request, values)
+		} catch (e) {
+			if (e.code === '42P01') {
+				console.log('Table(s) missing, creating database schema...')
+				await this.createDatabase()
+				return await this._pool.query(request, values)
+			}
+			throw e
+		}
 	}
 }
 
