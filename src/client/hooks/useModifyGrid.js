@@ -4,6 +4,7 @@ import useManageLines from './useManageLines'
 import { useSelector, useDispatch } from 'react-redux'
 import { pauseGame, resumeGame } from '../redux/slices/gameTimeSlice'
 import { listenLinesCleared } from '../api/socket.api'
+import { EmitGridAndScore } from '../redux/slices/gameplaySlice'
 
 const useModifyGrid = (width, height) => {
 	const dispatch = useDispatch()
@@ -115,6 +116,7 @@ const useModifyGrid = (width, height) => {
 			} else {
 				if (isInContact) {
 					clearFullLines()
+					dispatch(EmitGridAndScore())
 					spawnNewPiece(false)
 				} else {
 					setIsInContact(true)

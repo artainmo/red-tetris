@@ -13,7 +13,6 @@ export default function OpponentsPanel() {
 	}
 
 	const opponents = useSelector((state) => state.opponents)
-
 	return (
 		opponents &&
 		opponents.byId &&
@@ -25,7 +24,7 @@ export default function OpponentsPanel() {
 						{opponentId}
 						{opponentId === host ? ' (Host)' : ''}
 					</h4>
-					<Panel grid={opponent.grid} size={0.5} />
+					<Panel grid={opponent.grid} size={0.5} isOpponent={true} />
 					<p style={smallWhiteStyle}>Score: {opponent.score}</p>
 				</div>
 			)

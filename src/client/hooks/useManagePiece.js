@@ -9,7 +9,7 @@ import {
 	setIsGameOver,
 	setOrientation,
 	setNextOrientation,
-	setGridAndEmit,
+	setGrid,
 	setBox,
 } from '../redux/slices/gameplaySlice'
 import { incrementIndexFun } from '../redux/slices/pieceSlice'
@@ -20,7 +20,6 @@ const useManagePiece = (width, height) => {
 	const dispatch = useDispatch()
 
 	const username = useSelector((state) => state.auth.user)
-	// const scores = useSelector((state) => state.currentGame.scores)
 	const grid = useSelector((state) => state.gameplay.grid)
 	const activePiece = useSelector((state) => state.piece.tetrominosCurrentPiece)
 	const activePieceType = useSelector((state) => state.piece.currentPiece)
@@ -49,8 +48,6 @@ const useManagePiece = (width, height) => {
 
 		if (gameOver && !isGameOver) {
 			console.log('dispatching game over')
-			// const score = scores[username]
-			// console.log(score)
 
 			dispatch(setIsGameOver(true))
 
@@ -142,7 +139,7 @@ const useManagePiece = (width, height) => {
 			newGrid[newY][newX] = colorCode
 		})
 
-		dispatch(setGridAndEmit(newGrid))
+		dispatch(setGrid(newGrid))
 	}
 
 	const updateUpcomingPieceBox = (boxCoords, x, y, colorCode) => {
@@ -171,7 +168,7 @@ const useManagePiece = (width, height) => {
 				newGrid[oldY][oldX] = 0
 			})
 		}
-		dispatch(setGridAndEmit(newGrid))
+		dispatch(setGrid(newGrid))
 	}, [dispatch, activePiece, grid, orientation, piecePosition])
 
 	const removePieceSync = () => {
@@ -371,7 +368,7 @@ const useManagePiece = (width, height) => {
 				dispatch(setPiecePosition({ x: piecePosition.x, y: piecePosition.y }))
 			}
 
-			dispatch(setGridAndEmit(updatedGrid))
+			dispatch(setGrid(updatedGrid))
 		},
 		[dispatch, grid, width]
 	)
