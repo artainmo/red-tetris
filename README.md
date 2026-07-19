@@ -10,34 +10,38 @@ In the **backend** we will use **classes (object-oriented-programming)** and wri
 
 ## Use
 
-Before launching this app make sure a PostgreSQL database named `red_tetris` runs. This is possible on mac using the [postgres app](https://postgresapp.com/). Else it can run via docker when you launch the app using: `docker-compose up -d --build`.
+This project was created on macos.
+
+For the database we run a postgres server using the [postgres app](https://postgresapp.com) on macos. After downloading the postgres app, within the app you can click on 'initialize' to start the server.<br>
+Now access the psql command line by double clicking a default database such as the one named 'template1'. Within the psql command line you can use the following commands to create a red-tetris database:
+```
+CREATE USER postgres;
+ALTER USER postgres WITH PASSWORD 'admin';
+CREATE DATABASE "red-tetris" OWNER postgres;
+```
+Make sure the postgres server runs while launching the app or cleaning the database.
 
 Launch the whole app in one command:
-
 ```
 make
 ```
 
 Refresh the database:
-
 ```
 make refresh_database
 ```
 
 Run the frontend only in dev-mode with hot reload:
-
 ```
 make dev_front
 ```
 
 Run the backend only in dev-mode with hot reload:
-
 ```
 make dev_back
 ```
 
 Run both the frontend and backend simultaneously in dev-mode with hot reload:
-
 ```
 //In shell one
 make dev_back
@@ -46,7 +50,6 @@ make dev_back_front
 ```
 
 Run tests:
-
 ```
 make test //Run tests without debug logs
 make test_debug //Run tests with debug logs
