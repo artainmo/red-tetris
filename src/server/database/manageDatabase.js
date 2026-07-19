@@ -39,7 +39,7 @@ class database {
 		const client = new Client(this._credentials)
 		await client.connect()
 		const create_database_commands = await readFile(
-			__dirname + '/../../../db/designDatabase.sql',
+			__dirname + '/designDatabase.sql',
 			'utf8'
 		)
 		await client.query(create_database_commands)
