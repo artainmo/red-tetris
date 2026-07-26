@@ -143,16 +143,24 @@ const leaveRoom = async (socket) => {
 	}
 }
 
+//Tracks 'leaveRoom' calls still running because of a socket disconnecting. 'leaveRoom' can write to the
+//DB (see 'game.setDB' below), so shutdown (see 'shutdown' further down) must wait for these to finish
+//before closing the DB pool they use, or that write fails with "Cannot use a pool after calling end on
+//the pool".
+const pendingDisconnects = new Set()
+
 io.on('connection', async (socket) => {
 	console.log(`User ${socket.userId} connected to websocket`)
 	activeUsers.set(socket.userId, socket)
 
-	socket.on('disconnect', async () => {
+	socket.on('disconnect', () => {
 		console.log(
 			`User ${socket.userId} disconnected from websocket and thus left its room`
 		)
-		await leaveRoom(socket)
 		activeUsers.delete(socket.userId)
+		const cleanup = leaveRoom(socket)
+		pendingDisconnects.add(cleanup)
+		cleanup.finally(() => pendingDisconnects.delete(cleanup))
 	})
 
 	socket.on('joinRoom', async (data, callback) => {
@@ -366,3 +374,19 @@ io.on('connection', async (socket) => {
 		socket.broadcast.to(data.roomId).emit('nextGame', data.nextGame)
 	})
 })
+
+const shutdown = (signal) => {
+	console.log(`${signal} received, shutting down gracefully`)
+	io.close(() => {
+		server.close(async () => {
+			await Promise.all(pendingDisconnects)
+			await db.close_connection()
+			process.exit(0)
+		})
+	})
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'))
+process.on('SIGTERM', () => shutdown('SIGTERM'))
+
+module.exports = { app, server, db, pendingDisconnects }

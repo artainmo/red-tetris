@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"test": "node src/server/database/manageDatabase.js destroy && node src/server/database/manageDatabase.js     create && jest src/server/integration.test.js -dbg=false",
-		"coverage": "node src/server/database/manageDatabase.js destroy && node src/server/database/manageDatabase.js create && rm -rf coverage && jest --coverage src/server/integration.test.js -dbg=false",
+		"coverage": "node src/server/database/manageDatabase.js destroy && node src/server/database/manageDatabase.js create && rm -rf coverage && jest --coverage --collectCoverageFrom='./src/server/**/*.js' --collectCoverageFrom='!./src/server/integration.test.js' src/server/integration.test.js -dbg=false",
 		"dev_front": "webpack serve --mode development",
 		"dev_back": "nodemon src/server/app.js",
 		"build": "webpack --mode development",
@@ -21,7 +21,7 @@
 			"./src/server/app.js"
 		],
 		"coverageThreshold": {
-			"global": {
+			"./src/server/app.js": {
 				"statements": 70,
 				"functions": 70,
 				"lines": 70,

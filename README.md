@@ -53,6 +53,7 @@ Run tests:
 ```
 make test //Run tests without debug logs
 make test_debug //Run tests with debug logs
+make coverage //How much code is covered by the tests
 ```
 
 ## Bonus
