@@ -52,8 +52,10 @@ make dev_back_front
 Run tests:
 ```
 make test //Run tests without debug logs
+npm run test //Same as prior command.
 make test_debug //Run tests with debug logs
 make coverage //How much code is covered by the tests
+npm run coverage //Same as prior command.
 ```
 
 ## Bonus
