@@ -16,12 +16,15 @@ jest.setTimeout(20000)
 //Jest's default timeout is 5 seconds.
 //The above command increases the timeout time for slow machines.
 
-//'app.js' and the classes it uses log a lot via 'console.log', for use when running the server normally
-//(e.g. 'npm run dev_back'). Now that the server runs inside this same Jest process (see below), those
-//calls would otherwise flood the test output. Pass '-dbg=true' to see them again.
+//'app.js' and the classes it uses log a lot via 'console.log' (and the client redux slices log some
+//expected failure paths via 'console.error'/'console.warn', e.g. a rejected 'joinRoom' or a socket
+//disconnect), for use when running the app normally. Now that the server runs inside this same Jest
+//process (see below), those calls would otherwise flood the test output. Pass '-dbg=true' to see them again.
 const debugArg = (process.argv.filter((x) => x.startsWith('-dbg='))[0] || '').split('=')[1] === 'true'
 if (!debugArg) {
 	console.log = () => {}
+	console.error = () => {}
+	console.warn = () => {}
 }
 
 //Requiring the server directly (instead of spawning 'node app.js' as a separate OS process) makes it
@@ -29,6 +32,79 @@ if (!debugArg) {
 //'app.js' and everything it requires (the 'classes' files, 'manageDatabase.js') execute.
 const { server, db, pendingDisconnects } = require(SERVER_PATH)
 let request = null //A 'supertest' client used to send HTTP requests to the server.
+
+//The server classes 'app.js' itself is built on top of. Requiring them directly (instead of only going
+//through 'app.js') lets us unit-test their logic (piece/player bookkeeping, DB persistence, username
+//validation) without needing a socket or HTTP round-trip for every case.
+const { Game } = require('./classes/Game.js')
+const { Player } = require('./classes/Player.js')
+const { User } = require('./classes/User.js')
+const { Utils } = require('./classes/Utils.js')
+const { Piece } = require('./classes/Piece.js')
+
+//The client (React/Redux) side of the app. It's plain ES modules + JSX, transpiled for Jest by
+//'babel.config.js' (the same config webpack uses to bundle it for the browser). None of the files
+//below need a DOM, so they run fine in this file's default 'node' test environment - only the
+//'*.css'/font/image-free presentational components in 'sharedComponents.test.js' need the 'jsdom'
+//environment (and thus live in their own file - see the comment at the top of that file for why).
+const { configureStore } = require('@reduxjs/toolkit')
+
+const authSlice = require('../client/redux/slices/authSlice').default
+const { userConnect } = require('../client/redux/slices/authSlice')
+
+const gameTimeSlice = require('../client/redux/slices/gameTimeSlice').default
+const { startGame, endGame, updateGameTime, pauseGame, resumeGame } = require('../client/redux/slices/gameTimeSlice')
+
+const gameplaySlice = require('../client/redux/slices/gameplaySlice').default
+const {
+	setGrid,
+	setPiecePosition,
+	setScore,
+	resetGameplay,
+	resetGameplayAndScore,
+	EmitGridAndScore,
+	resetGameplayAndEmit,
+} = require('../client/redux/slices/gameplaySlice')
+
+const opponentsSlice = require('../client/redux/slices/opponentsSlice').default
+const { setOpponentGridAndScore, removeOpponent, resetAllOpponents } = require('../client/redux/slices/opponentsSlice')
+
+const pieceSlice = require('../client/redux/slices/pieceSlice').default
+const { incrementIndex, removeCurrentPiece, incrementIndexFun } = require('../client/redux/slices/pieceSlice')
+
+const roomSlice = require('../client/redux/slices/roomSlice').default
+const { setPlayers, setRoomId, playerJoined, playerLeft, gameStarted, setNewHost, joinRoomThunk } = require('../client/redux/slices/roomSlice')
+
+const socketSlice = require('../client/redux/slices/socketSlice').default
+const { socketConnected, socketConnectionFailed, socketDisconnected, socketConnectThunk } = require('../client/redux/slices/socketSlice')
+
+const httpApi = require('../client/api/http.api')
+const socketApiClient = require('../client/api/socket.api')
+
+const { CELL_COLORS } = require('../client/utils/cellColors')
+const { PIECE_STARTING_ORIENTATIONS } = require('../client/utils/pieceStartingOrientation')
+const { PIECES_COLOR_CODES } = require('../client/utils/piecesColorCodes')
+const { TETROMINOS } = require('../client/utils/tetrominoes')
+const { WALL_KICK_OFFSETS } = require('../client/utils/wallKickOffsets')
+
+//Same purpose as the 'authenticate'/'usernameFor' helpers used further down by the 'Socket.IO flows'
+//tests, just hoisted to file scope so the new client/server describe blocks below can reuse them too.
+const authenticate = (username) =>
+	request
+		.get(`${REST_PREFIX}/connect/${encodeURIComponent(username)}`)
+		.expect(200)
+		.then((res) => res.body.jwt)
+
+const usernameFor = (roomId, suffix) => `${roomId.replace(/[^a-zA-Z0-9]/g, '')}${suffix}`
+
+//A couple of the redux tests below store a real (or fake) socket directly in the store, same as the
+//real 'store.js' does - sockets aren't plain serializable data, so this mirrors 'store.js's own
+//'serializableCheck: false' middleware option to avoid a (harmless but noisy) console warning.
+const makeStore = (reducer) =>
+	configureStore({
+		reducer,
+		middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+	})
 
 //'beforeAll' is a jest lifecycle hook. It runs once before any tests.
 //It is used for global setup (starting a server, DB, etc).
@@ -99,21 +175,14 @@ describe('Socket.IO flows', () => { //This creates a test group in Jest for the 
 		timeout: 5000, //Give the connection up to 5 seconds to succeed so you don't wait forever if the server has a problem.
 	}
 
-	//Each test authenticates its own pair of usernames (derived from its own unique roomId) instead of
-	//reusing 'testUserA'/'testUserB' everywhere. The server only allows one active socket connection per
-	//username at a time (see 'activeUsers' in app.js), and disconnecting a socket doesn't instantly free
-	//that username server-side (it's freed once the server finishes processing its own 'disconnect'
-	//event). Reusing the same username across tests raced against that server-side cleanup, occasionally
+	//'authenticate'/'usernameFor' are defined once at file scope (see near the top of this file) since
+	//other describe blocks below (client/server unit tests) need them too. Each test still authenticates
+	//its own pair of usernames (derived from its own unique roomId) instead of reusing
+	//'testUserA'/'testUserB' everywhere: the server only allows one active socket connection per username
+	//at a time (see 'activeUsers' in app.js), and disconnecting a socket doesn't instantly free that
+	//username server-side (it's freed once the server finishes processing its own 'disconnect' event).
+	//Reusing the same username across tests raced against that server-side cleanup, occasionally
 	//rejecting the next test's connection. Unique usernames per test remove that race entirely.
-	const authenticate = (username) =>
-		request
-			.get(`${REST_PREFIX}/connect/${encodeURIComponent(username)}`)
-			.expect(200)
-			.then((res) => res.body.jwt)
-
-	//Usernames may only contain letters/digits (see 'User.js'), but roomId (already unique per test)
-	//uses hyphens, so strip anything else out to derive a valid, still-unique username from it.
-	const usernameFor = (roomId, suffix) => `${roomId.replace(/[^a-zA-Z0-9]/g, '')}${suffix}`
 
 	//The test function takes a 'done()' callback because the test is event driven and not promise-based.
 	//Jest will not know when the test finishes unless we call 'done()'.
@@ -746,4 +815,775 @@ describe('Socket.IO flows', () => { //This creates a test group in Jest for the 
 			.catch(done)
 	})
 
+})
+
+//'app.js' is a thin layer of routes/socket handlers on top of the classes below (Game/Player/User/Utils)
+//and 'manageDatabase.js'. The 'REST endpoints'/'Socket.IO flows' describes above already exercise most
+//of that logic indirectly through HTTP/socket calls, but this describe tests the classes directly so
+//edge cases (game full, host reassignment, invalid usernames, DB persistence) don't each need a full
+//HTTP or socket round-trip to cover.
+describe('Server classes (Game, Player, User, Utils, database)', () => {
+	describe('Game', () => {
+		test('addPlayer accepts up to 4 players, then rejects a 5th and rejects duplicate usernames', () => {
+			const game = new Game('unit-game-1')
+			expect(game.addPlayer('p1')).toBe(game) //On success 'addPlayer' returns the game itself (truthy).
+			game.addPlayer('p2')
+			game.addPlayer('p3')
+			game.addPlayer('p4')
+			expect(game.players).toHaveLength(4)
+			expect(game.addPlayer('p5')).toBe(false) //Game is full (MAX_PLAYERS = 4).
+			expect(game.addPlayer('p1')).toBe(false) //Duplicate username.
+		})
+
+		test('addPlayer refuses to add players once the game is locked', () => {
+			const game = new Game('unit-game-2')
+			game.lockGame()
+			expect(game.locked).toBe(true)
+			expect(game.addPlayer('p1')).toBe(false)
+		})
+
+		test('removePlayer reassigns the host to the next player, and marks the game finished once empty', () => {
+			const game = new Game('unit-game-3', false, false, 'host')
+			game.addPlayer('host')
+			game.addPlayer('guest')
+			expect(game.removePlayer('host')).toBe(game)
+			expect(game.host).toBe('guest') //Host reassigned to the remaining player.
+			expect(game.finished).toBe(false)
+			game.removePlayer('guest')
+			expect(game.finished).toBe(true) //No players left -> the game is over.
+			expect(game.removePlayer('nobody')).toBe(false)
+		})
+
+		test('playerLost / allPlayersLost track which players have lost', () => {
+			const game = new Game('unit-game-4')
+			game.addPlayer('a')
+			game.addPlayer('b')
+			expect(game.allPlayersLost()).toBe(false)
+			expect(game.playerLost('nobody')).toBe(false)
+			game.playerLost('a')
+			expect(game.allPlayersLost()).toBe(false)
+			game.playerLost('b')
+			expect(game.allPlayersLost()).toBe(true)
+		})
+
+		test('toJSON exposes id, locked, finished, host, pieceBasket and players', () => {
+			const game = new Game('unit-game-5', false, false, 'host')
+			game.addPlayer('host')
+			const json = game.toJSON()
+			expect(json).toMatchObject({
+				id: 'unit-game-5',
+				locked: false,
+				finished: false,
+				host: 'host',
+			})
+			expect(Array.isArray(json.pieceBasket)).toBe(true)
+			expect(json.players).toEqual([{ username: 'host', game_id: 'unit-game-5', score: 0 }])
+		})
+
+		test('socket getter returns each player\'s live socket, and display() summarizes the game as a string', () => {
+			const fakeSocket = { id: 'fake-socket-1' }
+			const game = new Game('unit-game-display', false, false, 'host')
+			game.addPlayer('host', fakeSocket)
+			expect(game.socket).toEqual([fakeSocket])
+
+			const summary = game.display()
+			expect(typeof summary).toBe('string')
+			expect(summary).toContain('unit-game-display')
+		})
+
+		test('setDB/endGame persist the game and its historical players to the real database', async () => {
+			const hostUsername = 'unithostgame'
+			const gameId = 'unit-game-db'
+			//The 'game' table's host column, and the 'player' table's username column, are foreign keys
+			//referencing 'account(username)' (see 'designDatabase.sql'), so the account must exist first.
+			await db.query('INSERT INTO account (username) VALUES ($1) ON CONFLICT DO NOTHING', [hostUsername])
+
+			const game = new Game(gameId, false, false, hostUsername)
+			game.addPlayer(hostUsername)
+			await game.endGame(db) //Marks the game finished, then calls 'setDB' internally.
+			expect(game.finished).toBe(true)
+
+			const gameRow = await db.query('SELECT * FROM game WHERE id = $1', [gameId])
+			expect(gameRow.rows[0]).toMatchObject({ id: gameId, finished: true, host: hostUsername })
+
+			const playerRow = await db.query('SELECT * FROM player WHERE game_id = $1', [gameId])
+			expect(playerRow.rows[0]).toMatchObject({ username: hostUsername, game_id: gameId, score: 0 })
+		})
+	})
+
+	describe('Player', () => {
+		test('constructor sets sane defaults, and getters/setters work', () => {
+			const player = new Player('alice', 'room1')
+			expect(player.username).toBe('alice')
+			expect(player.game_id).toBe('room1')
+			expect(player.score).toBe(0)
+			expect(player.hasLost).toBe(false)
+			player.score = 42
+			player.hasLost = true
+			expect(player.score).toBe(42)
+			expect(player.hasLost).toBe(true)
+		})
+
+		test('toJSON only exposes username, game_id and score (not the socket or hasLost)', () => {
+			const player = new Player('bob', 'room2', 7)
+			expect(player.toJSON()).toEqual({ username: 'bob', game_id: 'room2', score: 7 })
+		})
+
+		test("socket getter/setter store the player's live connection", () => {
+			const player = new Player('carol', 'room3')
+			expect(player.socket).toBeNull() //No socket passed to the constructor.
+			const fakeSocket = { id: 'fake-socket-2' }
+			player.socket = fakeSocket
+			expect(player.socket).toBe(fakeSocket)
+		})
+
+		test('setDB inserts the player row into the real database and returns itself', async () => {
+			const username = 'unitplayerdb'
+			const gameId = 'unit-game-player-db'
+			//Same foreign-key requirement as above: the account and the game must already exist.
+			await db.query('INSERT INTO account (username) VALUES ($1) ON CONFLICT DO NOTHING', [username])
+			await db.query(
+				'INSERT INTO game (id, locked, finished, host) VALUES ($1, false, false, $2) ON CONFLICT DO NOTHING',
+				[gameId, username]
+			)
+
+			const player = new Player(username, gameId, 9)
+			const result = await player.setDB(db)
+			expect(result).toBe(player)
+
+			const row = await db.query('SELECT * FROM player WHERE username = $1 AND game_id = $2', [username, gameId])
+			expect(row.rows[0]).toMatchObject({ username, game_id: gameId, score: 9 })
+		})
+	})
+
+	describe('Piece', () => {
+		test('displayPiece logs without throwing', () => {
+			const piece = new Piece()
+			expect(() => piece.displayPiece()).not.toThrow()
+		})
+	})
+
+	describe('User', () => {
+		test('connect rejects usernames longer than 19 characters', async () => {
+			const user = new User()
+			await expect(user.connect(db, 'a'.repeat(20))).rejects.toThrow("Player's username is too long")
+		})
+
+		test('connect rejects usernames containing special characters', async () => {
+			const user = new User()
+			await expect(user.connect(db, 'bad name!')).rejects.toThrow(
+				"Player's username contains special characters"
+			)
+		})
+
+		test('connect creates a new account, and connecting again with the same username does not throw', async () => {
+			const user = new User()
+			const username = 'unituserconnect'
+			await expect(user.connect(db, username)).resolves.toBeUndefined()
+			//A second 'connect' hits the DB's unique-constraint-violation branch (code '23505'), which
+			//'tryAccountCreation' swallows instead of throwing - i.e. logging back in should be a no-op.
+			await expect(user.connect(db, username)).resolves.toBeUndefined()
+		})
+	})
+
+	describe('Utils', () => {
+		const utils = new Utils()
+
+		test('FindGameById resolves to null (without throwing) when given a null/undefined id', async () => {
+			await expect(utils.FindGameById(db, null)).resolves.toBeNull()
+			await expect(utils.FindGameById(db, undefined)).resolves.toBeNull()
+		})
+
+		test('FindGameById finds a game that was persisted to the database, and finds nothing for an unknown id', async () => {
+			const hostUsername = 'unithostutils'
+			const gameId = 'unit-game-utils'
+			await db.query('INSERT INTO account (username) VALUES ($1) ON CONFLICT DO NOTHING', [hostUsername])
+			await db.query(
+				'INSERT INTO game (id, locked, finished, host) VALUES ($1, false, false, $2) ON CONFLICT DO NOTHING',
+				[gameId, hostUsername]
+			)
+
+			const found = await utils.FindGameById(db, gameId)
+			expect(found).toMatchObject({ id: gameId, host: hostUsername })
+
+			const notFound = await utils.FindGameById(db, 'unit-game-missing')
+			expect(notFound).toBeUndefined()
+		})
+
+		test("getUserScores returns a user's scores across games, most recent first", async () => {
+			const username = 'unitscoreuser'
+			const gameIdA = 'unit-game-scoreA'
+			const gameIdB = 'unit-game-scoreB'
+			await db.query('INSERT INTO account (username) VALUES ($1) ON CONFLICT DO NOTHING', [username])
+			await db.query(
+				'INSERT INTO game (id, locked, finished, host) VALUES ($1, false, true, $2) ON CONFLICT DO NOTHING',
+				[gameIdA, username]
+			)
+			await db.query(
+				'INSERT INTO game (id, locked, finished, host) VALUES ($1, false, true, $2) ON CONFLICT DO NOTHING',
+				[gameIdB, username]
+			)
+			await db.query('INSERT INTO player (username, game_id, score) VALUES ($1, $2, $3)', [username, gameIdA, 10])
+			await db.query('INSERT INTO player (username, game_id, score) VALUES ($1, $2, $3)', [username, gameIdB, 20])
+
+			const scores = await utils.getUserScores(db, username)
+			expect(scores).toHaveLength(2)
+			expect(scores.map((s) => s.score).sort()).toEqual([10, 20])
+			scores.forEach((s) => expect(s).toHaveProperty('gameId'))
+		})
+
+		test('getBestScores returns at most 10 entries, sorted by best score descending', async () => {
+			const scores = await utils.getBestScores(db)
+			expect(Array.isArray(scores)).toBe(true)
+			expect(scores.length).toBeLessThanOrEqual(10)
+			for (let i = 1; i < scores.length; i++) {
+				expect(scores[i - 1].bestScore).toBeGreaterThanOrEqual(scores[i].bestScore)
+			}
+		})
+	})
+
+	describe('database (manageDatabase.js)', () => {
+		test('query() runs parameterized SQL against the real database and returns rows', async () => {
+			const result = await db.query('SELECT 1 + 1 AS sum')
+			expect(result.rows[0].sum).toBe(2)
+		})
+
+		test('destroy_database + createDatabase recreate the schema from scratch without throwing', async () => {
+			//Uses its own throwaway 'database' instance instead of the shared 'db' the rest of this file's
+			//tests use: 'destroy_database'/'createDatabase' each open/close their own short-lived 'pg'
+			//Client rather than going through a connection pool. Running this drops and recreates
+			//'game'/'account'/'player' - safe here because no other test in this file relies on rows a
+			//previous test left behind (each creates whatever account/game/player rows it needs itself).
+			const { database } = require('./database/manageDatabase.js')
+			const freshDb = new database(false) //'false': skip auto-connecting a pool - only the Client-based methods below are used.
+			await freshDb.destroy_database()
+			await freshDb.createDatabase()
+			//The schema is back: a query through the original shared pool should succeed again.
+			const result = await db.query('SELECT 1 + 1 AS sum')
+			expect(result.rows[0].sum).toBe(2)
+		})
+	})
+})
+
+//These describes cover the client (React/Redux) side: the Redux slices' reducers (pure logic), the
+//pure lookup-table utils the game board/pieces are built from, and the 'api/*.js' wrappers that the
+//client actually calls into - the last of those against the very same live server the rest of this
+//file talks to, so the client and server sides are verified together rather than each in isolation.
+describe('Client redux slices', () => {
+	describe('authSlice (userConnect dispatched against the real live server)', () => {
+		const buildStore = () => configureStore({ reducer: { auth: authSlice.reducer } })
+
+		test('a successful connection marks the user authenticated', async () => {
+			const store = buildStore()
+			await store.dispatch(userConnect('clientAuthUser'))
+			expect(store.getState().auth).toMatchObject({
+				isAuthenticated: true,
+				user: 'clientAuthUser',
+				nameTooLong: false,
+				nameInvalidChars: false,
+			})
+		})
+
+		test('a name that is too long is rejected and flagged as such, without authenticating', async () => {
+			const store = buildStore()
+			await store.dispatch(userConnect('a'.repeat(25)))
+			const state = store.getState().auth
+			expect(state.isAuthenticated).toBe(false)
+			expect(state.nameTooLong).toBe(true)
+		})
+
+		test('a name with invalid characters is rejected and flagged as such, without authenticating', async () => {
+			const store = buildStore()
+			await store.dispatch(userConnect('bad name!'))
+			const state = store.getState().auth
+			expect(state.isAuthenticated).toBe(false)
+			expect(state.nameInvalidChars).toBe(true)
+		})
+	})
+
+	describe('gameTimeSlice (pure reducer)', () => {
+		const reducer = gameTimeSlice.reducer
+
+		test('startGame marks the game active and resets timing fields', () => {
+			const state = reducer(undefined, startGame())
+			expect(state.isGameActive).toBe(true)
+			expect(state.isGamePaused).toBe(false)
+			expect(state.endTime).toBeNull()
+			expect(typeof state.startTime).toBe('number')
+		})
+
+		test('pauseGame freezes currentTime, resumeGame accumulates the break into totalBreakTime', () => {
+			let state = reducer(undefined, startGame())
+			state = reducer(state, pauseGame())
+			expect(state.isGamePaused).toBe(true)
+			state = reducer(state, updateGameTime()) //A no-op while paused.
+			expect(state.currentTime).toBe(0)
+			state = reducer(state, resumeGame())
+			expect(state.isGamePaused).toBe(false)
+			expect(state.totalBreakTime).toBeGreaterThanOrEqual(0)
+			expect(state.currentBreakTime).toBe(0)
+		})
+
+		test('endGame stops the game and freezes currentTime', () => {
+			let state = reducer(undefined, startGame())
+			state = reducer(state, endGame())
+			expect(state.isGameActive).toBe(false)
+			expect(typeof state.endTime).toBe('number')
+		})
+	})
+
+	describe('gameplaySlice (pure reducer)', () => {
+		const reducer = gameplaySlice.reducer
+
+		test('setGrid / setScore / setPiecePosition update their own field only', () => {
+			let state = reducer(undefined, setGrid([[1]]))
+			state = reducer(state, setScore(99))
+			state = reducer(state, setPiecePosition({ x: 2, y: 3 }))
+			expect(state.grid).toEqual([[1]])
+			expect(state.score).toBe(99)
+			expect(state.piecePosition).toEqual({ x: 2, y: 3 })
+		})
+
+		test('resetGameplay resets the grid/piece but keeps the score; resetGameplayAndScore also resets the score', () => {
+			let state = reducer(undefined, setScore(99))
+			state = reducer(state, setPiecePosition({ x: 2, y: 3 }))
+
+			const afterReset = reducer(state, resetGameplay())
+			expect(afterReset.score).toBe(99) //Score untouched by 'resetGameplay'.
+			expect(afterReset.piecePosition).toEqual({ x: 4, y: 0 })
+
+			const afterResetAndScore = reducer(state, resetGameplayAndScore())
+			expect(afterResetAndScore.score).toBe(0)
+		})
+
+		test('setBox / resetBox / setOrientation / setNextOrientation / setIsInContact / setIsGameOver update their own field', () => {
+			let state = reducer(undefined, gameplaySlice.actions.setBox([[1]]))
+			expect(state.box).toEqual([[1]])
+			state = reducer(state, gameplaySlice.actions.setOrientation(90))
+			expect(state.orientation).toBe(90)
+			state = reducer(state, gameplaySlice.actions.setNextOrientation(180))
+			expect(state.nextOrientation).toBe(180)
+			state = reducer(state, gameplaySlice.actions.setIsInContact(true))
+			expect(state.isInContact).toBe(true)
+			state = reducer(state, gameplaySlice.actions.setIsGameOver(true))
+			expect(state.isGameOver).toBe(true)
+			state = reducer(state, gameplaySlice.actions.resetBox())
+			expect(state.box).toEqual(Array.from({ length: 10 }, () => Array(10).fill(0)))
+		})
+
+		test('resetGameplayNotBox resets the grid/piece but leaves the box and score untouched', () => {
+			let state = reducer(undefined, gameplaySlice.actions.setBox([[1]]))
+			state = reducer(state, setScore(5))
+			state = reducer(state, setPiecePosition({ x: 2, y: 3 }))
+			state = reducer(state, gameplaySlice.actions.resetGameplayNotBox())
+			expect(state.box).toEqual([[1]])
+			expect(state.score).toBe(5)
+			expect(state.piecePosition).toEqual({ x: 4, y: 0 })
+		})
+
+		test('EmitGridAndScore emits the current grid/score through whatever socket is in the store', () => {
+			const emit = jest.fn()
+			const store = makeStore({ socket: socketSlice.reducer, gameplay: gameplaySlice.reducer })
+			//Bypasses the real 'connect()'/socket.io round-trip: dispatching the thunk's own 'fulfilled'
+			//action type directly is enough to seed 'state.socket.socket' with our fake socket (see
+			//'socketSlice.js's extraReducers), since that's the only thing 'EmitGridAndScore' reads.
+			store.dispatch({ type: socketConnectThunk.fulfilled.type, payload: { emit } })
+			store.dispatch(setScore(7))
+			store.dispatch(EmitGridAndScore())
+			expect(emit).toHaveBeenCalledWith('updateScreenAndScore', expect.objectContaining({ score: 7 }))
+		})
+
+		test('resetGameplayAndEmit emits the reset (empty) grid/score and resets gameplay state', () => {
+			const emit = jest.fn()
+			const store = makeStore({ socket: socketSlice.reducer, gameplay: gameplaySlice.reducer })
+			store.dispatch({ type: socketConnectThunk.fulfilled.type, payload: { emit } })
+			store.dispatch(setScore(7))
+			store.dispatch(resetGameplayAndEmit())
+			expect(emit).toHaveBeenCalledWith('updateScreenAndScore', expect.objectContaining({ score: 0 }))
+			expect(store.getState().gameplay.score).toBe(0)
+		})
+	})
+
+	describe('opponentsSlice (pure reducer)', () => {
+		const reducer = opponentsSlice.reducer
+
+		test('setOpponentGridAndScore creates an opponent entry, then only patches the fields given', () => {
+			let state = reducer(undefined, setOpponentGridAndScore({ id: 'p1', grid: [[1]], score: 5 }))
+			expect(state.byId.p1).toEqual({ grid: [[1]], score: 5 })
+			state = reducer(state, setOpponentGridAndScore({ id: 'p1', score: 10 }))
+			expect(state.byId.p1).toEqual({ grid: [[1]], score: 10 }) //Grid untouched since it was omitted.
+		})
+
+		test('removeOpponent / resetAllOpponents clear opponents', () => {
+			let state = reducer(undefined, setOpponentGridAndScore({ id: 'p1', grid: [[1]], score: 5 }))
+			state = reducer(state, setOpponentGridAndScore({ id: 'p2', grid: [[2]], score: 6 }))
+			state = reducer(state, removeOpponent('p1'))
+			expect(state.byId.p1).toBeUndefined()
+			expect(state.byId.p2).toBeDefined()
+			state = reducer(state, resetAllOpponents())
+			expect(state.byId).toEqual({})
+		})
+	})
+
+	describe('pieceSlice (pure reducer)', () => {
+		const reducer = pieceSlice.reducer
+
+		test('refresh sets the current/next piece and their tetromino shapes from the given basket', () => {
+			const state = reducer(undefined, pieceSlice.actions.refresh(['I', 'O', 'T']))
+			expect(state.currentPiece).toBe('I')
+			expect(state.nextPiece).toBe('O')
+			expect(state.tetrominosCurrentPiece).toBe(TETROMINOS.I)
+			expect(state.tetrominosNextPiece).toBe(TETROMINOS.O)
+		})
+
+		test('incrementIndex advances the current/next piece', () => {
+			let state = reducer(undefined, pieceSlice.actions.refresh(['I', 'O', 'T']))
+			state = reducer(state, incrementIndex())
+			expect(state.currentPiece).toBe('O')
+			expect(state.nextPiece).toBe('T')
+		})
+
+		test('addPieces appends new baskets to the existing piece list', () => {
+			let state = reducer(undefined, pieceSlice.actions.refresh(['I']))
+			state = reducer(state, pieceSlice.actions.addPieces({ pieceBaskets: ['O', 'T'] }))
+			expect(state.listPieces).toEqual(['I', 'O', 'T'])
+		})
+
+		test('removeCurrentPiece clears the current piece', () => {
+			let state = reducer(undefined, pieceSlice.actions.refresh(['I']))
+			state = reducer(state, removeCurrentPiece())
+			expect(state.currentPiece).toBe('')
+			expect(state.tetrominosCurrentPiece).toBeNull()
+		})
+
+		test("joining a room (joinRoomThunk.fulfilled) seeds the piece list from the game's pieceBasket", () => {
+			const action = {
+				type: joinRoomThunk.fulfilled.type,
+				payload: { game: { pieceBasket: ['Z', 'S'] } },
+			}
+			const state = reducer(undefined, action)
+			expect(state.listPieces).toEqual(['Z', 'S'])
+			expect(state.currentPiece).toBe('Z')
+			expect(state.nextPiece).toBe('S')
+		})
+
+		test('incrementIndexFun advances the index and asks the server for a new piece basket once nearing the end of the list', () => {
+			const emit = jest.fn()
+			const store = makeStore({ piece: pieceSlice.reducer, socket: socketSlice.reducer })
+			store.dispatch({ type: socketConnectThunk.fulfilled.type, payload: { emit } })
+			store.dispatch(pieceSlice.actions.refresh(['I', 'O'])) //Only 2 pieces: index 0 is already 'length - 2'.
+			store.dispatch(incrementIndexFun())
+			expect(store.getState().piece.index).toBe(1)
+			expect(emit).toHaveBeenCalledWith('askNewPiece', undefined) //The thunk calls 'askNewPiece' with no roomId.
+		})
+	})
+
+	describe('roomSlice (pure reducer)', () => {
+		const reducer = roomSlice.reducer
+
+		test('setPlayers / setRoomId / setNewHost / gameStarted update their own field', () => {
+			let state = reducer(undefined, setRoomId('room-x'))
+			state = reducer(state, setPlayers(['a', 'b']))
+			state = reducer(state, setNewHost('a'))
+			state = reducer(state, gameStarted())
+			expect(state).toMatchObject({ id: 'room-x', players: ['a', 'b'], host: 'a', gameStarted: true })
+		})
+
+		test('playerJoined appends a player, playerLeft removes one', () => {
+			let state = reducer(undefined, setPlayers(['a']))
+			state = reducer(state, playerJoined('b'))
+			expect(state.players).toEqual(['a', 'b'])
+			state = reducer(state, playerLeft('a'))
+			expect(state.players).toEqual(['b'])
+		})
+
+		test('joinRoomThunk fulfilled/rejected populate room state or the error from the server', () => {
+			const fulfilled = {
+				type: joinRoomThunk.fulfilled.type,
+				payload: { game: { id: 'room-y', players: ['a'], host: 'a' } },
+			}
+			const stateOk = reducer(undefined, fulfilled)
+			expect(stateOk).toMatchObject({ id: 'room-y', players: ['a'], host: 'a', error: null })
+
+			const rejected = { type: joinRoomThunk.rejected.type, payload: 'Could not join the room' }
+			const stateErr = reducer(undefined, rejected)
+			expect(stateErr.error).toBe('Could not join the room')
+		})
+	})
+
+	describe('socketSlice (reducers, and socketConnectThunk against the real live server)', () => {
+		const reducer = socketSlice.reducer
+
+		test('socketConnected / socketConnectionFailed / socketDisconnected update status and error', () => {
+			let state = reducer(undefined, socketConnected())
+			expect(state).toMatchObject({ status: 'connected', error: null })
+			state = reducer(state, socketConnectionFailed('boom'))
+			expect(state).toMatchObject({ status: 'disconnected', error: 'boom' })
+			state = reducer(state, socketDisconnected('io client disconnect'))
+			expect(state).toMatchObject({ status: 'disconnected', error: 'io client disconnect' })
+		})
+
+		test('socketConnectThunk opens a real socket.io connection and the store reflects "connected"', (done) => {
+			const store = makeStore({ socket: socketSlice.reducer })
+			authenticate('clientSockThunk')
+				.then((token) => {
+					store.dispatch(socketConnectThunk(token))
+					const unsubscribe = store.subscribe(() => {
+						if (store.getState().socket.status === 'connected') {
+							unsubscribe()
+							store.getState().socket.socket.disconnect()
+							done()
+						}
+					})
+				})
+				.catch(done)
+		})
+	})
+})
+
+describe('Client utils (pure lookup tables the board/pieces are built from)', () => {
+	test('CELL_COLORS maps every cell value (including empty=0 and ghost=8) to a color string', () => {
+		expect(CELL_COLORS[0]).toBe('black')
+		expect(CELL_COLORS[8]).toBe('gray')
+		expect(Object.values(CELL_COLORS).every((color) => typeof color === 'string')).toBe(true)
+	})
+
+	test('PIECE_STARTING_ORIENTATIONS defines a starting rotation for all 7 tetromino types', () => {
+		expect(Object.keys(PIECE_STARTING_ORIENTATIONS).sort()).toEqual(['I', 'J', 'L', 'O', 'S', 'T', 'Z'])
+		expect(PIECE_STARTING_ORIENTATIONS.I).toBe(90) //The only piece that doesn't start flat.
+	})
+
+	test('PIECES_COLOR_CODES assigns a unique numeric code to each of the 7 pieces', () => {
+		const codes = Object.values(PIECES_COLOR_CODES)
+		expect(new Set(codes).size).toBe(7)
+	})
+
+	test('TETROMINOS defines all 4 rotations (0/90/180/270) for every piece, each made of exactly 4 cells', () => {
+		for (const piece of Object.keys(PIECES_COLOR_CODES)) {
+			expect(TETROMINOS).toHaveProperty(piece)
+			for (const rotation of [0, 90, 180, 270]) {
+				expect(TETROMINOS[piece][rotation]).toHaveLength(4)
+			}
+		}
+	})
+
+	test('WALL_KICK_OFFSETS defines 4 kick offsets per rotation for every piece except O (which never needs one)', () => {
+		expect(WALL_KICK_OFFSETS.O).toBeUndefined()
+		for (const piece of Object.keys(WALL_KICK_OFFSETS)) {
+			for (const rotation of [0, 90, 180, 270]) {
+				expect(WALL_KICK_OFFSETS[piece][rotation]).toHaveLength(4)
+			}
+		}
+	})
+})
+
+describe('Client API layer (src/client/api) against the real live server', () => {
+	test('http.api.connect() authenticates against the real server and returns a jwt', async () => {
+		const res = await httpApi.connect('httpApiUser')
+		expect(res.status).toBe(200)
+		expect(res.data).toHaveProperty('jwt')
+		expect(res.data).toHaveProperty('username', 'httpApiUser')
+	})
+
+	test('http.api.getJoinableGames() / getBestScores() / getUserScores() succeed against the real server', async () => {
+		const joinable = await httpApi.getJoinableGames()
+		expect(joinable.status).toBe(200)
+		expect(Array.isArray(joinable.games)).toBe(true)
+
+		const best = await httpApi.getBestScores()
+		expect(best.status).toBe(200)
+		expect(Array.isArray(best.scores)).toBe(true)
+
+		const userScores = await httpApi.getUserScores('httpApiUser')
+		expect(userScores.status).toBe(200)
+		expect(Array.isArray(userScores.scores)).toBe(true)
+	})
+
+	test('socket.api connect()/joinRoom()/leaveRoom() drive a real socket connection through the client wrappers', (done) => {
+		const roomId = 'room-capi'
+		const username = usernameFor(roomId, 'CA')
+
+		authenticate(username)
+			.then((token) => {
+				const socket = socketApiClient.connect(token)
+				socket.on('connect_error', done)
+				socket.on('connect', () => {
+					socketApiClient
+						.joinRoom(username, socket, roomId)
+						.then((data) => {
+							expect(data.game).toHaveProperty('id', roomId)
+							expect(data.game.players.map((p) => p.username)).toContain(username)
+							socketApiClient.leaveRoom(socket)
+							socket.disconnect()
+							done()
+						})
+						.catch(done)
+				})
+			})
+			.catch(done)
+	})
+
+	test('disconnect() closes a real socket, and is a no-op when given a falsy socket', (done) => {
+		expect(() => socketApiClient.disconnect(null)).not.toThrow() //Falsy branch: nothing to disconnect.
+
+		authenticate(usernameFor('room-sadc', 'X'))
+			.then((token) => {
+				const socket = socketApiClient.connect(token)
+				socket.on('connect_error', done)
+				socket.on('connect', () => {
+					socket.on('disconnect', () => done())
+					socketApiClient.disconnect(socket)
+				})
+			})
+			.catch(done)
+	})
+
+	//The rest of 'socket.api.js' is made of thin 'socket.emit'/'socket.on' wrappers around the same
+	//events already exercised (via raw socket calls) in the 'Socket.IO flows' describe above. These two
+	//tests drive the same real server through the client wrapper functions themselves instead, so that
+	//code path (the one the actual React app calls into) is verified too.
+	test('join-time client listeners: listenPlayerJoined, listenOtherScreenAndScore, listenLinesCleared, listenStartGame and listenNextPiece all fire for real server broadcasts', (done) => {
+		const roomId = 'room-sockapi-1'
+		const userA = usernameFor(roomId, 'A')
+		const userB = usernameFor(roomId, 'B')
+		let socketA, socketB
+
+		const cleanup = () => {
+			if (socketA && socketA.connected) socketA.disconnect()
+			if (socketB && socketB.connected) socketB.disconnect()
+		}
+		const onErr = (err) => {
+			cleanup()
+			done(err)
+		}
+
+		//A connects and joins (creating the room, becoming host) *before* B even connects, so which one
+		//ends up host is deterministic - both joining concurrently would race, since the server decides
+		//who created the room based on whichever socket's 'joinRoom' message it happens to process first.
+		Promise.all([authenticate(userA), authenticate(userB)])
+			.then(([tokenA, tokenB]) => {
+				socketA = socketApiClient.connect(tokenA)
+				socketA.on('connect_error', onErr)
+
+				const onPlayerJoinedA = jest.fn() //Registered before A joins: the server broadcasts 'playerJoined' to the whole room, including the joiner.
+				socketApiClient.listenPlayerJoined(socketA, onPlayerJoinedA)
+
+				socketA.on('connect', () => {
+					socketApiClient
+						.joinRoom(userA, socketA, roomId)
+						.then(() => {
+							socketB = socketApiClient.connect(tokenB)
+							socketB.on('connect_error', onErr)
+							socketB.on('connect', () => {
+								socketApiClient
+									.joinRoom(userB, socketB, roomId)
+									.then(() => {
+										const onScreenUpdate = jest.fn()
+										const onLinesCleared = jest.fn()
+										const onGameStarted = jest.fn()
+										const onNextPiece = jest.fn()
+										socketApiClient.listenOtherScreenAndScore(socketB, onScreenUpdate)
+										socketApiClient.listenLinesCleared(socketB, onLinesCleared)
+										socketApiClient.listenStartGame(socketB, onGameStarted)
+										socketApiClient.listenNextPiece(socketB, onNextPiece)
+
+										socketApiClient.startGame(socketA, roomId) //A is host (joined first).
+										socketApiClient.updateScreenAndScore(socketA, [[0]], 5)
+										socketApiClient.sendLinesCleared(socketA, 2) //Server subtracts 1, so this still broadcasts (2 - 1 > 0).
+										socketApiClient.askNewPiece(socketA)
+										socketApiClient.requestPieceBasket(socketA) //No matching server handler exists - only exercised for its own statement coverage.
+
+										setTimeout(() => {
+											try {
+												expect(onPlayerJoinedA).toHaveBeenCalled()
+												expect(onGameStarted).toHaveBeenCalled()
+												expect(onScreenUpdate).toHaveBeenCalled()
+												expect(onLinesCleared).toHaveBeenCalled()
+												expect(onNextPiece).toHaveBeenCalled()
+												cleanup()
+												done()
+											} catch (err) {
+												onErr(err)
+											}
+										}, 500)
+									})
+									.catch(onErr)
+							})
+						})
+						.catch(onErr)
+				})
+			})
+			.catch(onErr)
+	})
+
+	test('end-of-game client listeners: listenPlayerLeft, listenNewHost, updateScore and listenNextGame all fire for real server broadcasts', (done) => {
+		const roomId = 'room-sockapi-2'
+		const userA = usernameFor(roomId, 'A')
+		const userB = usernameFor(roomId, 'B')
+		let socketA, socketB
+
+		const cleanup = () => {
+			if (socketA && socketA.connected) socketA.disconnect()
+			if (socketB && socketB.connected) socketB.disconnect()
+		}
+		const onErr = (err) => {
+			cleanup()
+			done(err)
+		}
+
+		//Same reasoning as the previous test: A joins (and thus becomes host) before B even connects, so
+		//"A is host" below is guaranteed rather than a race between the two sockets' 'joinRoom' messages.
+		Promise.all([authenticate(userA), authenticate(userB)])
+			.then(([tokenA, tokenB]) => {
+				socketA = socketApiClient.connect(tokenA)
+				socketA.on('connect_error', onErr)
+
+				socketA.on('connect', () => {
+					socketApiClient
+						.joinRoom(userA, socketA, roomId)
+						.then(() => {
+							socketB = socketApiClient.connect(tokenB)
+							socketB.on('connect_error', onErr)
+							socketB.on('connect', () => {
+								socketApiClient
+									.joinRoom(userB, socketB, roomId)
+									.then(() => {
+										const onPlayerLeft = jest.fn()
+										const onNewHost = jest.fn()
+										const onScoreUpdate = jest.fn()
+										const onNextGame = jest.fn()
+										socketApiClient.listenPlayerLeft(socketB, onPlayerLeft)
+										socketApiClient.listenNewHost(socketB, onNewHost)
+										socketApiClient.updateScore(socketB, onScoreUpdate)
+										socketApiClient.listenNextGame(socketB, onNextGame)
+
+										//A both loses (triggers 'updateScore', since that makes every player have
+										//lost) and then leaves as host (triggers 'playerLeft' + 'newHost', since B
+										//is promoted). A also sends B the 'nextGame' payload, covering 'listenNextGame'.
+										socketApiClient.loseGame(socketA)
+										socketB.emit('loseGame') //B also has to lose for the server to consider "all players lost".
+										socketApiClient.sendNextGame(socketA, roomId, { winner: userB })
+										socketApiClient.leaveRoom(socketA)
+
+										setTimeout(() => {
+											try {
+												expect(onScoreUpdate).toHaveBeenCalled()
+												expect(onNextGame).toHaveBeenCalledWith({ winner: userB })
+												expect(onPlayerLeft).toHaveBeenCalled()
+												expect(onNewHost).toHaveBeenCalled()
+												cleanup()
+												done()
+											} catch (err) {
+												onErr(err)
+											}
+										}, 500)
+									})
+									.catch(onErr)
+							})
+						})
+						.catch(onErr)
+				})
+			})
+			.catch(onErr)
+	})
 })

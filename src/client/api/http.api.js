@@ -11,7 +11,10 @@ export const connect = async (name) => {
 			data: response.data,
 		}
 	} catch (err) {
-		return err
+		if (err.response) {
+			return { status: err.response.status, data: err.response.data }
+		}
+		throw err
 	}
 }
 

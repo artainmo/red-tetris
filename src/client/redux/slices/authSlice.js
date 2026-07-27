@@ -44,12 +44,11 @@ const authSlice = createSlice({
 			})
 			.addCase(userConnect.rejected, (state, action) => {
 				console.log(action.payload)
-				if (action.payload === "Player's username is too long") {
+				const message = action.payload && action.payload.message
+				if (message === "Player's username is too long") {
 					state.nameTooLong = true
 					state.nameInvalidChars = false
-				} else if (
-					action.payload === "Player's username contains special characters"
-				) {
+				} else if (message === "Player's username contains special characters") {
 					state.nameTooLong = false
 					state.nameInvalidChars = true
 				}

@@ -16,9 +16,7 @@ module.exports = {
 				exclude: /node_modules/,
 				use: {
 					loader: 'babel-loader',
-					options: {
-						presets: ['@babel/preset-env', '@babel/preset-react'],
-					},
+					//Presets now come from the shared 'babel.config.js' at the repo root (also used by Jest).
 				},
 			},
 			{
