@@ -4,11 +4,11 @@ const { Client, Pool } = require('pg')
 class database {
 	constructor(connect = true) {
 		this._credentials = {
-			host: 'localhost',
-			port: '5432',
-			user: 'postgres',
-			password: 'admin',
-			database: 'red-tetris',
+			host: process.env.DB_HOST || 'localhost',
+			port: process.env.DB_PORT || '5432',
+			user: process.env.DB_USER || 'postgres',
+			password: process.env.DB_PASSWORD || 'admin',
+			database: process.env.DB_NAME || 'red-tetris',
 		}
 		if (connect) {
 			this.connectToDatabase()
