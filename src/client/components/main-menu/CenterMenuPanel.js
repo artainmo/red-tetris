@@ -70,7 +70,7 @@ const CenterMenuPanel = () => {
 						<input
 							style={inputStyle}
 							type="text"
-							placeholder="Enter game name to create"
+							placeholder="Game name"
 							value={localName}
 							onChange={(e) => {
 								setLocalName(e.target.value)
