@@ -14,8 +14,6 @@ This project was created on macos, but Docker makes it possible to also run it o
 
 ### Run with Docker
 
-This is the recommended way to run the app on Linux, and also works on macos. It runs the app and a PostgreSQL database together via docker compose, so the [postgres app](https://postgresapp.com) is not needed.
-
 As a prerequisite, create a `.env` file at the root of the project containing the database credentials, for example:
 ```
 POSTGRES_USER=postgres
@@ -27,6 +25,7 @@ Launch the app (builds the images and starts the containers in the background):
 ```
 make docker_up
 ```
+Access the app here: http://localhost:3000/.
 
 Stop the app:
 ```
