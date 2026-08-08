@@ -6,7 +6,7 @@ import {
 	stackedContainerStyle,
 	smallWhiteStyle,
 	redStyle,
-	greenStyle,
+	yellowStyle,
 } from '../../style/containersStyle'
 import { StatusGame } from '../../utils/statusGame'
 
@@ -42,7 +42,9 @@ const GameStatsPanel = () => {
 				)}
 				{isGameOver == StatusGame.WINNER && (
 					<div style={stackedContainerStyle}>
-						<p style={greenStyle}>YOU WON!</p>
+						<p style={yellowStyle}>
+							The game ends because you are the last remaining player!
+						</p>
 					</div>
 				)}
 			</div>

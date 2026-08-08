@@ -1121,8 +1121,9 @@ describe('Server classes (Game, Player, User, Utils, database)', () => {
 			const user = new User()
 			const username = 'unituserconnect'
 			await expect(user.connect(db, username)).resolves.toBeUndefined()
-			//A second 'connect' hits the DB's unique-constraint-violation branch (code '23505'), which
-			//'tryAccountCreation' swallows instead of throwing - i.e. logging back in should be a no-op.
+			//A second 'connect' hits the 'ON CONFLICT (username) DO NOTHING' branch in
+			//'tryAccountCreation' (the username already exists), which resolves normally instead of
+			//throwing - i.e. logging back in should be a no-op.
 			await expect(user.connect(db, username)).resolves.toBeUndefined()
 		})
 	})
