@@ -790,6 +790,64 @@ describe('Socket.IO flows', () => {
 			.catch(done)
 	})
 
+	test("when every other player leaves, the remaining player is declared the winner via 'updateScore'", (done) => {
+		const roomId = 'room-leave-winner' //Name of the room for this test.
+		const userA = usernameFor(roomId, 'A')
+		const userB = usernameFor(roomId, 'B')
+
+		//Prevents socket leaks.
+		const cleanup = () => {
+			if (socketA && socketA.connected) socketA.disconnect()
+			if (socketB && socketB.connected) socketB.disconnect()
+		}
+
+		Promise.all([authenticate(userA), authenticate(userB)])
+			.then(([tokenA, tokenB]) => {
+				//Create two socket connections for the two players.
+				socketA = ioClient(BASE_URL, { ...opts, auth: { token: tokenA } })
+				socketB = ioClient(BASE_URL, { ...opts, auth: { token: tokenB } })
+
+				//If either socket connection fails, the test fails.
+				socketA.on('connect_error', (err) => done(err))
+				socketB.on('connect_error', (err) => done(err))
+
+				let ready = 0 //Track how many players joined the room.
+				//Once socket A connected we emit a request to join the room.
+				socketA.on('connect', () => {
+					socketA.emit('joinRoom', { roomId, username: userA }, () => {
+						ready += 1
+						if (ready === 2) start() //Once both A and B joined, B leaves so A should be declared the winner.
+					})
+				})
+				socketB.on('connect', () => {
+					socketB.emit('joinRoom', { roomId, username: userB }, () => {
+						ready += 1
+						if (ready === 2) start()
+					})
+				})
+
+				//Player A listens for the 'updateScore' broadcast that should be received after B leaves.
+				socketA.on('updateScore', (data) => {
+					try {
+						expect(data).toHaveProperty('username', userA)
+						expect(data).toHaveProperty('isGameOver', true)
+						cleanup()
+						done()
+					} catch (err) {
+						cleanup()
+						done(err)
+					}
+				})
+
+				//Player B leaves the room, which should leave A alone and thus the winner.
+				function start() {
+					socketB.emit('leaveRoom')
+					setTimeout(() => {}, 1000) //We use timeout to fail the test if A doesn't receive the broadcast.
+				}
+			})
+			.catch(done)
+	})
+
 	test("'askNewPiece' is broadcasted to all room members", (done) => {
 		const roomId = 'room-nextpiece' //Name of the room for this test.
 		const userA = usernameFor(roomId, 'A')

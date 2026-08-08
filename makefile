@@ -37,9 +37,8 @@ coverage: refresh_database
 #Coverage indicates how much of the code has been tested.
 
 docker_up: check_env
-	docker compose up --build -d
+	docker compose up --build
 #'--build' rebuilds the app image so it picks up code changes instead of reusing a stale cached image.
-#'-d' runs the containers detached (in the background), freeing up the terminal.
 
 docker_down:
 	docker compose down

@@ -126,6 +126,7 @@ const leaveRoom = async (socket) => {
 		return
 	}
 	const host = game.host
+	const playersBeforeLeave = game.players.length
 	game.removePlayer(socket.userId)
 	if (host !== game.host) {
 		socket.broadcast
@@ -136,8 +137,16 @@ const leaveRoom = async (socket) => {
 	io.to(game.id).emit('playerLeft', { player: socket.userId, room: game.id })
 	socket.leave(game.id)
 	console.log(`players remaining in game ${game.id}: ${game.players.length}`)
-	if (game.players.length === 1) {
-		console.log(`Game ${game.id} has only one player remaining`)
+	if (game.players.length === 1 && game.onePlayerRemain()) {
+		const remainingPlayer = game.getRemainingPlayer()
+		console.log(
+			`Player ${remainingPlayer.username} is the winner of game ${game.id} because every other player left`
+		)
+		io.to(game.id).emit('updateScore', {
+			username: remainingPlayer.username,
+			score: remainingPlayer.score + 100 * playersBeforeLeave,
+			isGameOver: true,
+		})
 	}
 	if (game.players.length === 0) {
 		console.log(`Game ${game.id} deleted as it became empty`)

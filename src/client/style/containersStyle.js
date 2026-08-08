@@ -9,6 +9,14 @@ export const redStyle = {
 	padding: 0,
 }
 
+export const greenStyle = {
+	color: colors.sovietGreen,
+	...redOctoberRegular,
+	fontSize: '72px',
+	margin: 0,
+	padding: 0,
+}
+
 export const whiteStyle = {
 	color: colors.white,
 	...redOctoberRegular,
