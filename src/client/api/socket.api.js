@@ -115,8 +115,8 @@ export const updateScore = (socket, onScoreUpdate) => {
 	})
 }
 
-export const loseGame = (socket) => {
-	socket.emit('loseGame')
+export const looseGame = (socket) => {
+	socket.emit('looseGame')
 }
 
 export const sendNextGame = (socket, roomId, nextGame) => {

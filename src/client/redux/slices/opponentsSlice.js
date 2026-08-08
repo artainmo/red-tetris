@@ -11,11 +11,12 @@ const opponentsSlice = createSlice({
 			delete state.byId[id]
 		},
 		setOpponentGridAndScore: (state, action) => {
-			const { id, grid, score } = action.payload
+			const { id, grid, score, isGameOver } = action.payload
 			if (!state.byId[id]) {
 				state.byId[id] = {
 					grid: grid ?? Array.from({ length: 20 }, () => Array(10).fill(0)),
 					score: score ?? 0,
+					isGameOver: isGameOver ?? false,
 				}
 			} else {
 				if (grid !== undefined) {
@@ -23,6 +24,9 @@ const opponentsSlice = createSlice({
 				}
 				if (score !== undefined) {
 					state.byId[id].score = score
+				}
+				if (isGameOver !== undefined) {
+					state.byId[id].isGameOver = isGameOver
 				}
 			}
 		},

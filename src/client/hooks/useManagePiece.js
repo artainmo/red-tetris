@@ -14,7 +14,8 @@ import {
 } from '../redux/slices/gameplaySlice'
 import { incrementIndexFun } from '../redux/slices/pieceSlice'
 import { pauseGame } from '../redux/slices/gameTimeSlice'
-import { loseGame } from '../api/socket.api'
+import { looseGame } from '../api/socket.api'
+import { StatusGame } from '../utils/statusGame'
 
 const useManagePiece = (width, height) => {
 	const dispatch = useDispatch()
@@ -46,13 +47,13 @@ const useManagePiece = (width, height) => {
 			return grid[newY] && grid[newY][newX] !== 0
 		})
 
-		if (gameOver && !isGameOver) {
+		if (gameOver && isGameOver === StatusGame.PLAYING) {
 			console.log('dispatching game over')
 
-			dispatch(setIsGameOver(true))
+			dispatch(setIsGameOver(StatusGame.GAME_OVER))
 
 			dispatch(pauseGame())
-			loseGame(socket)
+			looseGame(socket)
 			return false
 		}
 		return true
@@ -61,7 +62,7 @@ const useManagePiece = (width, height) => {
 	const spawnNewPiece = (both) => {
 		console.log('Spawning new piece, both:', both)
 		console.log('Active piece type:', activePieceType)
-		if (isGameOver) {
+		if (isGameOver !== StatusGame.PLAYING) {
 			return
 		}
 		if (both) {
@@ -384,4 +385,4 @@ const useManagePiece = (width, height) => {
 	}
 }
 
-export default useManagePiece
+export { useManagePiece }

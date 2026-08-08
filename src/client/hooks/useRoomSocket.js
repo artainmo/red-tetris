@@ -13,7 +13,9 @@ import {
 	removeOpponent,
 	setOpponentGridAndScore,
 } from '../redux/slices/opponentsSlice'
-import { setScore } from '../redux/slices/gameplaySlice'
+import { StatusGame } from '../utils/statusGame'
+import { setScore, setIsGameOver } from '../redux/slices/gameplaySlice'
+import { pauseGame } from '../redux/slices/gameTimeSlice'
 
 const useRoomSocket = () => {
 	const socket = useSelector((state) => state.socket?.socket)
@@ -84,15 +86,24 @@ const useGameSocket = () => {
 		}
 
 		const onScoreUpdate = (data) => {
-			console.log(`Score update for ${data.username}: ${data.score}`)
+			console.log(
+				`Score update for ${data.username}: ${data.score} + ${data.isWinner}`
+			)
 			if (data.username && data.score !== undefined) {
 				if (data.username === username) {
 					dispatch(setScore(data.score))
+					dispatch(pauseGame())
+					if (data.isGameOver) {
+						dispatch(setIsGameOver(StatusGame.WINNER))
+					} else {
+						dispatch(setIsGameOver(StatusGame.GAME_OVER))
+					}
 				} else {
 					dispatch(
 						setOpponentGridAndScore({
 							id: data.username,
 							score: data.score,
+							isGameOver: data.isGameOver || false,
 						})
 					)
 				}

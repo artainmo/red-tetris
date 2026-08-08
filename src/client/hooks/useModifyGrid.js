@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import useManagePiece from './useManagePiece'
+import { useManagePiece } from './useManagePiece'
 import useManageLines from './useManageLines'
 import { useSelector, useDispatch } from 'react-redux'
 import { pauseGame, resumeGame } from '../redux/slices/gameTimeSlice'
