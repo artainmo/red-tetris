@@ -301,6 +301,7 @@ io.on('connection', async (socket) => {
 		}
 		console.log(`Player ${socket.userId} lost the game in room ${roomId}`)
 		game.playerLost(socket.userId)
+		socket.broadcast.to(roomId).emit('playerLost', { player: socket.userId })
 		io.to(roomId).emit('updateScore', {
 			username: socket.userId,
 			score:

@@ -1385,9 +1385,9 @@ describe('Client redux slices', () => {
 				undefined,
 				setOpponentGridAndScore({ id: 'p1', grid: [[1]], score: 5 })
 			)
-			expect(state.byId.p1).toEqual({ grid: [[1]], score: 5 })
+			expect(state.byId.p1).toEqual({ grid: [[1]], score: 5, isGameOver: false })
 			state = reducer(state, setOpponentGridAndScore({ id: 'p1', score: 10 }))
-			expect(state.byId.p1).toEqual({ grid: [[1]], score: 10 }) //Grid untouched since it was omitted.
+			expect(state.byId.p1).toEqual({ grid: [[1]], score: 10, isGameOver: false }) //Grid untouched since it was omitted.
 		})
 
 		test('removeOpponent / resetAllOpponents clear opponents', () => {
