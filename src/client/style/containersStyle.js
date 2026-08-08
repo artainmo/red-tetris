@@ -84,12 +84,11 @@ export const cardContainerStyle = {
 }
 
 export const titleContainerStyle = {
-	height: '100%',
 	display: 'flex',
 	justifyContent: 'center',
 	alignItems: 'center',
 	flexDirection: 'column',
-	margin: 'auto',
+	margin: 0,
 }
 
 export const statsContainerStyle = {
@@ -142,7 +141,7 @@ export const buttonContainerStyle = {
 	width: '100%',
 	height: '40px',
 	display: 'flex',
-	justifyContent: 'flex-end',
+	justifyContent: 'center',
 	alignItems: 'center',
 }
 
