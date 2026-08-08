@@ -6,7 +6,9 @@ import { listenStartGame } from '../api/socket.api'
 import {
 	resetGameplay,
 	resetGameplayNotBox,
+	setScore,
 } from '../redux/slices/gameplaySlice'
+import pieceSlice from '../redux/slices/pieceSlice'
 
 const useManageTime = () => {
 	const dispatch = useDispatch()
@@ -36,8 +38,13 @@ const useManageTime = () => {
 
 	useEffect(() => {
 		console.log('Setting up listenStartGame in useManageTime')
-		const onGameStarted = () => {
+		const onGameStarted = (data) => {
 			dispatch(resetGameplayNotBox())
+			dispatch(setScore(0))
+			//Replaces the piece list with the fresh basket the server just (re)generated (see
+			//'restartGame' server-side), instead of replaying whatever list this client held onto
+			//from before the (re)start.
+			dispatch(pieceSlice.actions.refresh(data?.pieceBasket || []))
 			dispatch(startGame())
 		}
 
@@ -45,7 +52,7 @@ const useManageTime = () => {
 
 		return () => {
 			if (socket) {
-				socket.off('gameStarted', onGameStarted)
+				socket.off('startGame', onGameStarted)
 			}
 		}
 	}, [dispatch, socket])

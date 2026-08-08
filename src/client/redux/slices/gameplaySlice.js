@@ -5,9 +5,12 @@ import { updateScreenAndScore } from '../../api/socket.api'
 export const EmitGridAndScore = () => (dispatch, getState) => {
 	const state = getState()
 	const socket = state.socket.socket
-	const score = state.gameplay.score
 	const grid = state.gameplay.grid
+	//Score = amount of pieces received so far (piece.index is 0-based) times 10.
+	const piecesReceived = state.piece.index + 1
+	const score = piecesReceived * 10
 
+	dispatch(setScore(score))
 	if (socket && typeof socket.emit === 'function') {
 		updateScreenAndScore(socket, grid, score)
 	}

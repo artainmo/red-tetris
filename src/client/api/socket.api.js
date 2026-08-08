@@ -70,9 +70,9 @@ export const listenLinesCleared = (socket, onLinesCleared) => {
 }
 
 export const listenStartGame = (socket, onGameStarted) => {
-	socket.on('startGame', () => {
+	socket.on('startGame', (data) => {
 		console.log('Received gameStarted event from socket')
-		onGameStarted()
+		onGameStarted(data)
 	})
 }
 

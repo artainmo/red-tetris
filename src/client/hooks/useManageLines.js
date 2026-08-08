@@ -1,13 +1,12 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { setGrid, setScore } from '../redux/slices/gameplaySlice'
+import { setGrid } from '../redux/slices/gameplaySlice'
 import { sendLinesCleared } from '../api/socket.api'
 
 const useManageLines = (width, height) => {
 	const dispatch = useDispatch()
 
 	const grid = useSelector((state) => state.gameplay.grid)
-	const score = useSelector((state) => state.gameplay.score)
 	const username = useSelector((state) => state.auth.user)
 	const socket = useSelector((state) => state.socket?.socket)
 
@@ -28,12 +27,10 @@ const useManageLines = (width, height) => {
 			}
 
 			dispatch(setGrid(updatedGrid))
-			const currScore = score + clearedLines * 10
-			dispatch(setScore(currScore))
 		}
 
 		return clearedLines
-	}, [dispatch, grid, width, height, score, socket, username])
+	}, [dispatch, grid, width, height, socket, username])
 
 	return { clearFullLines }
 }

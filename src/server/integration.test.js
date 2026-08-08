@@ -316,8 +316,9 @@ describe('Socket.IO flows', () => {
 			.catch(done)
 	})
 
-	//This test verifies that when one player emits 'startGame', everyone in the room receives the broadcast.
-	test("'startGame' is broadcast to room", (done) => {
+	//This test verifies that when one player emits 'startGame', everyone in the room receives the broadcast,
+	//along with the fresh piece basket 'restartGame' just generated server-side.
+	test("'startGame' is broadcast to room, along with a fresh piece basket", (done) => {
 		const roomId = 'room-test-start' //The room player A and B will join.
 		const userA = usernameFor(roomId, 'A')
 		const userB = usernameFor(roomId, 'B')
@@ -364,7 +365,9 @@ describe('Socket.IO flows', () => {
 				})
 
 				//Player B listens for the 'startGame' broadcast.
-				socketB.on('startGame', () => {
+				socketB.on('startGame', (data) => {
+					expect(Array.isArray(data.pieceBasket)).toBe(true)
+					expect(data.pieceBasket.length).toBeGreaterThan(0)
 					receivedStart = true
 					tryFinish() //This function should now confirm the test succeeded.
 				})
@@ -1336,11 +1339,12 @@ describe('Client redux slices', () => {
 			expect(state.piecePosition).toEqual({ x: 4, y: 0 })
 		})
 
-		test('EmitGridAndScore emits the current grid/score through whatever socket is in the store', () => {
+		test('EmitGridAndScore emits the current grid, and a score equal to the amount of pieces received (piece.index + 1) times 10', () => {
 			const emit = jest.fn()
 			const store = makeStore({
 				socket: socketSlice.reducer,
 				gameplay: gameplaySlice.reducer,
+				piece: pieceSlice.reducer,
 			})
 			//Bypasses the real 'connect()'/socket.io round-trip: dispatching the thunk's own 'fulfilled'
 			//action type directly is enough to seed 'state.socket.socket' with our fake socket (see
@@ -1349,12 +1353,14 @@ describe('Client redux slices', () => {
 				type: socketConnectThunk.fulfilled.type,
 				payload: { emit },
 			})
-			store.dispatch(setScore(7))
+			store.dispatch(pieceSlice.actions.refresh(['I', 'O', 'T']))
+			store.dispatch(incrementIndex()) //Player has now received 2 pieces (index 1).
 			store.dispatch(EmitGridAndScore())
 			expect(emit).toHaveBeenCalledWith(
 				'updateScreenAndScore',
-				expect.objectContaining({ score: 7 })
+				expect.objectContaining({ score: 20 })
 			)
+			expect(store.getState().gameplay.score).toBe(20) //Also mirrored into 'gameplay.score'.
 		})
 
 		test('resetGameplayAndEmit emits the reset (empty) grid/score and resets gameplay state', () => {

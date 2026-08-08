@@ -126,7 +126,6 @@ const leaveRoom = async (socket) => {
 		return
 	}
 	const host = game.host
-	const playersBeforeLeave = game.players.length
 	game.removePlayer(socket.userId)
 	if (host !== game.host) {
 		socket.broadcast
@@ -144,7 +143,7 @@ const leaveRoom = async (socket) => {
 		)
 		io.to(game.id).emit('updateScore', {
 			username: remainingPlayer.username,
-			score: remainingPlayer.score + 100 * playersBeforeLeave,
+			score: remainingPlayer.score,
 			isGameOver: true,
 		})
 	}
@@ -272,7 +271,10 @@ io.on('connection', async (socket) => {
 		game.locked = true
 		console.log(`Starting game in room ${roomId}`)
 		game.restartGame()
-		io.to(roomId).emit('startGame')
+		//'restartGame' just replaced 'game.piece' with a fresh basket - send it along so every client
+		//(re)starts from that exact same authoritative sequence instead of whatever piece list they
+		//individually held onto from before the (re)start.
+		io.to(roomId).emit('startGame', { pieceBasket: game.piece.pieceBasket })
 	})
 
 	socket.on('gameOver', async () => {
@@ -304,9 +306,7 @@ io.on('connection', async (socket) => {
 		socket.broadcast.to(roomId).emit('playerLost', { player: socket.userId })
 		io.to(roomId).emit('updateScore', {
 			username: socket.userId,
-			score:
-				game.players.find((p) => p.username === socket.userId).score +
-				50 * game.players.length,
+			score: game.players.find((p) => p.username === socket.userId).score,
 			isGameOver: false,
 		})
 		if (game.players.length > 1 && game.onePlayerRemain()) {
@@ -316,7 +316,7 @@ io.on('connection', async (socket) => {
 			)
 			io.to(roomId).emit('updateScore', {
 				username: remainingPlayer.username,
-				score: remainingPlayer.score + 100 * game.players.length,
+				score: remainingPlayer.score,
 				isGameOver: true,
 			})
 		}
