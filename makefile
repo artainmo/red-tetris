@@ -1,5 +1,9 @@
-all:
-	npm install && npm run build && npm run start
+all: docker_up
+
+clean:
+	docker compose down -v
+
+re: clean all
 
 create_database:
 	node src/server/database/manageDatabase.js create

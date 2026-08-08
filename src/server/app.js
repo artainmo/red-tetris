@@ -136,6 +136,9 @@ const leaveRoom = async (socket) => {
 	io.to(game.id).emit('playerLeft', { player: socket.userId, room: game.id })
 	socket.leave(game.id)
 	console.log(`players remaining in game ${game.id}: ${game.players.length}`)
+	if (game.players.length === 1) {
+		console.log(`Game ${game.id} has only one player remaining`)
+	}
 	if (game.players.length === 0) {
 		console.log(`Game ${game.id} deleted as it became empty`)
 		await game.setDB(db)
@@ -259,6 +262,7 @@ io.on('connection', async (socket) => {
 		}
 		game.locked = true
 		console.log(`Starting game in room ${roomId}`)
+		game.restartGame()
 		io.to(roomId).emit('startGame')
 	})
 
@@ -277,7 +281,7 @@ io.on('connection', async (socket) => {
 			.emit('playerGameOver', { player: socket.userId })
 	})
 
-	socket.on('loseGame', async () => {
+	socket.on('looseGame', async () => {
 		const roomId = socketToGame.get(socket.id)
 		if (!roomId) {
 			return
@@ -288,16 +292,24 @@ io.on('connection', async (socket) => {
 		}
 		console.log(`Player ${socket.userId} lost the game in room ${roomId}`)
 		game.playerLost(socket.userId)
-		if (game.allPlayersLost()) {
-			console.log(`All players lost in game ${roomId}. Ending game.`)
+		io.to(roomId).emit('updateScore', {
+			username: socket.userId,
+			score:
+				game.players.find((p) => p.username === socket.userId).score +
+				50 * game.players.length,
+			isGameOver: false,
+		})
+		if (game.players.length > 1 && game.onePlayerRemain()) {
+			const remainingPlayer = game.getRemainingPlayer()
+			console.log(
+				`Player ${remainingPlayer.username} is the winner of game ${roomId}`
+			)
 			io.to(roomId).emit('updateScore', {
-				username: socket.userId,
-				score:
-					game.players.find((p) => p.username === socket.userId).score +
-					50 * game.players.length,
+				username: remainingPlayer.username,
+				score: remainingPlayer.score + 100 * game.players.length,
+				isGameOver: true,
 			})
 		}
-		socket.broadcast.to(roomId).emit('playerLost', { player: socket.userId })
 	})
 
 	socket.on('updateScreenAndScore', (data) => {
@@ -323,6 +335,7 @@ io.on('connection', async (socket) => {
 			player: socket.userId,
 			structure: data.structure,
 			score: data.score,
+			isGameOver: data.isGameOver || false,
 		})
 	})
 
@@ -365,6 +378,7 @@ io.on('connection', async (socket) => {
 			console.log('Only the host can restart the game')
 			return
 		}
+		game.restartGame()
 		console.log(`Restarting game in room ${roomId}`)
 		io.to(roomId).emit('restartGame')
 	})

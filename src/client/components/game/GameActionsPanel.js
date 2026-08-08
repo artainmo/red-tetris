@@ -19,6 +19,7 @@ import { pieceContainerStyle } from '../../style/containerStyle'
 import { redOctoberBaseStyle } from '../../style/fonts'
 import { colors } from '../../style/colors'
 import pieceSlice, { removeCurrentPiece } from '../../redux/slices/pieceSlice'
+import { StatusGame } from '../../utils/statusGame'
 
 const GameActionsPanel = () => {
 	const dispatch = useDispatch()
@@ -62,7 +63,10 @@ const GameActionsPanel = () => {
 		gridTemplateColumns: `repeat(${BOX_WIDTH}, 1fr)`,
 		boxSizing: 'border-box',
 		border: '1rem solid white',
-		filter: isGameOver ? 'grayscale(100%) brightness(0.7)' : 'none',
+		filter:
+			isGameOver !== StatusGame.PLAYING
+				? 'grayscale(100%) brightness(0.7)'
+				: 'none',
 	}
 
 	const alignSelfEnd = {
@@ -111,7 +115,7 @@ const GameActionsPanel = () => {
 			<div style={inlineContainerStyle}>
 				<div style={alignSelfEnd}>
 					{isGameStarted ? (
-						isGameOver ? (
+						isGameOver !== StatusGame.PLAYING ? (
 							isHost && (
 								<RedButton
 									textContent="Restart"

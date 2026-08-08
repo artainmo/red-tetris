@@ -7,6 +7,7 @@ import {
 	smallWhiteStyle,
 	redStyle,
 } from '../../style/containersStyle'
+import { StatusGame } from '../../utils/statusGame'
 
 const GameStatsPanel = () => {
 	const gameTime = useSelector((state) => state.gameTime.currentTime)
@@ -33,9 +34,14 @@ const GameStatsPanel = () => {
 					<p style={smallWhiteStyle}>SCORE</p>
 					<p style={smallWhiteStyle}>{gameScore}</p>
 				</div>
-				{isGameOver && (
+				{isGameOver == StatusGame.GAME_OVER && (
 					<div style={stackedContainerStyle}>
 						<p style={redStyle}>GAME OVER</p>
+					</div>
+				)}
+				{isGameOver == StatusGame.WINNER && (
+					<div style={stackedContainerStyle}>
+						<p style={redStyle}>YOU WIN!</p>
 					</div>
 				)}
 			</div>

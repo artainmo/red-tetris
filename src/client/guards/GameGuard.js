@@ -15,7 +15,12 @@ const GameGuard = () => {
 	const socket = useSelector((state) => state.socket?.socket)
 
 	useEffect(() => {
-		console.log('🧠 GameGuard mounted')
+		try {
+			dispatch(resetGameplayAndEmit())
+		} catch (error) {
+			console.error('Error occurred while resetting gameplay:', error)
+		}
+		dispatch(resetAllOpponents())
 		return () => console.log('💀 GameGuard unmounted')
 	}, [])
 

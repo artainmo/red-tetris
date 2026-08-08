@@ -24,14 +24,23 @@ class database {
 	}
 
 	async createDatabase() {
-		const client = new Client(this._credentials)
-		await client.connect()
-		const create_database_commands = await readFile(
-			__dirname + '/designDatabase.sql',
-			'utf8'
-		)
-		await client.query(create_database_commands)
-		await client.end() //close connection
+		try {
+			const client = new Client(this._credentials)
+			await client.connect()
+			const create_database_commands = await readFile(
+				__dirname + '/designDatabase.sql',
+				'utf8'
+			)
+			await client.query(create_database_commands)
+			await client.end() //close connection
+		} catch (err) {
+			if (err.code === '42P07') {
+				console.log('Database already exists.')
+			} else {
+				console.log('Create failed:', err.message, err.code)
+				throw err
+			}
+		}
 	}
 
 	async destroy_database() {

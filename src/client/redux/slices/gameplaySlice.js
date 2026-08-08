@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-
+import { StatusGame } from '../../utils/statusGame'
 import { updateScreenAndScore } from '../../api/socket.api'
 
 export const EmitGridAndScore = () => (dispatch, getState) => {
@@ -37,7 +37,7 @@ const gameplaySlice = createSlice({
 		orientation: 0,
 		nextOrientation: 0,
 		isInContact: false,
-		isGameOver: false,
+		isGameOver: StatusGame.PLAYING,
 		score: 0,
 	},
 	reducers: {
@@ -75,7 +75,7 @@ const gameplaySlice = createSlice({
 			state.orientation = 0
 			state.nextOrientation = 0
 			state.isInContact = false
-			state.isGameOver = false
+			state.isGameOver = StatusGame.PLAYING
 		},
 		resetGameplay: (state) => {
 			console.log('resetGameplay')
@@ -85,7 +85,7 @@ const gameplaySlice = createSlice({
 			state.orientation = 0
 			state.nextOrientation = 0
 			state.isInContact = false
-			state.isGameOver = false
+			state.isGameOver = StatusGame.PLAYING
 		},
 		resetGameplayAndScore: (state) => {
 			console.log('resetGameplayAndScore')
@@ -95,7 +95,7 @@ const gameplaySlice = createSlice({
 			state.orientation = 0
 			state.nextOrientation = 0
 			state.isInContact = false
-			state.isGameOver = false
+			state.isGameOver = StatusGame.PLAYING
 			state.score = 0
 		},
 	},

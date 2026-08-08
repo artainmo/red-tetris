@@ -132,6 +132,17 @@ class Game {
 		return this
 	}
 
+	restartGame() {
+		this.#finished = false
+		this.#locked = false
+		this.#piece = new Piece()
+		for (const player of this.#players) {
+			player.hasLost = false
+			player.score = 0
+		}
+		return this
+	}
+
 	allPlayersLost() {
 		for (const player of this.#players) {
 			if (!player.hasLost) {
@@ -139,6 +150,25 @@ class Game {
 			}
 		}
 		return true
+	}
+
+	onePlayerRemain() {
+		let remainingPlayers = 0
+		for (const player of this.#players) {
+			if (!player.hasLost) {
+				remainingPlayers++
+			}
+		}
+		return remainingPlayers === 1
+	}
+
+	getRemainingPlayer() {
+		for (const player of this.#players) {
+			if (!player.hasLost) {
+				return player
+			}
+		}
+		return null
 	}
 
 	async endGame(db) {

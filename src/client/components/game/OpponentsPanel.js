@@ -26,6 +26,7 @@ export default function OpponentsPanel() {
 					</h4>
 					<Panel grid={opponent.grid} size={0.5} isOpponent={true} />
 					<p style={smallWhiteStyle}>Score: {opponent.score}</p>
+					{opponent.isGameOver && <p style={smallWhiteStyle}>Game Over</p>}
 				</div>
 			)
 		})
