@@ -12,13 +12,15 @@ const SmallButton = ({ textContent, onClick }) => {
 		fontSize: '14px',
 		lineHeight: '27px',
 		textDecoration: 'none',
+		whiteSpace: 'nowrap',
 		margin: 0,
 	}
 
 	const buttonStyle = {
 		backgroundColor: isHovered ? colors.backgroundDarkGrey : colors.white,
-		width: '70px',
+		minWidth: '70px',
 		height: '30px',
+		padding: '0 16px',
 		borderRadius: '25px',
 		boxSizing: 'border-box',
 		display: 'flex',
