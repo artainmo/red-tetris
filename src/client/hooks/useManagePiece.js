@@ -14,7 +14,7 @@ import {
 } from '../redux/slices/gameplaySlice'
 import { incrementIndexFun } from '../redux/slices/pieceSlice'
 import { pauseGame } from '../redux/slices/gameTimeSlice'
-import { looseGame } from '../api/socket.api'
+import { loseGame } from '../api/socket.api'
 import { StatusGame } from '../utils/statusGame'
 
 const useManagePiece = (width, height) => {
@@ -53,7 +53,7 @@ const useManagePiece = (width, height) => {
 			dispatch(setIsGameOver(StatusGame.GAME_OVER))
 
 			dispatch(pauseGame())
-			looseGame(socket)
+			loseGame(socket)
 			return false
 		}
 		return true

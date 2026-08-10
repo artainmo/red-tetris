@@ -668,7 +668,7 @@ describe('Socket.IO flows', () => {
 			.catch(done)
 	})
 
-	test("Emitting 'looseGame' broadcasts 'playerLost' to room", (done) => {
+	test("Emitting 'loseGame' broadcasts 'playerLost' to room", (done) => {
 		const roomId = 'room-lose' //Name of the room for this test.
 		const userA = usernameFor(roomId, 'A')
 		const userB = usernameFor(roomId, 'B')
@@ -694,7 +694,7 @@ describe('Socket.IO flows', () => {
 				socketA.on('connect', () => {
 					socketA.emit('joinRoom', { roomId, username: userA }, () => {
 						ready += 1
-						if (ready === 2) start() //If both player A and B joined, we call 'start()' for player A to emit 'looseGame'.
+						if (ready === 2) start() //If both player A and B joined, we call 'start()' for player A to emit 'loseGame'.
 					})
 				})
 				socketB.on('connect', () => {
@@ -704,7 +704,7 @@ describe('Socket.IO flows', () => {
 					})
 				})
 
-				//Player B listens for the broadcast he should receive after player A emits 'looseGame'.
+				//Player B listens for the broadcast he should receive after player A emits 'loseGame'.
 				socketB.on('playerLost', (data) => {
 					try {
 						expect(data).toHaveProperty('player', userA)
@@ -716,9 +716,9 @@ describe('Socket.IO flows', () => {
 					}
 				})
 
-				//Player A emits 'looseGame' to the server who should broadcast 'playerLost' to the room.
+				//Player A emits 'loseGame' to the server who should broadcast 'playerLost' to the room.
 				function start() {
-					socketA.emit('looseGame')
+					socketA.emit('loseGame')
 					setTimeout(() => {}, 1000) //We use timeout to fail the test if B doesn't receive the broadcast.
 				}
 			})
@@ -827,7 +827,7 @@ describe('Socket.IO flows', () => {
 				socketA.on('connect', () => {
 					socketA.emit('joinRoom', { roomId, username: userA }, () => {
 						ready += 1
-						if (ready === 2) start() //If both player A and B joined, we call 'start()' for all players of the room to emit 'looseGame'.
+						if (ready === 2) start() //If both player A and B joined, we call 'start()' for all players of the room to emit 'loseGame'.
 					})
 				})
 				socketB.on('connect', () => {
@@ -837,10 +837,10 @@ describe('Socket.IO flows', () => {
 					})
 				})
 
-				//All players of the room emit 'looseGame' to the server who should broadcast 'updateScore'.
+				//All players of the room emit 'loseGame' to the server who should broadcast 'updateScore'.
 				function start() {
-					socketA.emit('looseGame')
-					setTimeout(() => socketB.emit('looseGame'), 200)
+					socketA.emit('loseGame')
+					setTimeout(() => socketB.emit('loseGame'), 200)
 				}
 
 				//Function to assert the 'updateScore' broadcast.
@@ -1932,8 +1932,8 @@ describe('Client API layer (src/client/api) against the real live server', () =>
 										//A both loses (triggers 'updateScore', since that makes every player have
 										//lost) and then leaves as host (triggers 'playerLeft' + 'newHost', since B
 										//is promoted). A also sends B the 'nextGame' payload, covering 'listenNextGame'.
-										socketApiClient.looseGame(socketA)
-										socketB.emit('looseGame') //B also has to lose for the server to consider "all players lost".
+										socketApiClient.loseGame(socketA)
+										socketB.emit('loseGame') //B also has to lose for the server to consider "all players lost".
 										socketApiClient.sendNextGame(socketA, roomId, {
 											winner: userB,
 										})

@@ -305,7 +305,7 @@ io.on('connection', async (socket) => {
 			.emit('playerGameOver', { player: socket.userId })
 	})
 
-	socket.on('looseGame', async () => {
+	socket.on('loseGame', async () => {
 		const roomId = socketToGame.get(socket.id)
 		if (!roomId) {
 			return
