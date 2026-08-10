@@ -725,6 +725,80 @@ describe('Socket.IO flows', () => {
 			.catch(done)
 	})
 
+	test("leaving a started room mid-match persists the departing player's score even though another player remains (regression: the multiplayer persistence gap - previously a player's score only got saved once EVERY player had left)", (done) => {
+		const roomId = 'room-leave-persist'
+		const userA = usernameFor(roomId, 'A')
+		const userB = usernameFor(roomId, 'B')
+
+		//Prevents socket leaks.
+		const cleanup = () => {
+			if (socketA && socketA.connected) socketA.disconnect()
+			if (socketB && socketB.connected) socketB.disconnect()
+		}
+
+		Promise.all([authenticate(userA), authenticate(userB)])
+			.then(([tokenA, tokenB]) => {
+				//Create two socket connections for the two players.
+				socketA = ioClient(BASE_URL, { ...opts, auth: { token: tokenA } })
+				socketB = ioClient(BASE_URL, { ...opts, auth: { token: tokenB } })
+
+				//If either socket connection fails, the test fails.
+				socketA.on('connect_error', (err) => done(err))
+				socketB.on('connect_error', (err) => done(err))
+
+				let ready = 0 //Track how many players joined the room.
+				socketA.on('connect', () => {
+					socketA.emit('joinRoom', { roomId, username: userA }, () => {
+						ready += 1
+						if (ready === 2) start() //A joined first, so A is the host and starts the game.
+					})
+				})
+				socketB.on('connect', () => {
+					socketB.emit('joinRoom', { roomId, username: userB }, () => {
+						ready += 1
+						if (ready === 2) start()
+					})
+				})
+
+				function start() {
+					socketA.emit('startGame') //Locks the room - see 'Game.locked' in app.js's 'leaveRoom'.
+					setTimeout(() => {
+						socketA.emit('updateScreenAndScore', {
+							structure: Array(20)
+								.fill()
+								.map(() => Array(10).fill(0)),
+							score: 77,
+						})
+						setTimeout(() => {
+							//A leaves while B is still connected and in the room (room stays non-empty), then
+							//waits for the server's ack before checking the DB - see socket.api.js/app.js.
+							socketA.emit('leaveRoom', () => {
+								db.query(
+									'SELECT score FROM player WHERE username = $1 AND game_id = $2',
+									[userA, roomId]
+								)
+									.then((result) => {
+										try {
+											expect(result.rows[0]).toMatchObject({ score: 77 })
+											cleanup()
+											done()
+										} catch (err) {
+											cleanup()
+											done(err)
+										}
+									})
+									.catch((err) => {
+										cleanup()
+										done(err)
+									})
+							})
+						}, 100)
+					}, 100)
+				}
+			})
+			.catch(done)
+	})
+
 	test("when all players lose, 'updateScore' is broadcast to room", (done) => {
 		const roomId = 'room-lose-all' //Name of the room for this test.
 		const userA = usernameFor(roomId, 'A')
@@ -953,6 +1027,18 @@ describe('Server classes (Game, Player, User, Utils, database)', () => {
 			expect(game.addPlayer('p1')).toBe(false)
 		})
 
+		test('restartGame resets round state but does not unlock the game (regression: a started/finished game must stay out of "active rooms" instead of reappearing as joinable)', () => {
+			const game = new Game('unit-game-2b')
+			game.addPlayer('p1')
+			game.lockGame()
+			game.players[0].score = 42
+			game.players[0].hasLost = true
+			game.restartGame()
+			expect(game.locked).toBe(true) //Locking is owned by the caller (see 'startGame' in app.js); restarting a round must not silently reopen the room.
+			expect(game.players[0].score).toBe(0)
+			expect(game.players[0].hasLost).toBe(false)
+		})
+
 		test('removePlayer reassigns the host to the next player, and marks the game finished once empty', () => {
 			const game = new Game('unit-game-3', false, false, 'host')
 			game.addPlayer('host')
@@ -1037,6 +1123,35 @@ describe('Server classes (Game, Player, User, Utils, database)', () => {
 				game_id: gameId,
 				score: 0,
 			})
+		})
+
+		test("setDB can be called more than once for the same room without throwing, and keeps each player's latest score (regression: the multiplayer persistence gap - 'setDB' is now called once per round/leave, not just once ever)", async () => {
+			const hostUsername = 'unithostgame2'
+			const gameId = 'unit-game-db-multi'
+			await db.query(
+				'INSERT INTO account (username) VALUES ($1) ON CONFLICT DO NOTHING',
+				[hostUsername]
+			)
+
+			const game = new Game(gameId, false, false, hostUsername)
+			game.addPlayer(hostUsername)
+			game.lockGame() //Simulates a started room, same as 'startGame' does in app.js.
+			game.players[0].score = 10
+			await game.setDB(db) //First sync, e.g. as soon as this player's round ends.
+
+			game.players[0].score = 42
+			await expect(game.setDB(db)).resolves.toBe(game) //Second sync, e.g. once this player leaves.
+
+			const playerRow = await db.query(
+				'SELECT * FROM player WHERE username = $1 AND game_id = $2',
+				[hostUsername, gameId]
+			)
+			expect(playerRow.rows[0]).toMatchObject({ score: 42 }) //Latest score wins, no duplicate-key error.
+
+			const gameRow = await db.query('SELECT * FROM game WHERE id = $1', [
+				gameId,
+			])
+			expect(gameRow.rows).toHaveLength(1) //Still exactly one 'game' row for this room id.
 		})
 	})
 
@@ -1646,6 +1761,28 @@ describe('Client API layer (src/client/api) against the real live server', () =>
 								username
 							)
 							socketApiClient.leaveRoom(socket)
+							socket.disconnect()
+							done()
+						})
+						.catch(done)
+				})
+			})
+			.catch(done)
+	})
+
+	test('socket.api leaveRoom() resolves only once the server acks (regression: callers must be able to wait for the leave, and its score-persisting DB write, before trusting freshly-fetched scores)', (done) => {
+		const roomId = 'room-capi-ack'
+		const username = usernameFor(roomId, 'CA')
+
+		authenticate(username)
+			.then((token) => {
+				const socket = socketApiClient.connect(token)
+				socket.on('connect_error', done)
+				socket.on('connect', () => {
+					socketApiClient
+						.joinRoom(username, socket, roomId)
+						.then(() => socketApiClient.leaveRoom(socket)) //Would hang/time out if the server never called the ack.
+						.then(() => {
 							socket.disconnect()
 							done()
 						})

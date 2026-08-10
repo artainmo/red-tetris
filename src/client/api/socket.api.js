@@ -88,7 +88,11 @@ export const requestPieceBasket = (socket) => {
 
 export const leaveRoom = (socket) => {
 	console.log('Leaving room')
-	socket.emit('leaveRoom')
+	//Resolves once the server acks that 'leaveRoom' (and the DB write it can trigger when the room
+	//becomes empty) has finished, so callers can wait for it before trusting freshly-fetched scores.
+	return new Promise((resolve) => {
+		socket.emit('leaveRoom', () => resolve())
+	})
 }
 
 export const listenPlayerLeft = (socket, onPlayerLeft) => {

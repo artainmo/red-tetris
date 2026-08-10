@@ -45,8 +45,14 @@ class Player {
 	}
 
 	async setDB(db) {
+		//'ON CONFLICT DO UPDATE' makes this idempotent: 'Game.setDB' can now be called several times over
+		//a room's life (whenever a round ends or a player leaves, not just once the room is fully empty -
+		//see 'app.js'), and each call just syncs this player's latest score into their one row for this
+		//room instead of failing on the '(username, game_id)' primary key.
 		await db.query(
-			'INSERT INTO player (username, game_id, score) VALUES ($1, $2, $3) RETURNING *',
+			`INSERT INTO player (username, game_id, score) VALUES ($1, $2, $3)
+			ON CONFLICT (username, game_id) DO UPDATE SET score = EXCLUDED.score
+			RETURNING *`,
 			[this.#username, this.#game_id, this.#score]
 		)
 		return this

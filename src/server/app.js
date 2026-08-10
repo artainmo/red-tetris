@@ -147,9 +147,17 @@ const leaveRoom = async (socket) => {
 			isGameOver: true,
 		})
 	}
+	//Once a game has actually started ('locked'), persist scores as soon as ANY player leaves - not just
+	//once the room becomes fully empty - so a player who quits mid-match while others keep playing still
+	//shows up in "your scores"/"best scores" right away instead of waiting on everyone else. For a lobby
+	//that never started, keep the old behavior of only persisting once it's fully abandoned (`game.setDB`
+	//is idempotent either way - see 'Game.js' - so calling it again later, e.g. once the room does empty
+	//out, just re-syncs the same rows).
+	if (game.locked || game.players.length === 0) {
+		await game.setDB(db)
+	}
 	if (game.players.length === 0) {
 		console.log(`Game ${game.id} deleted as it became empty`)
-		await game.setDB(db)
 		activeGames.delete(game.id)
 	}
 }
@@ -246,8 +254,13 @@ io.on('connection', async (socket) => {
 		}
 	})
 
-	socket.on('leaveRoom', async () => {
+	socket.on('leaveRoom', async (callback) => {
 		await leaveRoom(socket)
+		//Ack so callers (e.g. the client navigating back to the main menu) can wait for the room's
+		//score-persisting DB write to finish before they fetch/display scores - see 'setDB' above.
+		if (typeof callback === 'function') {
+			callback()
+		}
 	})
 
 	socket.on('startGame', async () => {
@@ -309,7 +322,8 @@ io.on('connection', async (socket) => {
 			score: game.players.find((p) => p.username === socket.userId).score,
 			isGameOver: false,
 		})
-		if (game.players.length > 1 && game.onePlayerRemain()) {
+		const isSoleWinnerDecided = game.players.length > 1 && game.onePlayerRemain()
+		if (isSoleWinnerDecided) {
 			const remainingPlayer = game.getRemainingPlayer()
 			console.log(
 				`Player ${remainingPlayer.username} is the winner of game ${roomId}`
@@ -319,6 +333,13 @@ io.on('connection', async (socket) => {
 				score: remainingPlayer.score,
 				isGameOver: true,
 			})
+		}
+		//Persist every player's current score for this room as soon as the round is actually decided
+		//(everyone has lost, or exactly one winner remains) - not only once players eventually leave the
+		//room. Otherwise a host clicking "Restart" (which zeroes scores in memory, see
+		//'Game.restartGame') could wipe a round's score before it was ever saved.
+		if (game.allPlayersLost() || isSoleWinnerDecided) {
+			await game.setDB(db)
 		}
 	})
 

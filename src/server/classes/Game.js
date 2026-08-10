@@ -44,14 +44,20 @@ class Game {
 	}
 
 	async setDB(db) {
+		//'ON CONFLICT DO UPDATE' makes this safe to call repeatedly for the same room (its 'id' is the
+		//primary key) - e.g. once per round as it ends, and again whenever a player leaves - instead of
+		//only once when the room becomes fully empty. That way a player's score is persisted as soon as
+		//their own match is decided, instead of staying invisible in "your scores"/"best scores" for as
+		//long as other players keep playing in the same room.
 		await db.query(
-			'INSERT INTO game (id, locked, finished, host) VALUES ($1, $2, $3, $4) RETURNING *',
+			`INSERT INTO game (id, locked, finished, host) VALUES ($1, $2, $3, $4)
+			ON CONFLICT (id) DO UPDATE SET locked = EXCLUDED.locked, finished = EXCLUDED.finished`,
 			[this.#id, this.#locked, this.#finished, this.#host]
 		)
 		for (const player of this.#historicalPlayers) {
 			await player.setDB(db)
 		}
-		console.log(`Game ${this.#id} created in database.`)
+		console.log(`Game ${this.#id} synced to database.`)
 		return this
 	}
 
@@ -134,7 +140,6 @@ class Game {
 
 	restartGame() {
 		this.#finished = false
-		this.#locked = false
 		this.#piece = new Piece()
 		for (const player of this.#players) {
 			player.hasLost = false
