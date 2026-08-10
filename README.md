@@ -1,6 +1,6 @@
 # red-tetris
 
-42 school [subject](https://cdn.intra.42.fr/pdf/pdf/170191/en.subject.pdf).
+42 school [subject](https://cdn.intra.42.fr/pdf/pdf/211256/en.subject.pdf).
 
 The **front-end** must be a **single-page-application** and we must use **functions (functional programming)** instead of classes (object-oriented-programming).<br>
 We will use the framework **React** with library Redux.<br>
