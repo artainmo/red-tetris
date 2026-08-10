@@ -97,6 +97,7 @@ const {
 	gameStarted,
 	setNewHost,
 	joinRoomThunk,
+	clearRoomError,
 } = require('../client/redux/slices/roomSlice')
 
 const socketSlice = require('../client/redux/slices/socketSlice').default
@@ -1641,6 +1642,17 @@ describe('Client redux slices', () => {
 			const stateErr = reducer(undefined, rejected)
 			expect(stateErr.error).toBe('Could not join the room')
 		})
+
+		test('clearRoomError resets the error field to null (used once the user edits the room name again)', () => {
+			const rejected = {
+				type: joinRoomThunk.rejected.type,
+				payload: 'Could not join the room',
+			}
+			let state = reducer(undefined, rejected)
+			expect(state.error).toBe('Could not join the room')
+			state = reducer(state, clearRoomError())
+			expect(state.error).toBeNull()
+		})
 	})
 
 	describe('socketSlice (reducers, and socketConnectThunk against the real live server)', () => {
@@ -1765,6 +1777,50 @@ describe('Client API layer (src/client/api) against the real live server', () =>
 							done()
 						})
 						.catch(done)
+				})
+			})
+			.catch(done)
+	})
+
+	test("socket.api joinRoom() rejects with the server's real message when the room id matches a previously-finished game (regression: the frontend couldn't display this - it read the wrong response field and fell back to 'Unknown socket error')", (done) => {
+		const roomId = 'room-finished'
+		const hostUsername = usernameFor(roomId, 'H')
+		const joinerUsername = usernameFor(roomId, 'J')
+
+		db.query(
+			'INSERT INTO account (username) VALUES ($1) ON CONFLICT DO NOTHING',
+			[hostUsername]
+		)
+			.then(() =>
+				//A 'game' row already exists for this room id, same as after a previous game finished.
+				db.query(
+					'INSERT INTO game (id, locked, finished, host) VALUES ($1, false, true, $2) ON CONFLICT (id) DO NOTHING',
+					[roomId, hostUsername]
+				)
+			)
+			.then(() => authenticate(joinerUsername))
+			.then((token) => {
+				const socket = socketApiClient.connect(token)
+				socket.on('connect_error', done)
+				socket.on('connect', () => {
+					socketApiClient
+						.joinRoom(joinerUsername, socket, roomId)
+						.then(() => {
+							socket.disconnect()
+							done(new Error('Expected joinRoom() to reject'))
+						})
+						.catch((err) => {
+							try {
+								expect(err.message).toBe(
+									'Could not join the room: Game with this ID is already finished'
+								)
+								socket.disconnect()
+								done()
+							} catch (assertionErr) {
+								socket.disconnect()
+								done(assertionErr)
+							}
+						})
 				})
 			})
 			.catch(done)

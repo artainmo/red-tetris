@@ -3,11 +3,13 @@ import { joinRoom, leaveRoom } from '../../api/socket.api'
 
 export const joinRoomThunk = createAsyncThunk(
 	'socket/joinRoomThunk',
-	({ username, userSocket, roomName }, { rejectWithValue }) => {
+	async ({ username, userSocket, roomName }, { rejectWithValue }) => {
 		try {
 			console.log('joinRoomThunk ', roomName)
-			const response = joinRoom(username, userSocket, roomName)
-			return response
+			//'joinRoom' is async, so it must be awaited here for its rejection (e.g. "Game with this ID is
+			//already finished") to land in this try/catch - without 'await' this returned a still-pending
+			//promise, so the catch below never ran and the real error was lost.
+			return await joinRoom(username, userSocket, roomName)
 		} catch (err) {
 			console.error('Error joinRoom:', err)
 			return rejectWithValue(
@@ -63,6 +65,9 @@ const roomSlice = createSlice({
 		setNewHost(state, action) {
 			state.host = action.payload
 		},
+		clearRoomError(state) {
+			state.error = null
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -89,5 +94,6 @@ export const {
 	playerJoined,
 	gameStarted,
 	setNewHost,
+	clearRoomError,
 } = roomSlice.actions
 export default roomSlice

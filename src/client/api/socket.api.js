@@ -31,7 +31,10 @@ export const joinRoom = async (username, socket, roomId) => {
 				if (response.success) {
 					resolve(response.data)
 				} else {
-					reject(new Error(response.error || 'Unknown socket error'))
+					//The server sends the failure reason as 'message' (see the 'joinRoom' socket handler in
+					//app.js), not 'error' - reading the wrong field silently dropped it in favor of the
+					//generic fallback below.
+					reject(new Error(response.message || 'Unknown socket error'))
 				}
 			}
 		)
