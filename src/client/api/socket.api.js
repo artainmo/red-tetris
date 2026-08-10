@@ -89,12 +89,15 @@ export const requestPieceBasket = (socket) => {
 	socket.emit('needPieceBasket')
 }
 
-export const leaveRoom = (socket) => {
+export const leaveRoom = (socket, roomId = null) => {
 	console.log('Leaving room')
 	//Resolves once the server acks that 'leaveRoom' (and the DB write it can trigger when the room
 	//becomes empty) has finished, so callers can wait for it before trusting freshly-fetched scores.
+	//'roomId' is the room this call is meant to leave - passing it lets the server ignore the request if
+	//this socket has since joined a different room (e.g. a late 'leaveRoom' from navigating away from a
+	//game, arriving after the user already created a new one) instead of tearing that new room down.
 	return new Promise((resolve) => {
-		socket.emit('leaveRoom', () => resolve())
+		socket.emit('leaveRoom', { roomId }, () => resolve())
 	})
 }
 

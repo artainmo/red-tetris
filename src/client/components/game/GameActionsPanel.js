@@ -96,7 +96,7 @@ const GameActionsPanel = () => {
 		//Wait for the server to finish persisting this game's score (see 'leaveRoom' in socket.api.js)
 		//before navigating away, so the main menu's score panels don't fetch too early and miss it.
 		if (socket) {
-			await leaveRoom(socket)
+			await leaveRoom(socket, roomId)
 		}
 		navigate('/main_menu')
 	}

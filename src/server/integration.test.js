@@ -773,7 +773,7 @@ describe('Socket.IO flows', () => {
 						setTimeout(() => {
 							//A leaves while B is still connected and in the room (room stays non-empty), then
 							//waits for the server's ack before checking the DB - see socket.api.js/app.js.
-							socketA.emit('leaveRoom', () => {
+							socketA.emit('leaveRoom', { roomId }, () => {
 								db.query(
 									'SELECT score FROM player WHERE username = $1 AND game_id = $2',
 									[userA, roomId]
@@ -796,6 +796,55 @@ describe('Socket.IO flows', () => {
 						}, 100)
 					}, 100)
 				}
+			})
+			.catch(done)
+	})
+
+	test("a stale 'leaveRoom' for an old room, arriving after the same socket already joined a new room, does not tear down the new room (regression: creating a game after having created a previous one could get the user instantly removed from it)", (done) => {
+		const oldRoomId = 'room-stale-old'
+		const newRoomId = 'room-stale-new'
+		const username = usernameFor(oldRoomId, 'S')
+
+		//Prevents socket leaks.
+		const cleanup = () => {
+			if (socketA && socketA.connected) socketA.disconnect()
+		}
+
+		authenticate(username)
+			.then((token) => {
+				socketA = ioClient(BASE_URL, { ...opts, auth: { token } })
+				socketA.on('connect_error', (err) => done(err))
+				socketA.on('connect', () => {
+					socketA.emit('joinRoom', { roomId: oldRoomId, username }, () => {
+						//Creating the second room leaves 'oldRoomId' first internally (see 'joinRoom' in
+						//app.js) - same as what happens when a user creates a second game from the menu.
+						socketA.emit('joinRoom', { roomId: newRoomId, username }, () => {
+							//A leave request for the OLD room now arrives late (e.g. a page navigation's
+							//cleanup, delayed) - it must be ignored, not tear down the room just joined.
+							socketA.emit('leaveRoom', { roomId: oldRoomId }, () => {
+								request
+									.get(`${REST_PREFIX}/joinablegames/`)
+									.expect(200)
+									.then((res) => {
+										try {
+											expect(res.body.some((g) => g.id === newRoomId)).toBe(
+												true
+											)
+											cleanup()
+											done()
+										} catch (err) {
+											cleanup()
+											done(err)
+										}
+									})
+									.catch((err) => {
+										cleanup()
+										done(err)
+									})
+							})
+						})
+					})
+				})
 			})
 			.catch(done)
 	})

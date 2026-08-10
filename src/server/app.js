@@ -115,9 +115,21 @@ app.get('*', (req, res) => {
 	res.sendFile('index.html', { root: path_to_bundled_files })
 })
 
-const leaveRoom = async (socket) => {
+//'expectedRoomId', when given, makes this a no-op unless the socket is still actually in that exact
+//room. Some callers (a page navigating away from a game) queue this leave from the room they were
+//viewing at the time, and by the time it's processed the same socket may have already joined a
+//DIFFERENT room (e.g. the player quickly created a new game) - without this check, a late/duplicate
+//leave would tear down that brand-new room instead of doing nothing, since 'socketToGame' only ever
+//tracks the CURRENT room per socket, not which specific room a given leave request was meant for.
+const leaveRoom = async (socket, expectedRoomId = null) => {
 	const gameId = socketToGame.get(socket.id)
 	if (!gameId) {
+		return
+	}
+	if (expectedRoomId && expectedRoomId !== gameId) {
+		console.log(
+			`Ignoring stale 'leaveRoom' for ${expectedRoomId} - socket ${socket.id} is now in ${gameId}`
+		)
 		return
 	}
 	socketToGame.delete(socket.id)
@@ -254,8 +266,10 @@ io.on('connection', async (socket) => {
 		}
 	})
 
-	socket.on('leaveRoom', async (callback) => {
-		await leaveRoom(socket)
+	socket.on('leaveRoom', async (data, callback) => {
+		//'data.roomId' is which room the caller believes it's leaving (see socket.api.js) - passing it
+		//through lets 'leaveRoom' ignore this request if the socket has since moved on to another room.
+		await leaveRoom(socket, data && data.roomId)
 		//Ack so callers (e.g. the client navigating back to the main menu) can wait for the room's
 		//score-persisting DB write to finish before they fetch/display scores - see 'setDB' above.
 		if (typeof callback === 'function') {

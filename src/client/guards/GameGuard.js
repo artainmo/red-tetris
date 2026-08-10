@@ -34,7 +34,12 @@ const GameGuard = () => {
 			console.log('Leaving game → cleanup')
 			dispatch(endGame())
 			dispatch(removeCurrentPiece())
-			if (socket) leaveRoom(socket)
+			//'/game/:room_id/:username' - read the room being left off the OLD path, not off redux state,
+			//since by the time this runs the user may already have created/joined a different room (this
+			//cleanup can lag behind that). Tagging the leave with the room it's actually meant for lets the
+			//server ignore it if it arrives late - see 'leaveRoom' in app.js.
+			const leavingRoomId = prev.pathname.split('/')[2] || null
+			if (socket) leaveRoom(socket, leavingRoomId)
 			dispatch(resetGameplayAndEmit())
 			dispatch(resetAllOpponents())
 		}
