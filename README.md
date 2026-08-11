@@ -32,8 +32,6 @@ Stop the app:
 make docker_down
 ```
 
-Make sure the containers are running (`make docker_up`) before refreshing the database or running tests below, since these commands need the `db` container.
-
 Refresh the database:
 ```
 make docker_refresh_database
