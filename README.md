@@ -98,6 +98,6 @@ make dev_back_front
 
 ## Bonus
 
-* Creation de [maquette](https://www.figma.com/design/EcSggVnGa2EQdxmYEQqPvL/Red-Tetris).
+* Creation of [mockup](https://www.figma.com/design/EcSggVnGa2EQdxmYEQqPvL/Red-Tetris).
 * Scoring system
 * Persistance of player scores.
